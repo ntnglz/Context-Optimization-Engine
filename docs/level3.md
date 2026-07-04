@@ -182,7 +182,9 @@ Casos de test: incluir bundles donde N3 aporta deduplicación relacional (p. ej.
 
 ## Siguiente nivel
 
-→ [level4.md](level4.md) — grafo del bundle (spec en revisión)
+→ [level4.md](level4.md) — grafo del bundle ✅ spec aprobada
+
+→ [level5.md](level5.md) — estado semántico (spec en revisión)
 
 ## Preguntas abiertas
 

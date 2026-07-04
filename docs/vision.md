@@ -21,7 +21,8 @@ En [Prompt-Compression-Middleware](https://github.com/ntnglz/Prompt-Compression-
 | [level1.md](level1.md) | Spec N1 ✅ aprobado |
 | [level2.md](level2.md) | Spec N2 ✅ aprobado |
 | [level3.md](level3.md) | Spec N3 ✅ aprobado |
-| [level4.md](level4.md) – [level5.md](level5.md) | Specs N4–N5 (en revisión) |
+| [level4.md](level4.md) | Spec N4 ✅ aprobado |
+| [level5.md](level5.md) | Spec N5 (en revisión) |
 | `src/coe/level1/` | Implementación Nivel 1 |
 | `data/examples/level1_acme.json` | Ejemplo ACME |
 
