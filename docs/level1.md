@@ -6,6 +6,32 @@
 
 Implementación determinista del Nivel 1: detectar líneas idénticas (tras normalización) que aparecen en **≥2 bloques de contexto** y extraerlas a hechos compartidos con referencias, sin eliminar información.
 
+## Naturaleza del procesado
+
+| Aspecto | Nivel 1 |
+|---------|---------|
+| **Persistencia** | No. Stateless: procesa la entrada del turno y devuelve salida al pipeline. No guarda estado entre invocaciones. |
+| **Tipo de matching** | **Sintáctico**, no semántico |
+| **Unidad** | Línea completa (no párrafos ni frases sueltas) |
+
+El matching es **sintáctico**: dos líneas se consideran duplicadas solo si, tras normalizar espacios y mayúsculas, son **idénticas carácter a carácter**. No se detecta la misma idea expresada con otras palabras, ni variaciones leves del texto.
+
+**Sí se deduplica** (misma línea, distinto bloque):
+
+```
+Empresa: ACME     ↔     empresa: acme
+```
+
+**No se deduplica** (equivalente semántico, texto distinto):
+
+```
+Empresa: ACME     ✗     La empresa es ACME
+Cliente: Globex   ✗     Cliente = Globex
+Presupuesto: 50k  ✗     Presupuesto de 50.000 €
+```
+
+La deduplicación semántica o por similitud queda fuera del alcance de N1; niveles posteriores o técnicas distintas podrían abordarla.
+
 ## Entrada / salida
 
 **Entrada:** lista de `ContextBlock(id, content)`.
@@ -54,13 +80,14 @@ Parámetro `min_occurrences=2` (por defecto): mínimo de bloques distintos donde
 
 ## Reglas de matching
 
-- Comparación **case-insensitive** tras normalizar espacios.
+- Comparación **sintáctica**: igualdad de línea tras `strip`, colapso de espacios y **case-insensitive** (`casefold`).
 - Una línea repetida solo dentro del **mismo** bloque no se extrae (no es redundancia inter-bloque).
 - Si no hay hechos compartidos, la salida conserva el contexto original sin reformatear.
 
 ## Límites del prototipo
 
-- Solo duplicados **exactos** a nivel de línea (no similitud semántica).
+- Solo duplicados **exactos** a nivel de línea; **sin** similitud semántica, embeddings ni fuzzy matching.
+- Sin persistencia ni estado entre peticiones (stateless).
 - Sin integración MCP ni pipeline PCM todavía.
 - Conteo de tokens aproximado (`len(text) // 4`).
 
