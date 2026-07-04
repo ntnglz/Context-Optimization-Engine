@@ -14,7 +14,8 @@ Contexto bruto (N bloques)  →  COE  →  Representación compacta  →  LLM
 | [Índice docs](docs/vision.md) | ✅ |
 | [Diseño global](docs/architecture.md) | ✅ |
 | [Pipeline N1–N5](docs/levels.md) | 📝 Specs en revisión |
-| [L0 + i18n](docs/l0-ingest.md) | 📝 Spec (sin implementar) |
+| [Multilingüe (i18n)](docs/i18n.md) | ✅ Aprobado |
+| [L0 Ingest](docs/l0-ingest.md) | 📝 En revisión |
 | [Nivel 1 — spec](docs/level1.md) | ✅ Aprobado |
 | [Nivel 2 — spec](docs/level2.md) | ✅ Aprobado |
 | Nivel 1 — implementación | ✅ Prototipo |

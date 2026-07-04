@@ -6,11 +6,12 @@
 
 COE aplica **transformaciones composables** sobre el contexto. **L0** (Ingest) precede a los niveles N1–N5 y **no es un nivel de optimización**: unifica idioma antes de comprimir.
 
-## Etapa previa: L0
+## Specs transversales
 
-| Etapa | Nombre | Spec | Estado |
-|-------|--------|------|--------|
-| **L0** | Normalización de idioma (Ingest) | [l0-ingest.md](l0-ingest.md) | 📝 Spec (sin implementar) |
+| Documento | Contenido | Estado |
+|-----------|-----------|--------|
+| [i18n.md](i18n.md) | Principios multilingües, `target_lang`, locale packs | ✅ Aprobado |
+| [l0-ingest.md](l0-ingest.md) | Normalización de idioma (Ingest) | 📝 En revisión |
 
 ## Specs operativas N1–N5
 
@@ -81,7 +82,8 @@ flowchart LR
 
 1. ✅ N1 — aprobado  
 2. ✅ N2 — aprobado  
-3. L0 + [i18n.md](i18n.md) — en revisión  
-4. N3 → N4 → N5  
+3. ✅ [i18n.md](i18n.md) — aprobado  
+4. [l0-ingest.md](l0-ingest.md) — en revisión  
+5. N3 → N4 → N5  
 4. Revisión cruzada pipeline + [architecture.md](architecture.md)  
 5. Implementación etapa a etapa  

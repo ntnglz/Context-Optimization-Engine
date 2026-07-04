@@ -14,8 +14,8 @@ En [Prompt-Compression-Middleware](https://github.com/ntnglz/Prompt-Compression-
 |-----------|-----------|
 | [Context Optimization Engine (COE).md](Context%20Optimization%20Engine%20(COE).md) | Visión fundacional (canónica) |
 | [architecture.md](architecture.md) | Diseño global: piezas, relaciones, roadmap de implementación |
-| [i18n.md](i18n.md) | Multilingüe: `target_lang`, locale packs, traducción pre-N1 |
-| [l0-ingest.md](l0-ingest.md) | Spec L0 — normalización de idioma (Ingest) |
+| [i18n.md](i18n.md) | Multilingüe: `target_lang`, locale packs ✅ aprobado |
+| [l0-ingest.md](l0-ingest.md) | Spec L0 — normalización de idioma 📝 en revisión |
 | [levels.md](levels.md) | Índice del pipeline L0 → N1–N5 |
 | [review-checklist.md](review-checklist.md) | Revisión cruzada al aprobar specs |
 | [level1.md](level1.md) | Spec N1 ✅ aprobado |

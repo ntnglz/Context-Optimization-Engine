@@ -1,6 +1,6 @@
 # Checklist de revisión al aprobar specs
 
-Usar **después** de revisar una spec de nivel (o L0) y **antes** del commit de aprobación. Objetivo: detectar desviaciones de la [visión fundacional](Context%20Optimization%20Engine%20(COE).md) por centrarse en soluciones puntuales.
+Usar **después** de revisar una spec de nivel, **L0**, o documento transversal (**i18n**) y **antes** del commit de aprobación. Objetivo: detectar desviaciones de la [visión fundacional](Context%20Optimization%20Engine%20(COE).md) por centrarse en soluciones puntuales.
 
 ## Preguntas obligatorias
 
