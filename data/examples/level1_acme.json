@@ -1,0 +1,8 @@
+{
+  "description": "Ejemplo Nivel 1 (caso ACME descrito en PCM/Context Optimization Engine (COE).md)",
+  "blocks": [
+    {"id": "A", "content": "Empresa: ACME\nCliente: Globex"},
+    {"id": "B", "content": "Empresa: ACME\nPresupuesto: 50k"},
+    {"id": "C", "content": "Empresa: ACME\nCliente: Globex"}
+  ]
+}

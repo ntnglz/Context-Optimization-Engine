@@ -1,0 +1,98 @@
+# Context Optimization Engine (COE)
+
+Motor de optimización de contexto para sistemas basados en LLM. Complementa a [PCM](https://github.com/ntnglz/Prompt-Compression-Middleware): mientras PCM comprime **instrucciones**, COE optimiza el **conocimiento** (RAG, historial, herramientas, código).
+
+```
+Contexto bruto (N bloques)  →  COE  →  Representación compacta  →  LLM
+```
+
+## Estado
+
+| Componente | Estado |
+|------------|--------|
+| [Visión (en PCM)](docs/vision.md) | ✅ Enlace al doc canónico |
+| [Nivel 1 — spec](docs/level1.md) | ✅ |
+| Nivel 1 — implementación | ✅ Prototipo |
+| Nivel 2+ | Planificado |
+
+## Inicio rápido
+
+```bash
+git clone https://github.com/ntnglz/Context-Optimization-Engine.git
+cd Context-Optimization-Engine
+
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+
+# Demo con el ejemplo de la visión (documentos A, B, C)
+python run.py --demo
+
+# Tests
+python run.py --test
+```
+
+## Nivel 1 — Deduplicación
+
+Detecta líneas repetidas entre bloques de contexto y las extrae a hechos compartidos con referencias, sin eliminar información.
+
+```python
+from coe.level1 import deduplicate_context
+from coe.models import ContextBlock
+
+blocks = [
+    ContextBlock(id="A", content="Empresa: ACME\nCliente: Globex"),
+    ContextBlock(id="B", content="Empresa: ACME\nPresupuesto: 50k"),
+    ContextBlock(id="C", content="Empresa: ACME\nCliente: Globex"),
+]
+
+result = deduplicate_context(blocks)
+print(result.render())
+print(f"Ahorro: {result.compression_ratio:.1%}")
+```
+
+Salida:
+
+```
+Empresa=ACME
+Referencias: A, B, C
+
+Cliente=Globex
+Referencias: A, C
+
+[B]
+Presupuesto: 50k
+```
+
+## Estructura
+
+```
+Context-Optimization-Engine/
+├── docs/
+│   ├── vision.md           # Enlace al doc canónico en PCM (sin duplicar)
+│   └── level1.md           # Spec operativa del Nivel 1 en este repo
+├── src/coe/
+│   ├── models.py             # ContextBlock, DeduplicationResult
+│   └── level1/
+│       ├── deduplicator.py   # Nivel 1: eliminación de redundancias
+│       └── render.py         # Serialización legible para LLM
+├── data/examples/
+│   └── level1_acme.json      # Ejemplo ACME (definido en PCM)
+├── tests/
+│   └── test_level1.py
+└── run.py
+```
+
+## Relación con PCM
+
+La visión global de COE vive en PCM: [Context Optimization Engine (COE).md](https://github.com/ntnglz/Prompt-Compression-Middleware/blob/main/Context%20Optimization%20Engine%20(COE).md).
+
+Este repositorio contiene **solo la implementación COE** (empezando por Nivel 1). No se duplica documentación ni código de PCM.
+
+| Proyecto | Repo | Optimiza |
+|----------|------|----------|
+| **PCM** | [Prompt-Compression-Middleware](https://github.com/ntnglz/Prompt-Compression-Middleware) | Instrucción (`TASK=review …`) |
+| **COE** | este repo | Contexto (`Empresa=ACME` + refs) |
+
+## Licencia
+
+MIT (pendiente de formalizar)
