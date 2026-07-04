@@ -10,7 +10,9 @@ Contexto bruto (N bloques)  →  COE  →  Representación compacta  →  LLM
 
 | Componente | Estado |
 |------------|--------|
-| [Visión (en PCM)](docs/vision.md) | ✅ Enlace al doc canónico |
+| [Visión fundacional](docs/Context%20Optimization%20Engine%20(COE).md) | ✅ |
+| [Índice docs](docs/vision.md) | ✅ |
+| [Diseño global](docs/architecture.md) | ✅ |
 | [Nivel 1 — spec](docs/level1.md) | ✅ |
 | Nivel 1 — implementación | ✅ Prototipo |
 | Nivel 2+ | Planificado |
@@ -68,15 +70,17 @@ Presupuesto: 50k
 ```
 Context-Optimization-Engine/
 ├── docs/
-│   ├── vision.md           # Enlace al doc canónico en PCM (sin duplicar)
-│   └── level1.md           # Spec operativa del Nivel 1 en este repo
+│   ├── Context Optimization Engine (COE).md   # Visión fundacional (canónica)
+│   ├── vision.md           # Índice de documentación
+│   ├── architecture.md     # Diseño global: piezas y relaciones
+│   └── level1.md           # Spec operativa del Nivel 1
 ├── src/coe/
 │   ├── models.py             # ContextBlock, DeduplicationResult
 │   └── level1/
 │       ├── deduplicator.py   # Nivel 1: eliminación de redundancias
 │       └── render.py         # Serialización legible para LLM
 ├── data/examples/
-│   └── level1_acme.json      # Ejemplo ACME (definido en PCM)
+│   └── level1_acme.json      # Ejemplo ACME (documento fundacional)
 ├── tests/
 │   └── test_level1.py
 └── run.py
@@ -84,9 +88,7 @@ Context-Optimization-Engine/
 
 ## Relación con PCM
 
-La visión global de COE vive en PCM: [Context Optimization Engine (COE).md](https://github.com/ntnglz/Prompt-Compression-Middleware/blob/main/Context%20Optimization%20Engine%20(COE).md).
-
-Este repositorio contiene **solo la implementación COE** (empezando por Nivel 1). No se duplica documentación ni código de PCM.
+La visión de COE vive en [Context Optimization Engine (COE).md](docs/Context%20Optimization%20Engine%20(COE).md) (este repo). PCM es el proyecto complementario de compresión de instrucciones.
 
 | Proyecto | Repo | Optimiza |
 |----------|------|----------|

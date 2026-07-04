@@ -1,30 +1,27 @@
 # Visión de COE
 
-La visión conceptual, los niveles de optimización (1–5), CIR, métricas y la analogía con compiladores están documentados en el **repositorio predecesor PCM**, no se duplican aquí.
+## Documento fundacional
 
-## Documento canónico
+→ **[Context Optimization Engine (COE).md](Context%20Optimization%20Engine%20(COE).md)**
 
-→ [Context Optimization Engine (COE).md](https://github.com/ntnglz/Prompt-Compression-Middleware/blob/main/Context%20Optimization%20Engine%20(COE).md) en [Prompt-Compression-Middleware](https://github.com/ntnglz/Prompt-Compression-Middleware)
+Es la fuente canónica de la visión de este proyecto: motivación, objetivo, niveles de optimización (1–5), CIR, métricas, relación con PCM e hipótesis de investigación. **Se mantiene en este repositorio.**
 
-Copia local (si clonaste ambos repos en paralelo):
+En [Prompt-Compression-Middleware](https://github.com/ntnglz/Prompt-Compression-Middleware) hay una copia histórica como referencia en la visión global del ecosistema; no se actualiza allí.
 
-```
-../Prompt-Compression-Middleware/Context Optimization Engine (COE).md
-```
+## Resto de la documentación
 
-## Qué vive en este repositorio
-
-| Contenido | Ubicación |
+| Documento | Contenido |
 |-----------|-----------|
-| Visión y roadmap global | PCM (enlace arriba) |
-| Prototipo **Nivel 1** — deduplicación | `src/coe/level1/` |
-| Especificación operativa Nivel 1 | [level1.md](level1.md) |
-| Ejemplo de referencia | `data/examples/level1_acme.json` |
+| [Context Optimization Engine (COE).md](Context%20Optimization%20Engine%20(COE).md) | Visión fundacional (canónica) |
+| [architecture.md](architecture.md) | Diseño global: piezas, relaciones, roadmap de implementación |
+| [level1.md](level1.md) | Spec operativa del Nivel 1 |
+| `src/coe/level1/` | Implementación Nivel 1 |
+| `data/examples/level1_acme.json` | Ejemplo ACME |
 
-## Pipeline
+## Pipeline con PCM
 
 ```
 Usuario → PCM (instrucción) → COE (contexto) → LLM
 ```
 
-PCM y COE son complementarios. Cada uno mantiene su código y su documentación conceptual en su propio repositorio.
+PCM y COE son complementarios. Cada uno mantiene su código en su repositorio; la visión de COE vive aquí.

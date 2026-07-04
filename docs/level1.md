@@ -1,6 +1,6 @@
 # Nivel 1 — Eliminación de redundancias
 
-> Definición conceptual (ejemplo ACME, niveles superiores, CIR): ver el [documento de visión en PCM](https://github.com/ntnglz/Prompt-Compression-Middleware/blob/main/Context%20Optimization%20Engine%20(COE).md#nivel-1--eliminación-de-redundancias).
+> Definición conceptual (ejemplo ACME, niveles superiores, CIR): ver el [documento fundacional](Context%20Optimization%20Engine%20(COE).md#nivel-1--eliminación-de-redundancias).
 
 ## Objetivo en este repo
 
@@ -16,7 +16,7 @@ Implementación determinista del Nivel 1: detectar líneas idénticas (tras norm
 - `unique_blocks` — contenido que solo aparece en un bloque
 - métricas de tokens estimados
 
-Ejemplo (mismo caso que en PCM):
+Ejemplo (mismo caso que en el documento fundacional):
 
 | Bloque | Contenido |
 |--------|-----------|
