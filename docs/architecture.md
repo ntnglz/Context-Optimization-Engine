@@ -59,7 +59,8 @@ flowchart TB
     subgraph coe [Context Optimization Engine]
         GW[Gateway\nAPI / MCP / CLI]
         ING[Context Ingest\nmodelo de entrada]
-        NORM[Normalizer\nsegmentación y normalización]
+        L0[L0 Language norm.\ntarget_lang]
+        NORM[Normalizer\nsegmentación]
         PIPE[Optimization Pipeline\nN1 → N2 → … → N5]
         CIR[CIR\nrepresentación intermedia]
         REN[Renderer\nserialización para LLM]
@@ -70,7 +71,8 @@ flowchart TB
     SRC --> ING
     CLI --> GW
     GW --> ING
-    ING --> NORM
+    ING --> L0
+    L0 --> NORM
     NORM --> PIPE
     PIPE <--> CIR
     PIPE --> REN
@@ -85,7 +87,8 @@ flowchart TB
 | Pieza | Responsabilidad | Entrada | Salida | Estado |
 |-------|-----------------|---------|--------|--------|
 | **Gateway** | Punto de entrada unificado (librería, CLI, MCP, HTTP futuro) | Petición del cliente | Contexto optimizado + métricas | Parcial (`run.py`) |
-| **Context Ingest** | Normalizar fuentes heterogéneas a un modelo común | Texto, chunks RAG, tool output, etc. | `ContextBundle` / `ContextBlock[]` | Parcial (`ContextBlock`) |
+| **Context Ingest** | Normalizar fuentes heterogéneas a un modelo común; opcional **L0** idioma | Texto, chunks RAG, tool output, etc. | `ContextBundle` / `ContextBlock[]` | Parcial (`ContextBlock`) |
+| **L0 (Language norm.)** | Detectar idioma; traducir a `target_lang` **antes de N1** si hace falta | `ContextBlock[]` | `ContextBlock[]` en idioma base | Spec: [l0-ingest.md](l0-ingest.md) |
 | **Normalizer** | Partir contenido en unidades comparables (líneas, párrafos, nodos) | Bloques crudos | Unidades normalizadas | Parcial (dentro de N1) |
 | **Optimization Pipeline** | Aplicar niveles de optimización en cadena configurable | Unidades + metadatos | Estructura optimizada | N1 ✅, N2–N5 planificado |
 | **CIR** | Representación intermedia estable, optimizable y serializable | Salida de parser / pipeline | Árbol o grafo de contexto | Diseño (sin implementar) |
@@ -99,10 +102,11 @@ flowchart TB
 
 ### 4.1 Flujo principal (happy path)
 
-1. **Gateway** recibe contexto bruto y opciones (`levels=[1,2]`, `target_model`, presupuesto de tokens).
+1. **Gateway** recibe contexto bruto y opciones (`target_lang`, `locale`, `levels=[1,2]`, presupuesto de tokens).
 2. **Context Ingest** asigna `id`, `source_type` y metadatos a cada bloque.
-3. **Normalizer** prepara unidades atómicas para el pipeline (hoy: líneas).
-4. **Optimization Pipeline** ejecuta niveles habilitados en orden creciente de complejidad.
+3. **L0** (opcional) detecta idioma y traduce a `target_lang` sobre prosa natural — ver [l0-ingest.md](l0-ingest.md), [i18n.md](i18n.md).
+4. **Normalizer** prepara unidades atómicas para el pipeline (hoy: líneas; otros locales en packs).
+5. **Optimization Pipeline** ejecuta niveles habilitados en orden creciente de complejidad.
 5. En fases avanzadas, el pipeline lee/escribe **CIR** como artefacto central.
 6. **Renderer** materializa la salida en formato legible por el LLM.
 7. **Metrics** compara entrada y salida y adjunta el informe al Gateway.
@@ -112,6 +116,7 @@ flowchart TB
 ```
 Gateway
   └── Context Ingest
+        └── L0 Language normalization (opcional) → [l0-ingest.md](l0-ingest.md)
         └── Normalizer
               └── Optimization Pipeline
                     ├── Level 1 (deduplicación)
@@ -167,7 +172,7 @@ flowchart LR
 
 **Regla de composición:** cada nivel asume que el anterior ya eliminó la redundancia obvia de su capa. Se pueden activar subconjuntos (p. ej. solo N1, o N1+N2).
 
-Spec operativa del Nivel 1: [level1.md](level1.md).
+Specs operativas: [levels.md](levels.md) (índice) · [level1.md](level1.md) ✅ · [level2.md](level2.md) – [level5.md](level5.md)
 
 ---
 
@@ -181,8 +186,11 @@ ContextBundle
 │     ├── id: str
 │     ├── source_type: rag | history | tool | code | memory
 │     ├── content: str
+│     ├── detected_lang: str | None    # post-L0
 │     └── metadata: dict
-├── query_context: str | None      # consulta actual (relevancia futura)
+├── target_lang: str | None            # L0: en, zh, …
+├── locale: str | None                 # locale pack N2+ (en, zh, …)
+├── query_context: str | None
 └── options: OptimizeOptions
 
 OptimizeResult
@@ -210,6 +218,8 @@ from coe import optimize_context
 
 result = optimize_context(
     blocks=[...],
+    target_lang="en",      # L0: normalizar idioma antes de N1
+    locale="en",           # patrones N2+ (locale pack)
     levels=[1, 2],
     target_model="mistral-large",
 )
@@ -278,4 +288,7 @@ Orden sugerido para construir las piezas:
 |-----------|-----------|
 | [vision.md](vision.md) | Índice de documentación |
 | [Context Optimization Engine (COE).md](Context%20Optimization%20Engine%20(COE).md) | Visión fundacional (canónica) |
-| [level1.md](level1.md) | Spec operativa del Nivel 1 |
+| [levels.md](levels.md) | Pipeline L0 → N1–N5: contratos e integración |
+| [i18n.md](i18n.md) | Principios multilingües, locale packs, `target_lang` |
+| [l0-ingest.md](l0-ingest.md) | Spec L0 — normalización de idioma (pre-N1) |
+| [level1.md](level1.md) – [level5.md](level5.md) | Spec operativa por nivel |

@@ -11,8 +11,9 @@ Implementación determinista del Nivel 1: detectar líneas idénticas (tras norm
 | Aspecto | Nivel 1 |
 |---------|---------|
 | **Persistencia** | No. Stateless: procesa la entrada del turno y devuelve salida al pipeline. No guarda estado entre invocaciones. |
-| **Tipo de matching** | **Sintáctico**, no semántico |
+| **Tipo de matching** | **Sintáctico**, no semántico — **independiente del idioma** (Unicode; normalización neutral) |
 | **Unidad** | Línea completa (no párrafos ni frases sueltas) |
+| **Idioma** | Si [L0](l0-ingest.md) está activo, N1 recibe bloques ya en `target_lang`; ver [i18n.md](i18n.md) |
 
 El matching es **sintáctico**: dos líneas se consideran duplicadas solo si, tras normalizar espacios y mayúsculas, son **idénticas carácter a carácter**. No se detecta la misma idea expresada con otras palabras, ni variaciones leves del texto.
 
@@ -91,8 +92,8 @@ Parámetro `min_occurrences=2` (por defecto): mínimo de bloques distintos donde
 - Sin integración MCP ni pipeline PCM todavía.
 - Conteo de tokens aproximado (`len(text) // 4`).
 
-## Próximos pasos (COE)
+## Siguiente nivel
 
-1. Nivel 2 — factorización por entidad
-2. Integración MCP (`optimize_context`)
-3. Benchmark con contextos RAG reales
+→ [level2.md](level2.md) — factorización por entidad (spec en revisión)
+
+Índice del pipeline: [levels.md](levels.md)

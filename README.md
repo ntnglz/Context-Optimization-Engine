@@ -13,9 +13,11 @@ Contexto bruto (N bloques)  →  COE  →  Representación compacta  →  LLM
 | [Visión fundacional](docs/Context%20Optimization%20Engine%20(COE).md) | ✅ |
 | [Índice docs](docs/vision.md) | ✅ |
 | [Diseño global](docs/architecture.md) | ✅ |
-| [Nivel 1 — spec](docs/level1.md) | ✅ |
+| [Pipeline N1–N5](docs/levels.md) | 📝 Specs en revisión |
+| [L0 + i18n](docs/l0-ingest.md) | 📝 Spec (sin implementar) |
+| [Nivel 1 — spec](docs/level1.md) | ✅ Aprobado |
 | Nivel 1 — implementación | ✅ Prototipo |
-| Nivel 2+ | Planificado |
+| N2–N5 — specs | 📝 Sin implementar |
 
 ## Inicio rápido
 
@@ -73,7 +75,10 @@ Context-Optimization-Engine/
 │   ├── Context Optimization Engine (COE).md   # Visión fundacional (canónica)
 │   ├── vision.md           # Índice de documentación
 │   ├── architecture.md     # Diseño global: piezas y relaciones
-│   └── level1.md           # Spec operativa del Nivel 1
+│   ├── levels.md           # Índice pipeline L0 → N1–N5
+│   ├── i18n.md             # Multilingüe, target_lang, locale packs
+│   ├── l0-ingest.md        # Spec L0 (pre-N1)
+│   ├── level1.md … level5.md
 ├── src/coe/
 │   ├── models.py             # ContextBlock, DeduplicationResult
 │   └── level1/
