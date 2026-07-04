@@ -13,15 +13,19 @@ Contexto bruto (N bloques)  →  COE  →  Representación compacta  →  LLM
 | [Visión fundacional](docs/Context%20Optimization%20Engine%20(COE).md) | ✅ |
 | [Índice docs](docs/vision.md) | ✅ |
 | [Diseño global](docs/architecture.md) | ✅ |
-| [Pipeline N1–N5](docs/levels.md) | 📝 Specs en revisión |
+| [Pipeline N1–N5](docs/levels.md) | ✅ Specs aprobadas · implementación pendiente |
 | [Multilingüe (i18n)](docs/i18n.md) | ✅ Aprobado |
 | [L0 Ingest](docs/l0-ingest.md) | ✅ Aprobado · sin implementar |
+| [Context Ingest](docs/ingest.md) | ✅ Spec cerrada |
+| [Renderer](docs/renderer.md) | ✅ Spec cerrada |
+| [Benchmarks y KPIs](docs/benchmarks.md) | ✅ Aprobado · harness pendiente |
+| [Cierre spec](docs/spec-gaps.md) | ✅ Checklist |
 | [Nivel 1 — spec](docs/level1.md) | ✅ Aprobado |
 | [Nivel 2 — spec](docs/level2.md) | ✅ Aprobado |
 | Nivel 1 — implementación | ✅ Prototipo |
 | [Nivel 3 — spec](docs/level3.md) | ✅ Aprobado |
 | [Nivel 4 — spec](docs/level4.md) | ✅ Aprobado |
-| [Nivel 5 — spec](docs/level5.md) | 📝 En revisión |
+| [Nivel 5 — spec](docs/level5.md) | ✅ Aprobado |
 
 ## Inicio rápido
 
@@ -82,6 +86,10 @@ Context-Optimization-Engine/
 │   ├── levels.md           # Índice pipeline L0 → N1–N5
 │   ├── i18n.md             # Multilingüe, target_lang, locale packs
 │   ├── l0-ingest.md        # Spec L0 (pre-N1)
+│   ├── benchmarks.md       # KPIs comprensión, redacción, latencia
+│   ├── spec-gaps.md        # Checklist cierre pre-implementación
+│   ├── ingest.md           # Context Ingest + Normalizer
+│   ├── renderer.md         # Prosa hacia LLM
 │   ├── level1.md … level5.md
 ├── src/coe/
 │   ├── models.py             # ContextBlock, DeduplicationResult

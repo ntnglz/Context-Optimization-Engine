@@ -2,6 +2,8 @@
 >
 > En [Prompt-Compression-Middleware](https://github.com/ntnglz/Prompt-Compression-Middleware) permanece una copia como referencia en la visión global del ecosistema; no se actualiza allí.
 
+> **Nota de evolución (specs operativas):** Las decisiones implementables viven en `docs/level1.md`–`level5.md`, [ingest.md](ingest.md), [renderer.md](renderer.md) y [benchmarks.md](benchmarks.md). Resumen de cierre: [spec-gaps.md](spec-gaps.md). Donde este documento difiera (p. ej. CIR «interpretable por LLM» en crudo, eliminación de información), **prevalecen las specs operativas**: hacia el LLM solo **prosa en lenguaje natural**; CIR/grafo es **interno**; no resumir en N1–N4; N5 puede omitir historial en la **vista** al LLM con benchmark OK.
+
 # Context Optimization Engine (COE)
 
 ## Visión
@@ -244,11 +246,11 @@ Características:
 
 - Compacta.
 - Semánticamente estable.
-- Independiente del idioma.
-- Fácilmente interpretable por LLM.
-- Fácilmente optimizable.
+- Independiente del idioma (labels post-L0).
+- **Optimizable** por el pipeline (N1–N5).
+- **Proyectable a prosa** para el LLM vía Renderer — el modelo **no** recibe CIR crudo en producción (ver [renderer.md](renderer.md)).
 
-Ejemplo conceptual:
+Ejemplo conceptual (**representación interna**, no salida al LLM):
 
 ```
 entity{
@@ -315,23 +317,24 @@ GPT / Claude / Gemini / Llama
 - Normalización.
 - Representación mediante grafos.
 - Compresión jerárquica.
-- Eliminación de información irrelevante.
-- Codificación estructurada.
-- Aprendizaje automático.
-- Optimización específica por modelo.
+- **Vista acotada** del estado acumulado (N5), con historial completo en store — no resumen libre.
+- Codificación estructurada **interna**.
+- Aprendizaje automático (investigación).
+- Optimización específica por modelo (Model Adapter, post-Renderer).
 
 ---
 
 # Métricas
 
+Ver especificación operativa [benchmarks.md](benchmarks.md): comprensión, redacción, latencia COE (`t_coe`), ratio documentado.
+
+Conceptos fundacionales:
+
 - Ratio de compresión.
 - Ahorro de tokens.
 - Latencia.
-- Coste.
-- Calidad de respuesta.
-- Recuperación de información.
-- Pérdida semántica.
-- Precisión factual.
+- Calidad de respuesta y recuperación factual.
+- Pérdida semántica (gate en benchmarks, no solo ratio).
 
 ---
 

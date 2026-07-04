@@ -66,10 +66,12 @@ flowchart LR
 ## Reglas
 
 1. **Skip si ya coincide** — no traducir bloques ya en `target_lang` (detección por bloque).
-2. **Traducir antes de comprimir** — L0 es **obligatoriamente anterior** a N1 en el pipeline cuando está habilitado.
-3. **Preservar identificadores** — nombres propios, URLs, UUIDs, paths: lista de exclusión; no traducir dentro de backticks/fences salvo flag explícito.
-4. **Un solo idioma de salida** — todo el bundle queda en `target_lang` para niveles posteriores y Renderer.
-5. **Sin compresión** — L0 no acorta texto; puede **aumentar** tokens si traduce de un idioma compacto a uno más verboso (métricas deben registrarlo).
+2. **`preserve_lang`** — no traducir bloques con `metadata.preserve_lang: true` (glosario bilingüe, citas, nombres propios multilingües).
+3. **Traducir antes de comprimir** — L0 es **obligatoriamente anterior** a N1 en el pipeline cuando está habilitado.
+4. **Preservar identificadores** — nombres propios, URLs, UUIDs, paths: lista de exclusión; no traducir dentro de backticks/fences salvo flag explícito.
+5. **Un solo idioma de salida** — todo el bundle queda en `target_lang` para niveles posteriores y Renderer, **salvo** bloques `preserve_lang`.
+6. **Sin compresión** — L0 no acorta texto; puede **aumentar** tokens si traduce de un idioma compacto a uno más verboso (métricas deben registrarlo).
+7. **Mezcla residual** — si tras L0 quedan idiomas distintos (baja confianza, bloques preservados), registrar `mixed_bundle: true` en `ingest_trace`; N2+ usa `locale` explícito o idioma dominante (ver [i18n.md](i18n.md)).
 
 ## API prevista
 
@@ -118,7 +120,7 @@ L0 **no** usa el mismo criterio de calidad que el LLM de producción; basta cohe
 
 ## Límites previstos (v1)
 
-- Un `target_lang` por petición (no mezcla en salida).
+- Un `target_lang` por petición; salida unificada salvo bloques `preserve_lang`.
 - Autodetect por bloque con biblioteca estándar (p. ej. `langdetect` / fastText); revisión humana en casos `confidence < umbral` → passthrough + warning en trace.
 - Sin traducción de JSON estructurado interno (solo valores string human-readable).
 
@@ -135,7 +137,7 @@ L0 **no** usa el mismo criterio de calidad que el LLM de producción; basta cohe
 
 - [ ] ¿Umbral de confianza de autodetect para traducir automáticamente?
 - [ ] ¿Traducir metadatos (`source_type` labels) o solo `content`?
-- [ ] ¿Política para bundles multilingües intencionados (p. ej. glosario bilingüe)?
+- [x] ¿Política para bundles multilingües intencionados? → **`preserve_lang` por bloque**; ver [i18n.md](i18n.md) § contexto multilingüe
 
 ## Riesgos
 

@@ -10,8 +10,12 @@ COE aplica **transformaciones composables** sobre el contexto. **L0** (Ingest) p
 
 | Documento | Contenido | Estado |
 |-----------|-----------|--------|
-| [i18n.md](i18n.md) | Principios multilingües, `target_lang`, locale packs | ✅ Aprobado |
+| [i18n.md](i18n.md) | Principios multilingües, locale packs | ✅ Aprobado |
 | [l0-ingest.md](l0-ingest.md) | Normalización de idioma (Ingest) | ✅ Aprobado · sin implementar |
+| [benchmarks.md](benchmarks.md) | KPIs comprensión, redacción, latencia COE | ✅ Aprobado · harness pendiente |
+| [spec-gaps.md](spec-gaps.md) | Checklist cierre pre-implementación | ✅ Cerrado |
+| [ingest.md](ingest.md) | Context Ingest + Normalizer | ✅ Cerrado |
+| [renderer.md](renderer.md) | Prosa obligatoria hacia LLM | ✅ Cerrado |
 
 ## Specs operativas N1–N5
 
@@ -21,7 +25,7 @@ COE aplica **transformaciones composables** sobre el contexto. **L0** (Ingest) p
 | **2** | Factorización | [level2.md](level2.md) | ✅ Aprobado · sin implementar |
 | **3** | Representación estructurada | [level3.md](level3.md) | ✅ Aprobado · sin implementar |
 | **4** | Grafo de conocimiento | [level4.md](level4.md) | ✅ Aprobado · sin implementar |
-| **5** | Estado semántico | [level5.md](level5.md) | 📝 Spec (sin implementar) |
+| **5** | Estado semántico | [level5.md](level5.md) | ✅ Aprobado · sin implementar |
 
 ## Pipeline
 
@@ -71,12 +75,20 @@ flowchart LR
 | **4** | Topológico — grafo del bundle | Comprensión LLM + slice |
 | **5** | Temporal — diffs sobre estado | Comprensión LLM + store |
 
-## Principios comunes (L0 + N1–N4)
+## Principios comunes
 
-1. **Sin pérdida de información** — L0 traduce; N1–N4 reorganizan; no resumir.
+### N1–N4 (+ L0 traduce, no elimina)
+
+1. **Sin pérdida en la salida del nivel** — reorganización; no resumir.
 2. **Traducción antes de compresión** — L0 siempre antes de N1 cuando está activo.
 3. **Determinismo preferido** — heurísticas y MT configurables antes que LLM auxiliar opaco.
 4. **Trazabilidad** — `ingest_trace` (L0) + `trace` por nivel.
+
+### N5 (distinto)
+
+5. **Store sin pérdida** — commits conservan historial completo.
+6. **Vista al LLM puede omitir** — subconjunto materializado **solo** si benchmarks OK ([benchmarks.md](benchmarks.md)).
+7. **Prosa obligatoria** — [renderer.md](renderer.md).
 
 ## Orden de aprobación sugerido
 
@@ -86,6 +98,7 @@ flowchart LR
 4. ✅ [l0-ingest.md](l0-ingest.md) — aprobado  
 5. ✅ N3 — aprobado  
 6. ✅ N4 — aprobado  
-7. N5 — en revisión  
-8. Revisión cruzada pipeline + [architecture.md](architecture.md)  
-9. Implementación etapa a etapa  
+7. ✅ N5 — aprobado  
+8. ✅ [benchmarks.md](benchmarks.md) — aprobado  
+9. ✅ Revisión cruzada + [spec-gaps.md](spec-gaps.md)  
+10. Implementación etapa a etapa  

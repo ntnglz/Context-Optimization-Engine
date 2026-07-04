@@ -8,8 +8,10 @@ Usar **después** de revisar una spec de nivel, **L0**, o documento transversal 
 2. **¿Encaja en el pipeline?** — Entrada/salida coherente con [levels.md](levels.md) y nivel anterior/siguiente.
 3. **¿Respeta [architecture.md](architecture.md)?** — Stateless/stateful, Ingest, Metrics, Renderer, sin mezclar responsabilidades de PCM.
 4. **¿El consumidor es un LLM en lenguaje natural?** — Desde N2: benchmark de comprensión; no formatos opacos sin validación.
-5. **¿Aporta compresión acorde al nivel conceptual?** — N1 redundancia exacta; N2 factorización; N3 relaciones; N4 grafo; N5 estado — sin “saltar” niveles.
-6. **¿Evita atajos que contradigan principios globales?** — p. ej. pronombres ambiguos, ratio por encima de calidad, LLM opaco en pipeline cuando el nivel es determinista.
+5. **¿KPIs de calidad y latencia?** — Ver [benchmarks.md](benchmarks.md).
+6. **¿Render hacia LLM solo prosa?** — Ver [renderer.md](renderer.md).
+7. **¿Ingest / source_type coherente?** — Ver [ingest.md](ingest.md).
+8. **¿Lagunas cerradas o documentadas?** — Ver [spec-gaps.md](spec-gaps.md).
 
 ## Acciones si algo falla
 

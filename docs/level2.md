@@ -96,17 +96,17 @@ O, si la compresión no compensa el riesgo, **passthrough**: dejar la oración o
 
 N2 **no factoriza** si la ganancia de tokens no supera un margen mínimo **o** si el número de entidades en el mismo bundle supera un umbral configurable (v1 propuesto: factorizar con cautela cuando hay **>3 entidades** con acciones entrelazadas). Parámetro previsto: `max_entities_for_aggressive_factorization`.
 
-### Variantes de render (a validar con tests)
+### Variantes de render
 
-El Renderer de N2 debería soportar al menos dos modos, elegidos por benchmark:
+Convención unificada: [renderer.md](renderer.md). Hacia el LLM **solo** `render_prose()`.
 
-| Modo | Forma | Cuándo |
-|------|-------|--------|
-| `structured` | Árbol / `entity:` (más compacto) | Pocas entidades, tests E2E OK |
-| `prose_compact` | Oraciones cortas con sujeto explícito repetido | Muchas entidades o tests por debajo del umbral |
+| Modo | Forma | Uso |
+|------|-------|-----|
+| **`prose_compact`** | Oraciones cortas con sujeto explícito repetido | **Default hacia LLM** |
+| `structured` | Árbol / `entity:` | **Solo interno** (`render_structured()`); no salida LLM v1 |
 | `passthrough` | Sin factorizar | Comprensión < umbral en tests |
 
-La elección del modo puede ser automática según métricas del benchmark de comprensión, no solo ratio de tokens.
+La elección del modo hacia el LLM puede ajustarse según benchmark; `structured` no se activa en producción v1 salvo revalidación E2E completa.
 
 ### Compresión próxima al lenguaje natural (refinamiento posterior)
 
@@ -147,7 +147,7 @@ Juan
       └ approved budget
 ```
 
-Orientative Renderer output (`structured` mode):
+Orientative **internal** output (`render_structured()` — not for LLM):
 
 ```
 entity:Juan
@@ -178,8 +178,9 @@ Reglas:
 ```python
 from coe.level2 import factorize_context
 
-result = factorize_context(deduplication_result)  # salida de N1
-result.render()
+result = factorize_context(deduplication_result)
+result.render_prose()          # → LLM (default prose_compact)
+result.render_structured()     # interno / debug
 result.to_json()
 ```
 
@@ -203,8 +204,8 @@ N1 puede validarse con **integridad sintáctica** (reconstrucción + tests unita
 Para cada caso del dataset:
 
 1. Fijar una **pregunta** respondible solo con el contexto (p. ej. «¿Quién aprobó el presupuesto?»).
-2. **Respuesta A** — LLM evaluador + contexto **original**.
-3. **Respuesta B** — mismo LLM + contexto **optimizado** (salida N1+N2).
+2. **Respuesta A** — LLM evaluador + contexto **original crudo** (pre-L0, pre-COE) — ver [benchmarks.md](benchmarks.md).
+3. **Respuesta B** — mismo LLM + contexto **optimizado** (salida N1+N2 + Renderer prosa).
 4. Medir **similitud semántica** entre A y B (embeddings o normalización de respuesta).
 5. Medir **recuperación factual** (¿B menciona los hechos clave? F1 sobre entidades/hechos esperados).
 
@@ -212,11 +213,13 @@ Criterio de aprobación del nivel (v1 propuesto):
 
 | Métrica | Umbral |
 |---------|--------|
-| Similitud media A vs. B | ≥ 0,90 |
-| Recuperación factual | ≥ 0,95 |
-| Ratio de compresión | documentado; no bloquea si comprensión falla |
+| Similitud media A vs. B (`comprehension_similarity`) | ≥ 0,90 |
+| Recuperación factual (`factual_recall`) | ≥ 0,95 |
+| **Redacción** (`readability_score`, respuesta B) | ≥ 3,5 **y** ≥ A − 0,3 |
+| Fugas de notación COE (`artifact_leak_rate`) | ≤ 2% |
+| Ratio de compresión | documentado; no bloquea si falla comprensión o redacción |
 
-Ejecutar benchmarks en **`target_lang`** del despliegue (tras L0 si aplica). Incluir casos multilingües: entrada en idioma distinto → L0 → N1+N2 → evaluación.
+Detalle completo de KPIs (comprensión, redacción, latencia COE): **[benchmarks.md](benchmarks.md)**.
 
 Si no se cumple el umbral → bajar agresividad (modo `prose_compact` o passthrough parcial).
 
@@ -234,7 +237,7 @@ Opciones previstas (orden de preferencia para CI/local):
 | **OpenRouter / Together** | Modelos muy baratos | Para CI si Ollama no está disponible |
 | **Mistral API** | Pago | Reservar para validación final puntual, no para miles de casos |
 
-Requisito: el **mismo modelo y temperatura** en A y B por caso. Ubicación prevista del harness: `scripts/comprehension_benchmark.py` + `data/comprehension_cases.json` (por crear al implementar).
+Requisito: el **mismo modelo y temperatura** en A y B por caso. Ubicación prevista del harness: `scripts/comprehension_benchmark.py` + `data/comprehension_cases.json` (ver [benchmarks.md](benchmarks.md)).
 
 ## Límites previstos (v1)
 
@@ -255,7 +258,7 @@ Requisito: el **mismo modelo y temperatura** en A y B por caso. Ubicación previ
 ## Preguntas abiertas
 
 - [ ] Closed verb list vs. domain-configurable patterns per locale?
-- [ ] Treat N1 `shared_facts` as global attributes or skip factorization?
-- [ ] Default render mode: `structured` vs. `prose_compact`?
+- [ ] Treat N1 `shared_facts` as global attributes or skip factorization? → **v1: no re-factorizar** (ver reglas integridad)
+- [x] Default render mode → **`prose_compact` hacia LLM**; `structured` interno ([renderer.md](renderer.md))
 - [ ] Entity threshold (`>3`) and minimum token savings to factorize?
 - [ ] Default Ollama model for harness (align with PCM or multilingual model)?

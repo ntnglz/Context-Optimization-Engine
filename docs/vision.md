@@ -16,13 +16,17 @@ En [Prompt-Compression-Middleware](https://github.com/ntnglz/Prompt-Compression-
 | [architecture.md](architecture.md) | Diseño global: piezas, relaciones, roadmap de implementación |
 | [i18n.md](i18n.md) | Multilingüe: `target_lang`, locale packs ✅ aprobado |
 | [l0-ingest.md](l0-ingest.md) | Spec L0 — normalización de idioma ✅ aprobada |
+| [benchmarks.md](benchmarks.md) | KPIs comprensión, redacción, latencia COE ✅ aprobado |
+| [spec-gaps.md](spec-gaps.md) | Checklist cierre pre-implementación ✅ |
+| [ingest.md](ingest.md) | Context Ingest + Normalizer ✅ |
+| [renderer.md](renderer.md) | Prosa hacia LLM ✅ |
 | [levels.md](levels.md) | Índice del pipeline L0 → N1–N5 |
 | [review-checklist.md](review-checklist.md) | Revisión cruzada al aprobar specs |
 | [level1.md](level1.md) | Spec N1 ✅ aprobado |
 | [level2.md](level2.md) | Spec N2 ✅ aprobado |
 | [level3.md](level3.md) | Spec N3 ✅ aprobado |
 | [level4.md](level4.md) | Spec N4 ✅ aprobado |
-| [level5.md](level5.md) | Spec N5 (en revisión) |
+| [level5.md](level5.md) | Spec N5 ✅ aprobado |
 | `src/coe/level1/` | Implementación Nivel 1 |
 | `data/examples/level1_acme.json` | Ejemplo ACME |
 

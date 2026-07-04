@@ -140,7 +140,7 @@ Misma filosofía que [level2.md](level2.md): el criterio de éxito no es la eleg
 
 ### Protocolo
 
-1. **Contexto original** — bundle sin N3 (p. ej. tras L0+N1+N2 o solo original según caso de test).
+1. **Contexto original crudo** — pre-L0, pre-COE ([benchmarks.md](benchmarks.md)).
 2. **Contexto optimizado** — salida **`render_prose()`** de N3 (no la estructura interna).
 3. Misma pregunta respondible solo con el contexto; **Respuesta A** vs **Respuesta B** con el mismo LLM evaluador barato.
 4. Similitud semántica A↔B ≥ 0,90; recuperación factual ≥ 0,95 (umbrales alineados con N2).
@@ -177,14 +177,14 @@ Casos de test: incluir bundles donde N3 aporta deduplicación relacional (p. ej.
 | Con | Relación |
 |-----|----------|
 | **N2** | Consume factorized entities; comprehension benchmark extended to **`render_prose()`** |
-| **N4** | Consumes internal `StructuredContext`; LLM still receives validated prose until N4 defines its own projection |
+| **N4** | Consumes internal `StructuredContext`; LLM receives **`render_prose()`** from N4 (or N3 passthrough if N4 off) |
 | **CIR** | Bridge factored text ↔ CIR draft; textual projection validated in parallel |
 
 ## Siguiente nivel
 
 → [level4.md](level4.md) — grafo del bundle ✅ spec aprobada
 
-→ [level5.md](level5.md) — estado semántico (spec en revisión)
+→ [level5.md](level5.md) — estado semántico ✅ spec aprobada
 
 ## Preguntas abiertas
 

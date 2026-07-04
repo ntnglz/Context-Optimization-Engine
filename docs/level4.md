@@ -186,6 +186,7 @@ Preguntas de test respondibles solo con el contexto; mismo LLM evaluador barato;
 - Sin razonamiento OWL/RDF completo; modelo de propiedades plano.
 - **`render_prose()` obligatorio** hacia el LLM; `serialize_internal()` no sustituye benchmark.
 - Métricas duales: **`internal_ratio`** + **`prose_ratio`** + **`complexity`**.
+- Tamaño acotado: máx. **10k nodos** por bundle (configurable).
 
 ## Relación con otros niveles
 
@@ -194,8 +195,6 @@ Preguntas de test respondibles solo con el contexto; mismo LLM evaluador barato;
 | **N3** | Fuente de entidades y relaciones |
 | **N5** | N5 **persiste** evolución del grafo entre turnos; N4 define el modelo de grafo que N5 versionará |
 | **CIR** | El grafo es candidato a forma concreta de CIR serializado |
-
-- Tamaño acotado (p. ej. máx. 10k nodos por bundle; configurable).
 
 ## Preguntas abiertas
 

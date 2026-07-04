@@ -43,6 +43,18 @@ flowchart LR
 
 PCM y COE pueden usarse de forma independiente. El pipeline completo maximiza el ahorro cuando conviven.
 
+### 3.4 Model Adapter (acotado)
+
+Componente **opcional externo** post-Renderer:
+
+| Hace | No hace |
+|------|---------|
+| Ajustar formato al gusto del modelo (markdown, bullets) | Traducir idioma (L0) |
+| Tokenizer-specific layout si aplica | Cambiar hechos ni omitir contenido |
+| | Sustituir benchmarks de comprensión |
+
+Entrada: `optimized_context` en prosa (`target_lang`). Spec detallada en fase posterior; ver [renderer.md](renderer.md).
+
 ---
 
 ## 3. Piezas principales
@@ -87,12 +99,12 @@ flowchart TB
 | Pieza | Responsabilidad | Entrada | Salida | Estado |
 |-------|-----------------|---------|--------|--------|
 | **Gateway** | Punto de entrada unificado (librería, CLI, MCP, HTTP futuro) | Petición del cliente | Contexto optimizado + métricas | Parcial (`run.py`) |
-| **Context Ingest** | Normalizar fuentes heterogéneas a un modelo común; opcional **L0** idioma | Texto, chunks RAG, tool output, etc. | `ContextBundle` / `ContextBlock[]` | Parcial (`ContextBlock`) |
+| **Context Ingest** | Normalizar fuentes heterogéneas a un modelo común; Normalizer; opcional **L0** | Texto, chunks RAG, tool output, etc. | `ContextBundle` / `ContextBlock[]` | Spec ✅ [ingest.md](ingest.md) |
 | **L0 (Language norm.)** | Detectar idioma; traducir a `target_lang` **antes de N1** si hace falta | `ContextBlock[]` | `ContextBlock[]` en idioma base | Spec: [l0-ingest.md](l0-ingest.md) |
-| **Normalizer** | Partir contenido en unidades comparables (líneas, párrafos, nodos) | Bloques crudos | Unidades normalizadas | Parcial (dentro de N1) |
+| **Normalizer** | Sub-etapa de Ingest: segmentación (líneas, oraciones `zh`), respeto fences | Bloques crudos | Unidades normalizadas | Spec ✅ [ingest.md](ingest.md) |
 | **Optimization Pipeline** | Aplicar niveles de optimización en cadena configurable | Unidades + metadatos | Estructura optimizada | N1 ✅, N2–N5 planificado |
 | **CIR** | Representación intermedia estable, optimizable y serializable | Salida de parser / pipeline | Árbol o grafo de contexto | Diseño (sin implementar) |
-| **Renderer** | Convertir resultado interno a texto o JSON para el LLM | Resultado del pipeline | String / messages[] | Parcial (`level1/render.py`) |
+| **Renderer** | Proyección **prosa** hacia LLM; ensamblaje final | Resultado del pipeline | String / messages[] | Spec ✅ [renderer.md](renderer.md) · parcial N1 |
 | **Metrics** | Tokens, ratio, latencia, integridad semántica | Antes / después del pipeline | Informe de métricas | Parcial (estimación tokens) |
 | **State Store** | Mantener estado semántico entre turnos (Nivel 5) | Diffs de contexto | Vista materializada | Futuro |
 
@@ -105,11 +117,11 @@ flowchart TB
 1. **Gateway** recibe contexto bruto y opciones (`target_lang`, `locale`, `levels=[1,2]`, presupuesto de tokens).
 2. **Context Ingest** asigna `id`, `source_type` y metadatos a cada bloque.
 3. **L0** (opcional) detecta idioma y traduce a `target_lang` sobre prosa natural — ver [l0-ingest.md](l0-ingest.md), [i18n.md](i18n.md).
-4. **Normalizer** prepara unidades atómicas para el pipeline (hoy: líneas; otros locales en packs).
+4. **Normalizer** prepara unidades atómicas (sub-etapa Ingest) — ver [ingest.md](ingest.md).
 5. **Optimization Pipeline** ejecuta niveles habilitados en orden creciente de complejidad.
-5. En fases avanzadas, el pipeline lee/escribe **CIR** como artefacto central.
-6. **Renderer** materializa la salida en formato legible por el LLM.
-7. **Metrics** compara entrada y salida y adjunta el informe al Gateway.
+6. En fases avanzadas, el pipeline lee/escribe **CIR** como artefacto central (fase D).
+7. **Renderer** materializa **prosa** para el LLM — ver [renderer.md](renderer.md).
+8. **Metrics** compara entrada y salida y adjunta el informe al Gateway.
 
 ### 4.2 Dependencias
 
@@ -129,8 +141,8 @@ Gateway
   └── Metrics (observa todo el flujo)
 ```
 
-- **CIR** será el contrato interno: cada nivel transforma CIR → CIR optimizado.
-- **Renderer** es independiente del nivel concreto: consume el CIR final (o el resultado del último nivel disponible).
+- **CIR** será el contrato interno (fase D): cada nivel transforma hacia tipos encadenados hasta grafo — ver [levels.md](levels.md). Hoy: `DeduplicationResult` → … → `ContextGraph`.
+- **Renderer** consume la salida del último nivel activo y produce **prosa** — [renderer.md](renderer.md).
 - **Metrics** no modifica datos; es transversal (observabilidad + benchmarks).
 - **State Store** solo interviene en Nivel 5; los niveles 1–4 son stateless sobre el bundle de entrada.
 
@@ -168,7 +180,7 @@ flowchart LR
 | **2** | Agrupar hechos bajo entidades (`Juan → acciones`) | Heurística + locale pack | Spec ✅ [level2.md](level2.md) |
 | **3** | Natural → estructura compacta + `render_prose()` | Parser / plantillas + proyección LN | Spec ✅ [level3.md](level3.md) |
 | **4** | Grafo del bundle + `render_prose()` | Topológico; cero pérdida vs N3 | Spec ✅ [level4.md](level4.md) |
-| **5** | Estado semántico + diff (modelo Git) | Store persistente | Investigación |
+| **5** | Estado semántico + diff (modelo Git) | Store persistente | Spec ✅ [level5.md](level5.md) |
 
 **Regla de composición:** cada nivel asume que el anterior ya eliminó la redundancia obvia de su capa. Se pueden activar subconjuntos (p. ej. solo N1, o N1+N2).
 
@@ -242,18 +254,19 @@ PCM ya expone MCP/HTTP para compresión; COE seguirá el mismo patrón de integr
 
 ## 8. Métricas y calidad
 
-Transversal a todo el diseño:
+Transversal a todo el diseño. **Especificación completa:** [benchmarks.md](benchmarks.md).
 
 | Métrica | Uso |
 |---------|-----|
-| **Ratio de compresión** | Decidir si optimizar vale la pena |
+| **Ratio de compresión** | Documentado; no bloquea si fallan KPIs de calidad |
 | **Tokens ahorrados** | ROI económico |
-| **Latencia del pipeline** | Límite aceptable vs. ahorro |
+| **`t_coe` (latencia COE)** | P95 ≤ **200 ms** (L0+N1–N4 chat); ≤ **350 ms** con N5; ver presupuestos por etapa |
 | **Integridad (N1–N4)** | Cero pérdida por nivel; N4: grafo ∪ orphans ⊇ entrada N3 |
-| **Comprensión (N2–N4)** | Benchmark A/B sobre `render_prose()`; N4 también vs prosa N3 |
-| **Calidad de respuesta (E2E)** | LLM judge con contexto original vs. optimizado |
+| **Comprensión (N2–N5)** | `comprehension_similarity` ≥ 0,90; `factual_recall` ≥ 0,95 vs original pre-L0 |
+| **Redacción E2E** | `readability_score` ≥ 3,5; `artifact_leak_rate` ≤ 2%; respuesta legible para usuario final |
+| **Calidad de respuesta (E2E)** | Benchmark A/B: original crudo vs optimizado + juez LLM |
 
-Los benchmarks vivirán en `data/` + `tests/` + scripts dedicados (por crear).
+Los benchmarks vivirán en `data/` + `tests/` + `scripts/comprehension_benchmark.py` (por crear).
 
 ---
 
@@ -291,5 +304,9 @@ Orden sugerido para construir las piezas:
 | [Context Optimization Engine (COE).md](Context%20Optimization%20Engine%20(COE).md) | Visión fundacional (canónica) |
 | [levels.md](levels.md) | Pipeline L0 → N1–N5: contratos e integración |
 | [i18n.md](i18n.md) | Principios multilingües, locale packs ✅ aprobado |
+| [benchmarks.md](benchmarks.md) | KPIs comprensión, redacción, latencia COE |
+| [spec-gaps.md](spec-gaps.md) | Checklist cierre pre-implementación |
+| [ingest.md](ingest.md) | Context Ingest + Normalizer |
+| [renderer.md](renderer.md) | Prosa hacia LLM |
 | [l0-ingest.md](l0-ingest.md) | Spec L0 — normalización de idioma (pre-N1) ✅ aprobada |
 | [level1.md](level1.md) – [level5.md](level5.md) | Spec operativa por nivel |

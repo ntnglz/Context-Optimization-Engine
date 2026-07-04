@@ -6,6 +6,18 @@
 
 Implementación determinista del Nivel 1: detectar líneas idénticas (tras normalización) que aparecen en **≥2 bloques de contexto** y extraerlas a hechos compartidos con referencias, sin eliminar información.
 
+> **Render hacia el LLM:** solo prosa vía `render_prose()` ([renderer.md](renderer.md)). El formato compacto actual (`Empresa=ACME`, `Referencias:`) es **`render_compact()`** — interno/legacy hasta migración Gateway.
+
+## Alineación con la visión fundacional
+
+| Principio ([COE].md) | Cómo lo cumple N1 |
+|----------------------|-------------------|
+| Optimizar contexto, no resumir | Extrae duplicados inter-bloque; reconstrucción total |
+| Matching sintáctico | Línea idéntica tras normalización; sin semántica |
+| Camino hacia pipeline | Entrada `ContextBlock[]` post-[Ingest](ingest.md) |
+
+[COE]: Context%20Optimization%20Engine%20(COE).md
+
 ## Naturaleza del procesado
 
 | Aspecto | Nivel 1 |
@@ -72,9 +84,10 @@ result = deduplicate_context([
     ContextBlock(id="A", content="..."),
     ContextBlock(id="B", content="..."),
 ])
-result.render()           # texto para LLM
-result.compression_ratio    # ahorro estimado
-result.to_json()            # depuración / pipelines
+result.render_prose()       # → LLM (vía Renderer; por implementar)
+result.render_compact()     # legacy; alias render()
+result.compression_ratio
+result.to_json()
 ```
 
 Parámetro `min_occurrences=2` (por defecto): mínimo de bloques distintos donde debe aparecer una línea para extraerla.
