@@ -17,7 +17,7 @@ COE aplica **transformaciones composables** sobre el contexto. **L0** (Ingest) p
 | Nivel | Nombre | Spec | Estado |
 |-------|--------|------|--------|
 | **1** | Eliminación de redundancias | [level1.md](level1.md) | ✅ Aprobado · implementado |
-| **2** | Factorización | [level2.md](level2.md) | 📝 Spec (sin implementar) |
+| **2** | Factorización | [level2.md](level2.md) | ✅ Aprobado · sin implementar |
 | **3** | Representación estructurada | [level3.md](level3.md) | 📝 Spec (sin implementar) |
 | **4** | Grafo de conocimiento | [level4.md](level4.md) | 📝 Spec (sin implementar) |
 | **5** | Estado semántico | [level5.md](level5.md) | 📝 Spec (sin implementar) |
@@ -64,8 +64,8 @@ flowchart LR
 | Etapa | Transformación |
 |-------|----------------|
 | **L0** | Detección de idioma + traducción opcional a `target_lang` |
-| **1** | Sintáctico — líneas idénticas | Integridad sintáctica |
-| **2** | Estructural — locale pack; misma entidad como sujeto | Comprensión LLM |
+| **1** | Sintáctico — líneas idénticas tras normalización | Integridad sintáctica |
+| **2** | Estructural — locale pack; misma entidad como sujeto | Comprensión LLM (benchmark A/B) |
 | **3** | Relacional — locale pack | Comprensión LLM |
 | **4** | Topológico — grafo del bundle | Comprensión LLM + slice |
 | **5** | Temporal — diffs sobre estado | Comprensión LLM + store |
@@ -80,7 +80,8 @@ flowchart LR
 ## Orden de aprobación sugerido
 
 1. ✅ N1 — aprobado  
-2. L0 + [i18n.md](i18n.md) — en revisión  
-3. N2 → N3 → N4 → N5  
+2. ✅ N2 — aprobado  
+3. L0 + [i18n.md](i18n.md) — en revisión  
+4. N3 → N4 → N5  
 4. Revisión cruzada pipeline + [architecture.md](architecture.md)  
 5. Implementación etapa a etapa  

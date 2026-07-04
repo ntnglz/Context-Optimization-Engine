@@ -3,7 +3,21 @@
 > Definición conceptual: [documento fundacional](Context%20Optimization%20Engine%20(COE).md#nivel-2--factorización).  
 > Nivel anterior: [level1.md](level1.md) · Índice: [levels.md](levels.md) · Locale: [i18n.md](i18n.md)
 
-**Estado:** spec en revisión · sin implementar
+**Estado:** ✅ Spec aprobada · sin implementar
+
+## Alineación con la visión fundacional
+
+Checklist de revisión al aprobar (evitar desviaciones hacia “trucos de compresión” aislados):
+
+| Principio ([COE].md) | Cómo lo cumple N2 |
+|----------------------|-------------------|
+| Optimizar **contexto**, no resumir | Reorganiza bajo entidad; integridad + reconstrucción; sin eliminar hechos |
+| **Cambiar representación**, no contenido | Factorización + modos de render; passthrough si no compensa |
+| Redundancia = repetición explícita | Solo misma entidad como sujeto (estructural), no parafrase semántica |
+| El LLM es el consumidor | Benchmark A/B obligatorio; riesgo de comprensión documentado; ratio no manda sobre calidad |
+| Camino hacia CIR | Salida estructurada intermedia; N3 añade relaciones; no salta a grafo opaco |
+
+[COE]: Context%20Optimization%20Engine%20(COE).md
 
 ## Objetivo
 
@@ -94,6 +108,25 @@ El Renderer de N2 debería soportar al menos dos modos, elegidos por benchmark:
 
 La elección del modo puede ser automática según métricas del benchmark de comprensión, no solo ratio de tokens.
 
+### Compresión próxima al lenguaje natural (refinamiento posterior)
+
+La **v1** de N2 se centra en factorización estructurada (`structured` / `prose_compact`). En una **fase de refinamiento** (tras validar comprensión con benchmarks) conviene explorar técnicas que comprimen **sin alejarse del lenguaje natural** que el LLM ya conoce — posiblemente más seguras que árboles o notación `entity:`.
+
+Candidatas a evaluar (no comprometidas en v1):
+
+| Técnica | Idea | Ejemplo |
+|---------|------|---------|
+| **Abreviatura entre paréntesis** | Primera mención completa + sigla; luego solo sigla | `ACME (Acme Corp)` … `ACME approved …` |
+| **Notas al pie / códigos** | Aclaración repetida → una nota con código reutilizable | `(1)` en varios sitios → `[1] Acme Corp, global supplier` |
+| **Etiquetas inline mínimas** | Etiqueta corta en prosa, no árbol | `Juan [ACME]: created Project X; approved budget` |
+
+Principios para esta fase:
+
+- Priorizar convenciones que aparecen en **texto real** (papers, informes, legal).
+- Cada técnica debe superar el **benchmark de comprensión** (A/B) frente al contexto original.
+- **Prohibido** pronombres ambiguos o referencias opacas sin leyenda (igual que en v1).
+- Detalle de reglas, locale packs y Renderer → spec de refinamiento **N2 v2** o subsección ampliada aquí cuando toque implementar.
+
 ## Entrada / salida
 
 **Entrada:** `DeduplicationResult` de N1 (`shared_facts` + `unique_blocks`), o `ContextBlock[]` si N1 está desactivado (el nivel debe normalizar internamente).
@@ -104,23 +137,23 @@ La elección del modo puede ser automática según métricas del benchmark de co
 - `unparsed[]` — líneas u oraciones que no encajan en ningún patrón (se pasan sin modificar)
 - métricas de tokens estimados
 
-Ejemplo (documento fundacional):
+Ejemplo (documento fundacional; labels depend on locale pack):
 
 ```
 Juan
- ├ empresa = ACME
- └ acciones
-      ├ creó Proyecto X
-      └ aprobó presupuesto
+ ├ company = ACME
+ └ actions
+      ├ created Project X
+      └ approved budget
 ```
 
-Serialización orientativa para el Renderer:
+Orientative Renderer output (`structured` mode):
 
 ```
 entity:Juan
-  empresa=ACME
-  acción: creó Proyecto X
-  acción: aprobó presupuesto
+  company=ACME
+  action: created Project X
+  action: approved budget
 ```
 
 ## Patrones de extracción (v1)

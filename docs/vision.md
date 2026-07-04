@@ -17,8 +17,10 @@ En [Prompt-Compression-Middleware](https://github.com/ntnglz/Prompt-Compression-
 | [i18n.md](i18n.md) | Multilingüe: `target_lang`, locale packs, traducción pre-N1 |
 | [l0-ingest.md](l0-ingest.md) | Spec L0 — normalización de idioma (Ingest) |
 | [levels.md](levels.md) | Índice del pipeline L0 → N1–N5 |
-| [level1.md](level1.md) | Spec Nivel 1 ✅ aprobado |
-| [level2.md](level2.md) – [level5.md](level5.md) | Specs N2–N5 (en revisión) |
+| [review-checklist.md](review-checklist.md) | Revisión cruzada al aprobar specs |
+| [level1.md](level1.md) | Spec N1 ✅ aprobado |
+| [level2.md](level2.md) | Spec N2 ✅ aprobado |
+| [level3.md](level3.md) – [level5.md](level5.md) | Specs N3–N5 (en revisión) |
 | `src/coe/level1/` | Implementación Nivel 1 |
 | `data/examples/level1_acme.json` | Ejemplo ACME |
 

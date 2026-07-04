@@ -94,6 +94,6 @@ Parámetro `min_occurrences=2` (por defecto): mínimo de bloques distintos donde
 
 ## Siguiente nivel
 
-→ [level2.md](level2.md) — factorización por entidad (spec en revisión)
+→ [level2.md](level2.md) — factorización por entidad ✅ spec aprobada
 
 Índice del pipeline: [levels.md](levels.md)
