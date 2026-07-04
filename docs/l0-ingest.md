@@ -3,7 +3,19 @@
 > Principios multilingües: [i18n.md](i18n.md).  
 > **No es un nivel de optimización** (no es N0 que compite con N1–N5): es una etapa **pre-N1** dentro de **Context Ingest**.
 
-**Estado:** spec en revisión · sin implementar
+**Estado:** ✅ Spec aprobada · sin implementar
+
+## Alineación con la visión fundacional
+
+| Principio ([COE].md) / [i18n.md](i18n.md) | Cómo lo cumple L0 |
+|---------------------------------------------|-------------------|
+| Optimizar **contexto** global | `target_lang` por despliegue; núcleo agnostic |
+| **Traducir antes de comprimir** | Obligatoriamente **pre-N1** sobre prosa natural |
+| No confundir con niveles N1–N5 | Etapa **Ingest**; no elimina redundancias ni cambia CIR |
+| El **LLM** es el consumidor | Unifica idioma antes de N2+ benchmarks en `target_lang` |
+| Separación **PCM / COE** | PCM (instrucción) independiente del idioma del contexto |
+
+[COE]: Context%20Optimization%20Engine%20(COE).md
 
 ## Objetivo
 

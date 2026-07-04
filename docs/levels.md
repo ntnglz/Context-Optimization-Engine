@@ -11,7 +11,7 @@ COE aplica **transformaciones composables** sobre el contexto. **L0** (Ingest) p
 | Documento | Contenido | Estado |
 |-----------|-----------|--------|
 | [i18n.md](i18n.md) | Principios multilingües, `target_lang`, locale packs | ✅ Aprobado |
-| [l0-ingest.md](l0-ingest.md) | Normalización de idioma (Ingest) | 📝 En revisión |
+| [l0-ingest.md](l0-ingest.md) | Normalización de idioma (Ingest) | ✅ Aprobado · sin implementar |
 
 ## Specs operativas N1–N5
 
@@ -83,9 +83,9 @@ flowchart LR
 1. ✅ N1 — aprobado  
 2. ✅ N2 — aprobado  
 3. ✅ [i18n.md](i18n.md) — aprobado  
-4. ✅ N3 — aprobado  
-5. [l0-ingest.md](l0-ingest.md) — en revisión  
-5. ✅ N4 — aprobado  
-6. N5 — en revisión  
-4. Revisión cruzada pipeline + [architecture.md](architecture.md)  
-5. Implementación etapa a etapa  
+4. ✅ [l0-ingest.md](l0-ingest.md) — aprobado  
+5. ✅ N3 — aprobado  
+6. ✅ N4 — aprobado  
+7. N5 — en revisión  
+8. Revisión cruzada pipeline + [architecture.md](architecture.md)  
+9. Implementación etapa a etapa  

@@ -291,5 +291,5 @@ Orden sugerido para construir las piezas:
 | [Context Optimization Engine (COE).md](Context%20Optimization%20Engine%20(COE).md) | Visión fundacional (canónica) |
 | [levels.md](levels.md) | Pipeline L0 → N1–N5: contratos e integración |
 | [i18n.md](i18n.md) | Principios multilingües, locale packs ✅ aprobado |
-| [l0-ingest.md](l0-ingest.md) | Spec L0 — normalización de idioma (pre-N1) 📝 en revisión |
+| [l0-ingest.md](l0-ingest.md) | Spec L0 — normalización de idioma (pre-N1) ✅ aprobada |
 | [level1.md](level1.md) – [level5.md](level5.md) | Spec operativa por nivel |
