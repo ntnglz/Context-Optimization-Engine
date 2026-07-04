@@ -19,6 +19,7 @@ Contexto bruto (N bloques)  →  COE  →  Representación compacta  →  LLM
 | [Nivel 1 — spec](docs/level1.md) | ✅ Aprobado |
 | [Nivel 2 — spec](docs/level2.md) | ✅ Aprobado |
 | Nivel 1 — implementación | ✅ Prototipo |
+| [Nivel 3 — spec](docs/level3.md) | ✅ Aprobado |
 | N3–N5 — specs | 📝 En revisión |
 
 ## Inicio rápido

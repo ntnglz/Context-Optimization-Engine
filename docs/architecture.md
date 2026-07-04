@@ -166,13 +166,13 @@ flowchart LR
 |-------|------------------|------|-------------------|
 | **1** | Extraer duplicados exactos inter-bloque | Determinista | `src/coe/level1/` ✅ |
 | **2** | Agrupar hechos bajo entidades (`Juan → acciones`) | Heurística + locale pack | Spec ✅ [level2.md](level2.md) |
-| **3** | Natural → estructura compacta (`entity{…}`) | Parser / plantillas | Planificado |
+| **3** | Natural → estructura compacta + `render_prose()` | Parser / plantillas + proyección LN | Spec ✅ [level3.md](level3.md) |
 | **4** | Mantener grafo de conocimiento incremental | Grafo + consultas | Investigación |
 | **5** | Estado semántico + diff (modelo Git) | Store persistente | Investigación |
 
 **Regla de composición:** cada nivel asume que el anterior ya eliminó la redundancia obvia de su capa. Se pueden activar subconjuntos (p. ej. solo N1, o N1+N2).
 
-Specs operativas: [levels.md](levels.md) · [level1.md](level1.md) ✅ · [level2.md](level2.md) ✅ · [level3.md](level3.md)–[level5.md](level5.md)
+Specs operativas: [levels.md](levels.md) · [level1.md](level1.md) ✅ · [level2.md](level2.md) ✅ · [level3.md](level3.md) ✅ · [level4.md](level4.md)–[level5.md](level5.md)
 
 ---
 

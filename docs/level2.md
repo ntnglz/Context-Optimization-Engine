@@ -249,7 +249,7 @@ Requisito: el **mismo modelo y temperatura** en A y B por caso. Ubicación previ
 | Con | Relación |
 |-----|----------|
 | **N1** | Entrada preferida; N1 quita duplicados exactos antes de buscar sujetos repetidos |
-| **N3** | N3 consume árboles planos de N2 y añade relaciones cruzadas (`conoce →`, `empresa →`) |
+| **N3** | N3 adds cross-entity relations; internal structure + mandatory `render_prose()` |
 | **N4** | N4 proyecta entidades/atributos de N2/N3 como nodos del grafo |
 
 ## Preguntas abiertas

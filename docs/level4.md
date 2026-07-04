@@ -1,7 +1,8 @@
 # Nivel 4 — Grafo de conocimiento
 
 > Definición conceptual: [documento fundacional](Context%20Optimization%20Engine%20(COE).md#nivel-4--grafo-de-conocimiento).  
-> Nivel anterior: [level3.md](level3.md) · Índice: [levels.md](levels.md)
+> Nivel anterior: [level3.md](level3.md) · Índice: [levels.md](levels.md)  
+> **Nota (N3 aprobado):** el grafo N4 es representación **interna**; hacia el LLM aplica la misma regla de proyección en lenguaje natural y benchmark de comprensión que [level3.md](level3.md#validación-comprensión-llm-obligatoria) (detalle en spec N4).
 
 **Estado:** spec en revisión · sin implementar
 

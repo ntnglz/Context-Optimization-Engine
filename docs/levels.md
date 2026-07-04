@@ -19,7 +19,7 @@ COE aplica **transformaciones composables** sobre el contexto. **L0** (Ingest) p
 |-------|--------|------|--------|
 | **1** | Eliminación de redundancias | [level1.md](level1.md) | ✅ Aprobado · implementado |
 | **2** | Factorización | [level2.md](level2.md) | ✅ Aprobado · sin implementar |
-| **3** | Representación estructurada | [level3.md](level3.md) | 📝 Spec (sin implementar) |
+| **3** | Representación estructurada | [level3.md](level3.md) | ✅ Aprobado · sin implementar |
 | **4** | Grafo de conocimiento | [level4.md](level4.md) | 📝 Spec (sin implementar) |
 | **5** | Estado semántico | [level5.md](level5.md) | 📝 Spec (sin implementar) |
 
@@ -83,7 +83,8 @@ flowchart LR
 1. ✅ N1 — aprobado  
 2. ✅ N2 — aprobado  
 3. ✅ [i18n.md](i18n.md) — aprobado  
-4. [l0-ingest.md](l0-ingest.md) — en revisión  
-5. N3 → N4 → N5  
+4. ✅ N3 — aprobado  
+5. [l0-ingest.md](l0-ingest.md) — en revisión  
+6. N4 → N5  
 4. Revisión cruzada pipeline + [architecture.md](architecture.md)  
 5. Implementación etapa a etapa  
