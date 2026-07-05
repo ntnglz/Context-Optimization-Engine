@@ -160,7 +160,7 @@ Este plan **reemplaza** `architecture.md` §9 como orden de trabajo. La arquitec
 | 2 | Renderer + ensamblaje Gateway | ✅ cerrada | — |
 | 3 | N5 producción | ✅ cerrada | d733bb7 |
 | 4 | Harness madurez + casos reales | ✅ cerrada | b8de213 |
-| 5 | MCP COE | ✅ cerrada | (este commit) |
+| 5 | MCP COE | ✅ cerrada | bf9ddf2 |
 | 6 | CIR formal | 📝 diferido | — |
 
 **Leyenda:** ⏳ pendiente · 🔄 en curso · ✅ cerrada · 📝 diferido
