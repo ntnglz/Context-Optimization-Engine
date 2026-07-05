@@ -106,7 +106,7 @@ flowchart TB
 | **CIR** | Representación intermedia estable, optimizable y serializable | Salida de parser / pipeline | Árbol o grafo de contexto | Diseño (sin implementar) |
 | **Renderer** | Proyección **prosa** hacia LLM; ensamblaje final | Resultado del pipeline | String / messages[] | N1/N2 `render_prose` · spec [renderer.md](renderer.md) |
 | **Metrics** | Tokens, ratio, latencia, integridad semántica | Antes / después del pipeline | Informe de métricas | Gateway + harness |
-| **State Store** | Mantener estado semántico entre turnos (Nivel 5) | Diffs de contexto | Vista materializada | v1 in-memory · `src/coe/level5/` |
+| **State Store** | Mantener estado semántico entre turnos (Nivel 5) | Diffs de contexto | Vista materializada | v1 filesystem JSON + in-memory · `src/coe/level5/` |
 
 ---
 

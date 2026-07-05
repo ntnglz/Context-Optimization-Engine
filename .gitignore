@@ -21,3 +21,5 @@ data/benchmarks/runs/*
 # Transcripts locales (exports Cursor, chats, etc.) — ver data/benchmarks/corpus/README.md
 data/benchmarks/corpus/transcripts/*
 !data/benchmarks/corpus/transcripts/.gitkeep
+data/sessions/*
+!data/sessions/.gitkeep

@@ -380,3 +380,59 @@ class ContextGraph:
 
     def to_json(self, indent: int = 2) -> str:
         return json.dumps(self.to_dict(), indent=indent, ensure_ascii=False)
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> ContextGraph:
+        nodes = [
+            GraphNode(
+                id=node["id"],
+                kind=node["kind"],
+                labels=list(node.get("labels") or []),
+                properties=dict(node.get("properties") or {}),
+                source_refs=list(node.get("source_refs") or []),
+            )
+            for node in data.get("nodes") or []
+        ]
+        edges = [
+            GraphEdge(
+                from_id=edge["from"],
+                to_id=edge["to"],
+                type=edge["type"],
+                properties=dict(edge.get("properties") or {}),
+            )
+            for edge in data.get("edges") or []
+        ]
+        orphans = [
+            GraphOrphan(
+                text=orphan["text"],
+                source_refs=list(orphan.get("source_refs") or []),
+            )
+            for orphan in data.get("orphans") or []
+        ]
+        node_by_id = {node.id: node for node in nodes}
+        active_ids = data.get("active_node_ids")
+        if active_ids is None:
+            active_nodes = None
+            active_edges = None
+        else:
+            active_id_set = set(active_ids)
+            active_nodes = [node_by_id[node_id] for node_id in active_ids if node_id in node_by_id]
+            active_edges = [
+                edge
+                for edge in edges
+                if edge.from_id in active_id_set and edge.to_id in active_id_set
+            ]
+        return cls(
+            nodes=nodes,
+            edges=edges,
+            orphans=orphans,
+            schema_version=data.get("schema_version") or GRAPH_SCHEMA_VERSION,
+            original_tokens=int(data.get("original_tokens") or 0),
+            optimized_tokens=int(data.get("optimized_tokens") or 0),
+            internal_tokens=int(data.get("internal_tokens") or 0),
+            active_nodes=active_nodes,
+            active_edges=active_edges,
+            query_context=data.get("query_context"),
+            max_hops=int(data.get("max_hops") or 2),
+            include_orphans=bool(data.get("include_orphans", True)),
+        )
