@@ -1,5 +1,5 @@
 id: n5_session
-description: Multi-turn session — N5 passthrough via N1 flatten until StateView
+description: Multi-turn session — N1 dedup + N5 StateView
 levels: [1, 5]
 target_lang: null
 locale: en

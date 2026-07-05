@@ -104,3 +104,17 @@ class TestOptimizeContextN2:
 
         with pytest.raises(NotImplementedError, match="Levels not implemented"):
             optimize_context(blocks, levels=[3])
+
+
+class TestOptimizeContextN5:
+    def test_n1_n5_delegates_to_state_view(self):
+        blocks = [
+            ContextBlock(id="A", content="Juan works at ACME."),
+            ContextBlock(id="B", content="Juan approved the budget."),
+        ]
+        out = optimize_context(blocks, levels=[1, 5], locale="en")
+
+        assert out.state_view is not None
+        assert "n5" in out.metrics.latency_ms_by_level
+        assert "n1" not in out.metrics.latency_ms_by_level
+        assert "Accumulated session state:" in out.text

@@ -1,0 +1,49 @@
+{
+  "harness_version": "0.4.0",
+  "profile_id": "n5_session",
+  "tier": "smoke",
+  "evaluator": "mock",
+  "cases_run": 1,
+  "cases_passed": 1,
+  "gate_passed": true,
+  "gate_failures": [],
+  "summary": {
+    "factual_recall_mean": 1.0,
+    "t_coe_p95_ms": 0.07,
+    "artifact_leak_rate": 0.0,
+    "prose_ratio_mean": 1.8919,
+    "comprehension_similarity_mean": 1.0,
+    "comprehension_delta_mean": 0.0,
+    "factual_f1_mean": 1.0,
+    "user_language_match_rate": 1.0
+  },
+  "results": [
+    {
+      "case_id": "acme_session_budget_v1",
+      "passed": true,
+      "failures": [],
+      "metrics": {
+        "t_coe_ms": 0.07,
+        "optimized_tokens": 70,
+        "original_tokens": 37,
+        "prose_ratio": 1.8919,
+        "artifact_leak": false,
+        "factual_recall": 1.0,
+        "factual_f1": 1.0,
+        "comprehension_similarity": 1.0,
+        "comprehension_delta": 0.0,
+        "readability_score": null,
+        "readability_score_a": null,
+        "user_language_ok": true,
+        "response_artifact_leak": false
+      },
+      "optimized_context_preview": "Accumulated session state:\n\nThe following information appears in multiple sources:\n- Empresa: ACME (sources A, B, C).\n\nAdditional content by source:\nFrom source A:\nJuan works at ACME.\n\nFrom source B:\n"
+    }
+  ],
+  "metadata": {
+    "git_sha": "7c04055",
+    "embedding_backend": "simple",
+    "embedding_model": "paraphrase-multilingual-MiniLM-L12-v2",
+    "evaluator": "mock"
+  }
+}

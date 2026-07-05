@@ -8,6 +8,8 @@ from typing import Any
 
 from .level1 import deduplicate_context
 from .level2 import factorize_context
+from .level5 import InMemoryStateStore, StateView, update_semantic_state
+from .level5.store import StateStore
 from .models import (
     ContextBlock,
     DeduplicationResult,
@@ -16,7 +18,7 @@ from .models import (
 )
 from .renderer import render_raw_context
 
-_SUPPORTED_LEVELS = frozenset({1, 2})
+_SUPPORTED_LEVELS = frozenset({1, 2, 5})
 
 
 @dataclass
@@ -25,6 +27,8 @@ class OptimizeOptions:
     locale: str | None = "en"
     target_lang: str | None = None
     l0: bool = False
+    session_id: str | None = None
+    state_store: StateStore | None = None
 
 
 @dataclass
@@ -50,6 +54,8 @@ class OptimizeResult:
     metrics: OptimizationMetrics
     deduplication: DeduplicationResult | None = None
     factorization: FactorizationResult | None = None
+    state_view: StateView | None = None
+    commit_id: str | None = None
     trace: list[LevelTrace] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
@@ -74,6 +80,8 @@ class OptimizeResult:
             data["deduplication"] = self.deduplication.to_dict()
         if self.factorization is not None:
             data["factorization"] = self.factorization.to_dict()
+        if self.commit_id is not None:
+            data["commit_id"] = self.commit_id
         return data
 
 
@@ -84,17 +92,22 @@ def optimize_context(
     locale: str | None = "en",
     target_lang: str | None = None,
     l0: bool = False,
+    session_id: str | None = None,
+    state_store: StateStore | None = None,
 ) -> OptimizeResult:
     """
     Ejecuta el pipeline COE sobre un bundle de bloques.
 
-    Niveles soportados: **1** (dedup), **2** (factorización). L0 pendiente.
+    Niveles soportados: **1** (dedup), **2** (factorización), **5** (estado).
+    L0 pendiente.
     """
     opts = OptimizeOptions(
         levels=_normalize_levels(levels or [1]),
         locale=locale,
         target_lang=target_lang,
         l0=l0,
+        session_id=session_id,
+        state_store=state_store,
     )
     return _optimize(blocks, opts)
 
@@ -120,14 +133,33 @@ def _optimize(blocks: list[ContextBlock], opts: OptimizeOptions) -> OptimizeResu
     latency_by_level: dict[str, float] = {}
     dedup: DeduplicationResult | None = None
     factorized: FactorizationResult | None = None
+    state_view: StateView | None = None
+    commit_id: str | None = None
     text = original_text
 
     t_total = time.perf_counter()
 
-    run_n1 = 1 in opts.levels
-    run_n2 = 2 in opts.levels
+    run_n5 = 5 in opts.levels
+    run_n1 = 1 in opts.levels and not run_n5
+    run_n2 = 2 in opts.levels and not run_n5
 
-    if run_n1:
+    if run_n5:
+        sub_levels = [n for n in opts.levels if n != 5] or [1]
+        t0 = time.perf_counter()
+        n5_result = update_semantic_state(
+            blocks,
+            session_id=opts.session_id or "_ephemeral",
+            store=opts.state_store or InMemoryStateStore(),
+            locale=opts.locale,
+            levels=sub_levels,
+        )
+        elapsed = (time.perf_counter() - t0) * 1000.0
+        latency_by_level["n5"] = elapsed
+        trace.append(LevelTrace(level=5, latency_ms=elapsed, detail="state_view"))
+        state_view = n5_result.view
+        commit_id = n5_result.commit_id
+        text = state_view.render()
+    elif run_n1:
         t0 = time.perf_counter()
         dedup = deduplicate_context(blocks)
         elapsed = (time.perf_counter() - t0) * 1000.0
@@ -165,5 +197,7 @@ def _optimize(blocks: list[ContextBlock], opts: OptimizeOptions) -> OptimizeResu
         metrics=metrics,
         deduplication=dedup,
         factorization=factorized,
+        state_view=state_view,
+        commit_id=commit_id,
         trace=trace,
     )
