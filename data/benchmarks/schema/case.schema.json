@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://coe.local/schema/case.schema.json",
+  "title": "COE Benchmark Case",
+  "type": "object",
+  "required": ["id"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "version": { "type": "integer", "minimum": 1 },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "description": { "type": "string" },
+    "blocks": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/block" }
+    },
+    "question": { "type": "string" },
+    "expected_facts": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "response_lang": { "type": "string", "minLength": 2 },
+    "user_message_lang": { "type": "string", "minLength": 2 },
+    "system_addendum": { "type": "string" },
+    "session": { "$ref": "#/$defs/session" },
+    "mock": { "$ref": "#/$defs/mock" }
+  },
+  "oneOf": [
+    {
+      "required": ["blocks", "question"],
+      "properties": {
+        "session": { "type": "null" }
+      }
+    },
+    {
+      "required": ["session"],
+      "properties": {
+        "session": { "$ref": "#/$defs/session" }
+      }
+    }
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "block": {
+      "type": "object",
+      "required": ["id", "content"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "content": { "type": "string" },
+        "source_type": {
+          "type": "string",
+          "enum": [
+            "prose",
+            "history",
+            "rag",
+            "tool",
+            "structured",
+            "code",
+            "glossary",
+            "memory"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "session_turn": {
+      "type": "object",
+      "required": ["blocks", "question"],
+      "properties": {
+        "blocks": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/block" }
+        },
+        "question": { "type": "string", "minLength": 1 },
+        "expected_facts": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "session": {
+      "type": "object",
+      "required": ["turns"],
+      "properties": {
+        "session_id": { "type": "string" },
+        "turns": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/session_turn" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "mock": {
+      "type": "object",
+      "required": ["arm_a_response", "arm_b_response"],
+      "properties": {
+        "arm_a_response": { "type": "string" },
+        "arm_b_response": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  }
+}

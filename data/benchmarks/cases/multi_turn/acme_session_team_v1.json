@@ -1,0 +1,59 @@
+{
+  "id": "acme_session_team_v1",
+  "version": 1,
+  "tags": ["multi_turn", "n5", "en"],
+  "description": "ACME team session — 3 turns: roster, budget, approval chain",
+
+  "response_lang": "en",
+  "user_message_lang": "en",
+  "system_addendum": "Answer in English. Be clear for a non-technical user.",
+
+  "session": {
+    "session_id": "bench-acme-team-session-1",
+    "turns": [
+      {
+        "blocks": [
+          {
+            "id": "A",
+            "source_type": "rag",
+            "content": "Empresa: ACME\nJuan works at ACME as engineer."
+          },
+          {
+            "id": "B",
+            "source_type": "rag",
+            "content": "Empresa: ACME\nPedro works at ACME as analyst."
+          }
+        ],
+        "question": "Who works at ACME?",
+        "expected_facts": ["Juan", "Pedro"]
+      },
+      {
+        "blocks": [
+          {
+            "id": "C",
+            "source_type": "rag",
+            "content": "Empresa: ACME\nPresupuesto: 80k for Q2."
+          }
+        ],
+        "question": "What is the Q2 budget for ACME?",
+        "expected_facts": ["80k", "Q2"]
+      },
+      {
+        "blocks": [
+          {
+            "id": "D",
+            "source_type": "rag",
+            "content": "Empresa: ACME\nJuan approved the Q2 budget on Monday."
+          }
+        ],
+        "question": "Who approved the ACME Q2 budget?",
+        "expected_facts": ["Juan", "approved"]
+      }
+    ]
+  },
+
+  "mock": {
+    "arm_a_response": "Juan approved the ACME Q2 budget of 80k.",
+    "arm_b_response": "Juan approved the ACME Q2 budget of 80k."
+  }
+}

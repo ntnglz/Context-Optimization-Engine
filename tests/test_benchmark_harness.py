@@ -128,7 +128,7 @@ class TestHarnessN5Session:
             tags={"multi_turn"},
             benchmark_root=BENCH,
         )
-        assert report.cases_run == 1
+        assert report.cases_run == 2
         assert report.gate_passed
         assert "Accumulated session state:" in (
             report.results[0].optimized_context_preview or ""

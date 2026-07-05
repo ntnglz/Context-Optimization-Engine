@@ -123,7 +123,7 @@ Excepción v1: flag `include_pending_turn=true` si merge difiere de commit (work
 | 6 | MCP `optimize_context` / `estimate_savings` | 5 ✅ |
 | 7 | CIR v1.0 grafo + schema + envelope N5 | 6 ✅ |
 | 8 | README + architecture §9 + vision al día | 7 ✅ |
-| 9 | `case.schema.json` + ≥4 casos nuevos | 8 |
+| 9 | `case.schema.json` + ≥4 casos nuevos | 8 ✅ |
 | 10 | L0 v2 (detección, `TranslationBackend`) | 9 |
 | 11 | `max_context_tokens` en Gateway | 10 |
 | 12 | Composición PCM+COE + harness `coe+pcm` | 11 |

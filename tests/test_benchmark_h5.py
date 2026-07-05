@@ -34,7 +34,7 @@ class TestMultiTurnCase:
             tags={"multi_turn"},
             benchmark_root=BENCH,
         )
-        assert report.cases_run == 1
+        assert report.cases_run == 2
         assert report.gate_passed
 
 

@@ -45,8 +45,8 @@ Orden de las fases 6–18 según **dependencias técnicas** y **cierre de deuda*
 | MCP stdio | ✅ | ✅ | 5 |
 | L0 | ✅ | ⚠️ parcial | **9** |
 | CIR formal | ✅ | ✅ | **6** |
-| `case.schema.json` | — | ❌ | **8** |
-| Casos benchmark | — | 6 | **8** |
+| `case.schema.json` | ✅ | ✅ | **8** |
+| Casos benchmark | — | 10 | **8** |
 | Presupuesto tokens COE | ✅ parcial | ❌ | **10** |
 | PCM+COE runtime | ✅ doc | ❌ | **11** |
 | HTTP API | ✅ doc | ❌ | **12** |
@@ -124,7 +124,7 @@ Resumen; detalle histórico en commits de cierre.
 
 ---
 
-### Fase 8 — Harness contrato + corpus
+### Fase 8 — Harness contrato + corpus ✅
 
 **Objetivo:** Validación escalable antes de integraciones externas.
 
@@ -339,8 +339,8 @@ Temas de [Context Optimization Engine (COE).md](Context%20Optimization%20Engine%
 | 5 | MCP COE | ✅ cerrada | bf9ddf2 |
 | 6 | CIR formal | ✅ cerrada | dd51755 |
 | 7 | Sincronización documental | ✅ cerrada | 727a182 |
-| 8 | Harness contrato + corpus | ⏳ **activa** | — |
-| 9 | L0 v2 | ⏳ pendiente | — |
+| 8 | Harness contrato + corpus | ✅ cerrada | — |
+| 9 | L0 v2 | ⏳ **activa** | — |
 | 10 | Presupuesto tokens COE | ⏳ pendiente | — |
 | 11 | Integración PCM+COE | ⏳ pendiente | — |
 | 12 | HTTP API | ⏳ pendiente | — |
@@ -398,7 +398,7 @@ flowchart LR
 | 2026-07-05 | CIR v1.0 diseño | Opción A: solo grafo serializado; N1–N3 en Python; `document`/`chunk`; `action` arista |
 | 2026-07-05 | Fases 6–18 + Pista I | Cierre de deuda sin presión de fechas; Fase 6 activa; 19 opcional |
 | 2026-07-05 | Fase 6 CIR v1.0 | Envelope, schema, action aristas, document/chunk RAG |
-| 2026-07-05 | Fase 7 docs sync | README, vision, architecture §3/§9 alineados con fases 0–6 |
+| 2026-07-05 | Fase 8 harness | case.schema.json, 4 casos, validación loader; release Ollama manual si Ollama local |
 
 ---
 

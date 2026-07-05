@@ -147,7 +147,7 @@ Context-Optimization-Engine/
 ├── data/
 │   ├── examples/             # Demo N1 (ACME)
 │   └── benchmarks/           # Casos, perfiles, baselines, runs
-├── tests/                    # pytest (154 tests)
+├── tests/                    # pytest (169 tests)
 └── run.py
 ```
 

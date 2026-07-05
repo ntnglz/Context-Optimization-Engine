@@ -149,18 +149,21 @@ data/benchmarks/
     └── .gitkeep
 ```
 
-Integración con `run.py` raíz (futuro):
+Integración con `run.py` raíz:
 
 ```bash
-python run.py --benchmark --profile n1_n2_en --tier ci
-python run.py --benchmark --profile full --tier release --evaluator ollama:qwen3:8b
+python run.py --ci
+python run.py --benchmark --profile n1_n2_en
+python run.py --release-dev-agent   # tier release dev_agent + Ollama (fuera de --ci)
 ```
+
+`--release-dev-agent` ejecuta `scripts/ci/release-dev-agent.sh` (perfil `n5_graph_session`, `--tags dev_agent`, evaluador Ollama). Requiere Ollama en marcha; **no** forma parte de `python run.py --ci`.
 
 ---
 
 ## 5. Schema de casos (`Case`)
 
-Un caso es un experimento **respondible solo con el contexto**. Validación JSON Schema en carga.
+Un caso es un experimento **respondible solo con el contexto**. Validación JSON Schema en carga (`src/coe/benchmark/validate.py` → `data/benchmarks/schema/case.schema.json`).
 
 ```json
 {
@@ -452,7 +455,7 @@ Versionado:
 |---------|-----|
 | `pytest` | Capa 0 (ya) |
 | `pyyaml` | Perfiles |
-| `jsonschema` | Validación casos |
+| **`jsonschema`** | Validación casos (`case.schema.json`) |
 | `langdetect` o `fasttext` | user_language_match |
 | opcional `sentence-transformers` | **comprehension_similarity** (gate; modelo fijado en config) |
 | opcional `httpx` | Ollama / APIs |
@@ -461,7 +464,76 @@ Sin dependencias LLM en capa 1 — CI funciona offline.
 
 ---
 
-## 13. Roadmap de implementación
+## 13. Corpus local → casos versionados
+
+Transcripciones crudas de agentes **no** van a git. El flujo convierte exports locales en casos JSON anonimizados bajo `data/benchmarks/cases/`.
+
+### Layout
+
+```
+data/benchmarks/
+├── corpus/
+│   ├── README.md              # recordatorio local (versionado)
+│   └── transcripts/           # .gitignore — exports Cursor, .md, .jsonl
+│       └── .gitkeep
+├── schema/case.schema.json    # contrato — validado en load_case()
+└── cases/
+    ├── core/                  # gate smoke CI
+    ├── regression/            # fallos históricos congelados
+    ├── multi_turn/            # N5 sesiones
+    ├── es/                    # casos español (locale)
+    ├── multilingual/          # alias histórico ES
+    └── dev_agent/             # conversaciones reales anonimizadas
+```
+
+### Workflow (manual)
+
+1. **Exportar** chat de Cursor u otro agente → copiar a `corpus/transcripts/` (p. ej. `transcripts/cursor/pytest-triage.md`).
+2. **Recortar** a 2–4 turnos útiles; separar bloques `tool` (logs, salida terminal) y `prose` (resumen humano).
+3. **Anonimizar** según tabla:
+
+| Original | Sustituto |
+|----------|-----------|
+| Nombre de app / proyecto | `ExampleApp`, `ExampleService` |
+| Modelos de dominio | `RecordItem`, `RecordType` |
+| Rutas locales (`/Users/…`) | `/workspace/app/…` u omitir |
+| Commits / hashes reales | ficticios u omitir |
+| PII, tokens, URLs con credenciales | `[REDACTED]` |
+
+4. **Estructurar** JSON con `id`, `tags`, `session.turns[]` o `blocks` + `question`, `expected_facts` por turno.
+5. **Validar** antes de commit:
+
+```bash
+python3 -m pytest tests/test_benchmark_schema.py -q
+# o cargar un caso:
+python3 -c "
+from pathlib import Path
+from coe.benchmark.dataset import load_case
+load_case(Path('data/benchmarks/cases/dev_agent/mi_caso_v1.json'))
+"
+```
+
+6. **Mock fixture** — si el caso entra en tier smoke/CI, añadir `mock.arm_a_response` / `arm_b_response` para evaluador determinista.
+7. **Release** — casos `dev_agent` con conversación real: validar con Ollama antes de merge grande:
+
+```bash
+python run.py --release-dev-agent
+```
+
+8. **Commit** solo el JSON en `cases/`; nunca el transcript bruto.
+
+### Casos por carpeta (Fase 8)
+
+| Carpeta | Rol | Ejemplo |
+|---------|-----|---------|
+| `regression/` | Regresión mínima reproducible | `regression_prose_no_artifact_v1.json` |
+| `multi_turn/` | Sesión N5 ampliada (≥3 turnos) | `acme_session_team_v1.json` |
+| `es/` | Pregunta/respuesta en español | `acme_team_es_v1.json` |
+| `dev_agent/` | Desde corpus transcripts | `dev_pytest_failure_session_v1.json` |
+
+---
+
+## 14. Roadmap de implementación
 
 | Fase | Entregable | Desbloquea |
 |------|------------|------------|
@@ -473,7 +545,7 @@ Sin dependencias LLM en capa 1 — CI funciona offline.
 
 ---
 
-## 14. Decisiones operativas cerradas
+## 15. Decisiones operativas cerradas
 
 | Tema | Decisión |
 |------|----------|
@@ -483,7 +555,7 @@ Sin dependencias LLM en capa 1 — CI funciona offline.
 
 ---
 
-## 15. Documentos relacionados
+## 16. Documentos relacionados
 
 | Documento | Relación |
 |-----------|----------|

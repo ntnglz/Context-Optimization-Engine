@@ -6,10 +6,12 @@ import json
 from pathlib import Path
 
 from .schema import BenchmarkCase
+from .validate import validate_case_dict
 
 
 def load_case(path: Path) -> BenchmarkCase:
     data = json.loads(path.read_text(encoding="utf-8"))
+    validate_case_dict(data)
     return BenchmarkCase.from_dict(data)
 
 

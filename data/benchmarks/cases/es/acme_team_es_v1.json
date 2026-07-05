@@ -1,0 +1,35 @@
+{
+  "id": "acme_team_es_v1",
+  "version": 1,
+  "tags": ["es", "single_turn"],
+  "description": "Equipo ACME — pregunta en español sobre roles y presupuesto",
+
+  "blocks": [
+    {
+      "id": "A",
+      "source_type": "rag",
+      "content": "Empresa: ACME\nJuan trabaja en ACME como ingeniero."
+    },
+    {
+      "id": "B",
+      "source_type": "rag",
+      "content": "Empresa: ACME\nPedro trabaja en ACME como analista."
+    },
+    {
+      "id": "C",
+      "source_type": "rag",
+      "content": "Empresa: ACME\nPresupuesto: 80k\nJuan aprobó el presupuesto."
+    }
+  ],
+
+  "question": "¿Quién aprobó el presupuesto de ACME y quién trabaja allí?",
+  "expected_facts": ["Juan", "aprobó", "Pedro"],
+  "response_lang": "es",
+  "user_message_lang": "es",
+  "system_addendum": "Responde en español. Sé claro para un usuario no técnico.",
+
+  "mock": {
+    "arm_a_response": "Juan aprobó el presupuesto de ACME. Juan y Pedro trabajan en ACME.",
+    "arm_b_response": "Juan aprobó el presupuesto de ACME. Juan y Pedro trabajan en ACME."
+  }
+}

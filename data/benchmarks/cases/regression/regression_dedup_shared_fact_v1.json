@@ -1,0 +1,35 @@
+{
+  "id": "regression_dedup_shared_fact_v1",
+  "version": 1,
+  "tags": ["regression", "single_turn", "en", "n1"],
+  "description": "Regression — repeated Empresa: ACME line deduped without losing unique facts",
+
+  "blocks": [
+    {
+      "id": "A",
+      "source_type": "rag",
+      "content": "Empresa: ACME\nCliente: Globex"
+    },
+    {
+      "id": "B",
+      "source_type": "rag",
+      "content": "Empresa: ACME\nPresupuesto: 50k"
+    },
+    {
+      "id": "C",
+      "source_type": "rag",
+      "content": "Empresa: ACME\nCliente: Globex"
+    }
+  ],
+
+  "question": "What is the ACME budget?",
+  "expected_facts": ["50k", "budget"],
+  "response_lang": "en",
+  "user_message_lang": "en",
+  "system_addendum": "Answer in English. Be clear for a non-technical user.",
+
+  "mock": {
+    "arm_a_response": "The ACME budget is 50k.",
+    "arm_b_response": "The ACME budget is 50k."
+  }
+}

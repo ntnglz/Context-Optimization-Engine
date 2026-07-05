@@ -1,0 +1,30 @@
+{
+  "id": "regression_prose_no_artifact_v1",
+  "version": 1,
+  "tags": ["regression", "single_turn", "en", "n4"],
+  "description": "Regression — graph render must not leak node:/entity: tokens in prose",
+
+  "blocks": [
+    {
+      "id": "A",
+      "source_type": "rag",
+      "content": "Empresa: ACME\nJuan knows Pedro."
+    },
+    {
+      "id": "B",
+      "source_type": "rag",
+      "content": "Pedro works at ACME.\nJuan works at ACME."
+    }
+  ],
+
+  "question": "Who does Juan know and where does Pedro work?",
+  "expected_facts": ["Pedro", "ACME", "knows"],
+  "response_lang": "en",
+  "user_message_lang": "en",
+  "system_addendum": "Answer in English. Be clear for a non-technical user.",
+
+  "mock": {
+    "arm_a_response": "Juan knows Pedro. Pedro works at ACME.",
+    "arm_b_response": "Juan knows Pedro. Pedro works at ACME."
+  }
+}
