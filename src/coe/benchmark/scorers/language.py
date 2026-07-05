@@ -4,27 +4,31 @@ from __future__ import annotations
 
 import re
 
+from coe.ingest.detect import detect_language, has_spanish_surface
+
 
 def user_language_match(response: str, expected_lang: str) -> bool:
     """
     True si la respuesta parece estar en ``expected_lang``.
 
-    Usa ``langdetect`` si está instalado; si no, heurística ASCII/latin para ``en``.
+    Reutiliza detección L0; tolera respuestas ES con jerga técnica en inglés.
     """
     text = response.strip()
     if not text:
         return False
 
     expected = expected_lang.split("-")[0].lower()
-    try:
-        from langdetect import detect
+    detected, confidence = detect_language(text)
+    if detected == expected:
+        return True
 
-        detected = detect(text).split("-")[0].lower()
-        return detected == expected
-    except ImportError:
+    if expected == "es" and has_spanish_surface(text):
+        return True
+
+    if expected == "en" and detected == "unknown":
         return _fallback_match(text, expected)
-    except Exception:
-        return _fallback_match(text, expected)
+
+    return False
 
 
 def _fallback_match(text: str, expected_lang: str) -> bool:

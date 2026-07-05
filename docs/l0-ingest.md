@@ -3,7 +3,7 @@
 > Principios multilingües: [i18n.md](i18n.md).  
 > **No es un nivel de optimización** (no es N0 que compite con N1–N5): es una etapa **pre-N1** dentro de **Context Ingest**.
 
-**Estado:** ✅ Spec aprobada · **v1 implementado** (`src/coe/ingest/` · ES→EN heurístico)
+**Estado:** ✅ Spec aprobada · **v2 implementado** (`src/coe/ingest/` · langdetect + `TranslationBackend`)
 
 ## Alineación con la visión fundacional
 

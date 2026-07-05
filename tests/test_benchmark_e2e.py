@@ -83,3 +83,10 @@ class TestReadabilityJudge:
 class TestLanguageScorer:
     def test_english_fallback(self):
         assert user_language_match("Juan approved the budget.", "en") is True
+
+    def test_spanish_with_english_jargon(self):
+        text = (
+            "Tras compilar para macOS queda 1 warning de AppIntents "
+            "(metadata generation skipped)."
+        )
+        assert user_language_match(text, "es") is True

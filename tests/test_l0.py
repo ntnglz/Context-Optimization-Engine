@@ -1,7 +1,12 @@
-"""Tests L0 — normalización de idioma."""
+"""Tests L0 — normalización de idioma (v2)."""
 
 from coe import optimize_context
-from coe.ingest import normalize_language
+from coe.ingest import (
+    BenchmarkStubBackend,
+    compute_dominant_language,
+    normalize_language,
+)
+from coe.ingest.translate import translate_block_content
 from coe.models import ContextBlock
 
 
@@ -20,6 +25,45 @@ class TestL0Detect:
         assert lang == "en"
         assert confidence > 0.5
 
+    def test_short_text_uses_heuristic(self):
+        from coe.ingest.detect import detect_language
+
+        lang, confidence = detect_language("Juan trabaja en ACME.")
+        assert lang == "es"
+        assert confidence > 0.0
+
+
+class TestL0DominantLanguage:
+    def test_mixed_bundle_sets_dominant_lang(self):
+        blocks = [
+            ContextBlock(
+                id="A",
+                content="Juan trabaja en ACME y aprobó el presupuesto en la reunión.",
+            ),
+            ContextBlock(
+                id="B",
+                content="Pedro works at ACME and approved the budget for the project.",
+            ),
+        ]
+        dominant, _ = compute_dominant_language(blocks)
+        assert dominant in {"es", "en"}
+
+    def test_mixed_bundle_trace(self):
+        blocks = [
+            ContextBlock(
+                id="A",
+                content="Juan trabaja en ACME y aprobó el presupuesto en la reunión.",
+            ),
+            ContextBlock(
+                id="B",
+                content="Pedro works at ACME and approved the budget for the project.",
+            ),
+        ]
+        result = normalize_language(blocks, target_lang="en")
+        assert result.ingest_trace.mixed_bundle is True
+        assert result.ingest_trace.dominant_lang in {"es", "en"}
+        assert result.ingest_trace.detect_confidence["A"] > 0.0
+
 
 class TestL0Normalize:
     def test_translates_es_blocks_to_en(self):
@@ -36,6 +80,7 @@ class TestL0Normalize:
         result = normalize_language(blocks, target_lang="en")
 
         assert result.ingest_trace.blocks_translated == 2
+        assert result.ingest_trace.translation_backend == "benchmark_stub"
         assert "works at ACME" in result.blocks[0].content
         assert "approved the budget" in result.blocks[1].content
         assert "trabaja" not in result.blocks[0].content
@@ -52,6 +97,7 @@ class TestL0Normalize:
 
         assert result.blocks[0].content == "Juan trabaja en ACME."
         assert result.ingest_trace.blocks_skipped == 1
+        assert result.ingest_trace.detected_langs["A"] == "preserved"
 
     def test_skips_already_english(self):
         blocks = [ContextBlock(id="A", content="Juan works at ACME.")]
@@ -59,6 +105,63 @@ class TestL0Normalize:
 
         assert result.ingest_trace.blocks_translated == 0
         assert result.blocks[0].content == "Juan works at ACME."
+
+    def test_target_lang_auto_uses_dominant(self):
+        blocks = [
+            ContextBlock(
+                id="A",
+                content="Juan trabaja en ACME y aprobó el presupuesto en la reunión larga.",
+            ),
+            ContextBlock(
+                id="B",
+                content="Pedro también trabaja en ACME y aprobó el presupuesto del cliente.",
+            ),
+        ]
+        result = normalize_language(blocks, target_lang="auto")
+        assert result.ingest_trace.target_lang == "es"
+        assert result.ingest_trace.blocks_translated == 0
+
+    def test_preserves_urls_and_uuids(self):
+        backend = BenchmarkStubBackend()
+        text = (
+            "Visita https://acme.example/docs y el id "
+            "550e8400-e29b-41d4-a716-446655440000. Juan trabaja en ACME."
+        )
+        translated = translate_block_content(
+            text,
+            source_lang="es",
+            target_lang="en",
+            backend=backend,
+        )
+        assert "https://acme.example/docs" in translated
+        assert "550e8400-e29b-41d4-a716-446655440000" in translated
+        assert "works at ACME" in translated
+
+    def test_skips_code_fence_by_default(self):
+        blocks = [
+            ContextBlock(
+                id="A",
+                content="```python\nJuan trabaja en ACME.\n```",
+            ),
+        ]
+        result = normalize_language(blocks, target_lang="en")
+        assert result.ingest_trace.blocks_skipped == 1
+        assert "trabaja" in result.blocks[0].content
+
+    def test_translate_code_blocks_opt_in(self):
+        blocks = [
+            ContextBlock(
+                id="A",
+                content="```\nJuan trabaja en ACME.\n```",
+            ),
+        ]
+        result = normalize_language(
+            blocks,
+            target_lang="en",
+            translate_code_blocks=True,
+        )
+        assert result.ingest_trace.blocks_translated == 1
+        assert "works at ACME" in result.blocks[0].content
 
 
 class TestL0Gateway:

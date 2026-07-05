@@ -8,7 +8,7 @@ Contexto bruto (N bloques)  →  COE  →  Representación compacta  →  LLM
 
 ## Estado
 
-> Orden de trabajo: [execution-plan.md](docs/execution-plan.md) · **Fases 0–8 ✅** · activa: **Fase 9**
+> Orden de trabajo: [execution-plan.md](docs/execution-plan.md) · **Fases 0–9 ✅** · activa: **Fase 10**
 
 | Componente | Spec | Implementación |
 |------------|------|----------------|
@@ -17,7 +17,7 @@ Contexto bruto (N bloques)  →  COE  →  Representación compacta  →  LLM
 | [Plan de ejecución](docs/execution-plan.md) | ✅ | Fases 0–6 cerradas |
 | [Pipeline L0 → N1–N5](docs/levels.md) | ✅ | L0 v1 · N1 · N2 · N3 · N4 · N5 |
 | [Multilingüe (i18n)](docs/i18n.md) | ✅ | Locale packs N2 EN/ES |
-| [L0 Ingest](docs/l0-ingest.md) | ✅ | v1 (heurística ES→EN) · v2 planificado Fase 9 |
+| [L0 Ingest](docs/l0-ingest.md) | ✅ | v2 (langdetect + TranslationBackend) |
 | [Context Ingest](docs/ingest.md) | ✅ | ✅ `ingest_context`, `ContextBundle`, matriz `source_type` |
 | [Renderer](docs/renderer.md) | ✅ | ✅ prosa N1–N5 vía `renderer/assembly.py` |
 | [CIR v1.0](docs/cir-v1.md) | ✅ | ✅ grafo + envelope N5 (`src/coe/cir/`) |

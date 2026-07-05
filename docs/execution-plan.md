@@ -43,7 +43,7 @@ Orden de las fases 6–18 según **dependencias técnicas** y **cierre de deuda*
 | Renderer unificado | ✅ | ✅ | 2 |
 | Harness smoke + release script | ✅ | ✅ | 4 |
 | MCP stdio | ✅ | ✅ | 5 |
-| L0 | ✅ | ⚠️ parcial | **9** |
+| L0 | ✅ | ✅ | **9** |
 | CIR formal | ✅ | ✅ | **6** |
 | `case.schema.json` | ✅ | ✅ | **8** |
 | Casos benchmark | — | 10 | **8** |
@@ -141,7 +141,7 @@ Resumen; detalle histórico en commits de cierre.
 
 ---
 
-### Fase 9 — L0 v2
+### Fase 9 — L0 v2 ✅
 
 **Objetivo:** Cumplir [l0-ingest.md](l0-ingest.md) más allá de heurística ES→EN.
 
@@ -340,8 +340,8 @@ Temas de [Context Optimization Engine (COE).md](Context%20Optimization%20Engine%
 | 6 | CIR formal | ✅ cerrada | dd51755 |
 | 7 | Sincronización documental | ✅ cerrada | 727a182 |
 | 8 | Harness contrato + corpus | ✅ cerrada | 872d5d1 |
-| 9 | L0 v2 | ⏳ **activa** | — |
-| 10 | Presupuesto tokens COE | ⏳ pendiente | — |
+| 9 | L0 v2 | ✅ cerrada | — |
+| 10 | Presupuesto tokens COE | ⏳ **activa** | — |
 | 11 | Integración PCM+COE | ⏳ pendiente | — |
 | 12 | HTTP API | ⏳ pendiente | — |
 | 13 | Model Adapter | ⏳ pendiente | — |
