@@ -62,14 +62,25 @@ def build_pcm_messages(
     optimized_context: str,
     user_question: str,
     response_lang: str,
+    output_style: str = "normal",
     system_addendum: str = "",
+    pcm_interpretation_hint: str = "",
 ) -> list[dict[str, str]]:
     """Monta messages[] según renderer.md — PCM en system, contexto separado del user."""
-    addendum = system_addendum.strip() or "Answer clearly using only the provided context."
-    system = (
-        f"{compressed_instruction.strip()}\n\n"
-        f"Answer in {response_lang}. {addendum}"
-    )
+    try:
+        from pcm.message_assembly import build_system_prompt
+
+        system = build_system_prompt(
+            compressed_instruction=compressed_instruction,
+            response_lang=response_lang,
+            output_style=output_style,  # type: ignore[arg-type]
+            pcm_interpretation_hint=pcm_interpretation_hint or system_addendum,
+        )
+    except ImportError:
+        addendum = system_addendum.strip() or (
+            f"Answer in {response_lang}. Answer clearly using only the provided context."
+        )
+        system = f"{compressed_instruction.strip()}\n\n{addendum}"
     user = (
         f"Context:\n{optimized_context.strip()}\n\n"
         f"Question: {user_question.strip()}"
@@ -91,6 +102,7 @@ def optimize_with_pcm(
     max_window_tokens: int | None = None,
     response_reserve: int = 512,
     response_lang: str = "en",
+    output_style: str = "normal",
     system_addendum: str = "",
     pcm_backend: str = "stub",
     pcm_compressor: InstructionCompressor | None = None,
@@ -154,6 +166,7 @@ def optimize_with_pcm(
         optimized_context=context.text,
         user_question=user_instruction,
         response_lang=response_lang,
+        output_style=output_style,
         system_addendum=system_addendum,
     )
 
