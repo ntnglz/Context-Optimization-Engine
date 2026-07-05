@@ -25,6 +25,7 @@ Perfil **`n5_graph_session_release`**: `comprehension_similarity` ≥ **0.86**, 
 | **qwen3:4b** | ~130 s | **0.894** | 1.0 | **PASS** | Default release; lento, semántica estable |
 | **qwen3:4b** ×3 runs | ~390 s | 0.894 | 1.0 | **PASS** | Gate oficial `release-dev-agent.sh` |
 | **granite4.1:3b** | **~12 s** | 0.413 | 0.75 | FAIL | Rápido; respuestas A/B muy distintas |
+| **granite4.1:8b** | **~28 s** | 0.626 | 0.75 | FAIL | ~2× más lento que 3b; **+52% similitud**; EN casi pasa (0.78) |
 | **pcm-granite:latest** | ~17 s | 0.532 | 0.50 | FAIL | Modelo PCM; no calibrado para evaluación chat |
 | **gemma3:4b** | ~18 s | 0.474 | 0.50 | FAIL | Rápido; similar a Granite en gate |
 | **qwen3.5:9b** | ~20 min / 3 runs | 0.489 | 0.50 | FAIL | Más capaz en otros tasks; peor en este benchmark |
@@ -32,6 +33,13 @@ Perfil **`n5_graph_session_release`**: `comprehension_similarity` ≥ **0.86**, 
 Perfil estricto **`n5_graph_session`** (similitud ≥ 0.90): **qwen3:4b** falla por 0.894 — usar **`qwen3:8b`** tras `ollama pull` si se exige gate estricto.
 
 ---
+
+## Detalle por caso — granite4.1:8b (fast+, 2026-07-05)
+
+| Caso | similitud | factual | readability | vs granite 3b |
+|------|-----------|---------|-------------|---------------|
+| `dev_pytest_failure_session_v1` | **0.783** | 1.0 | 5.0 | +0.18 (cerca umbral 0.86) |
+| `dev_warnings_session_v1` | 0.469 | 0.50 | 3.0 | +0.25 (sigue flojo en ES) |
 
 ## Detalle por caso — granite4.1:3b (fast)
 
@@ -77,6 +85,7 @@ bash scripts/ci/benchmark-dev-agent-fast.sh
 # Granite por defecto
 
 OLLAMA_MODEL=gemma3:4b bash scripts/ci/benchmark-dev-agent-fast.sh
+OLLAMA_MODEL=granite4.1:8b bash scripts/ci/benchmark-dev-agent-fast.sh   # ~28 s, mejor EN
 OLLAMA_MODEL=granite4.1:3b RUNS=1 bash scripts/ci/benchmark-dev-agent-fast.sh
 ```
 
@@ -111,7 +120,7 @@ No crear perfil «fast» con umbrales bajos para Granite: el gate perdería sign
 ## Recomendación operativa
 
 1. **Desarrollo diario:** `python run.py --ci` (mock, segundos).
-2. **Probar casos dev_agent con feedback LLM:** `benchmark-dev-agent-fast.sh` + Granite o Gemma (~10–20 s).
+2. **Probar casos dev_agent con feedback LLM:** `benchmark-dev-agent-fast.sh` — `granite4.1:8b` (~28 s, mejor EN) o `granite4.1:3b` (~12 s, más rápido).
 3. **Antes de push/merge con cambios en pipeline o casos:** `python run.py --release-dev-agent` con Qwen (~7 min, 3 runs).
 4. **Modelos PCM** (`pcm-granite`, `pcm-compressor`): reservados para compresión de instrucciones; no usar como evaluador E2E del harness COE.
 
