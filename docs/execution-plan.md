@@ -338,7 +338,7 @@ Temas de [Context Optimization Engine (COE).md](Context%20Optimization%20Engine%
 | 4 | Harness madurez + casos reales | ✅ cerrada | b8de213 |
 | 5 | MCP COE | ✅ cerrada | bf9ddf2 |
 | 6 | CIR formal | ✅ cerrada | dd51755 |
-| 7 | Sincronización documental | ✅ cerrada | — |
+| 7 | Sincronización documental | ✅ cerrada | 727a182 |
 | 8 | Harness contrato + corpus | ⏳ **activa** | — |
 | 9 | L0 v2 | ⏳ pendiente | — |
 | 10 | Presupuesto tokens COE | ⏳ pendiente | — |
