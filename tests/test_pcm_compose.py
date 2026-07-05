@@ -1,5 +1,9 @@
 """Tests composición PCM+COE (Fase 11)."""
 
+from unittest.mock import patch
+
+import pytest
+
 from coe import optimize_with_pcm
 from coe.budget import allocate_coe_budget
 from coe.models import ContextBlock
@@ -75,3 +79,35 @@ class TestOptimizeWithPCM:
         assert out.context.metrics.truncated is True
         assert out.window.truncated is True
         assert out.context.metrics.optimized_tokens <= out.window.coe_budget_tokens + 2
+
+
+def test_build_pcm_messages_includes_response_block_when_pcm_installed():
+    from coe.pcm.compose import build_pcm_messages
+
+    pytest.importorskip("pcm")
+    messages = build_pcm_messages(
+        compressed_instruction="TASK=review INPUT=python",
+        optimized_context="ctx",
+        user_question="Review this",
+        response_lang="en",
+        output_style="concise",
+    )
+    assert "RESPONSE:" in messages[0]["content"]
+    assert "Answer only what was asked" in messages[0]["content"]
+
+
+def test_build_pcm_messages_import_error_fallback():
+    from coe.pcm.compose import build_pcm_messages
+
+    with patch.dict("sys.modules", {"pcm.message_assembly": None}):
+        messages = build_pcm_messages(
+            compressed_instruction="TASK=review INPUT=python",
+            optimized_context="ctx",
+            user_question="Review this",
+            response_lang="en",
+        )
+    assert messages[0]["content"] == (
+        "TASK=review INPUT=python\n\n"
+        "Answer in en. Answer clearly using only the provided context."
+    )
+    assert messages[1]["content"] == "Context:\nctx\n\nQuestion: Review this"
