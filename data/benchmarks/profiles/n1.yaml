@@ -1,0 +1,14 @@
+id: n1
+description: N1 deduplication only — structural + latency gate
+levels: [1]
+target_lang: null
+locale: null
+l0: false
+options:
+  cite_sources: false
+gate:
+  t_coe_p95_ms: 80
+  artifact_leak_rate_max: 0.02
+tier:
+  ci: true
+  release: true

@@ -176,24 +176,34 @@ Un pipeline puede cumplir ratio excelente y **fallar** latencia o redacción. La
 
 ---
 
-## 7. Implementación prevista
+## 7. Implementación
 
-```
-scripts/comprehension_benchmark.py
-├── run_case(context, question, pipeline_config)
-├── score_comprehension(resp_a, resp_b, expected_facts)
-├── score_readability(resp_b, resp_a, user_instruction)   # juez LLM + heurísticas
-├── detect_artifacts(resp_b)
-└── report(metrics, latency_ms)
+**Diseño completo del harness:** [benchmark-harness.md](benchmark-harness.md) (capas, módulos, schema, CI, roadmap H1–H5).
 
-data/comprehension_cases.json
-├── single_turn[]
-├── multi_turn[]          # N5
-├── multilingual[]        # mezcla en contexto (L0) + turnos con user_lang distinto
-└── per_case.response_lang  # idioma esperado de la respuesta (= user_lang del turno)
-```
+Resumen:
 
-Salida: informe JSON + markdown para CI; fallo de gate si cualquier umbral §6 no se cumple.
+| Pieza | Ubicación |
+|-------|-----------|
+| Librería | `src/coe/benchmark/` |
+| CLI | `scripts/benchmark/run.py` |
+| Casos | `data/benchmarks/cases/` |
+| Perfiles | `data/benchmarks/profiles/` |
+| Informes | `data/benchmarks/runs/` (gitignored) |
+
+Gate de aprobación: umbrales §6 aplicados por **perfil YAML**, no hardcode en script.
+
+---
+
+## 8. Tiers CI (referencia rápida)
+
+Ver [benchmark-harness.md](benchmark-harness.md) §10.
+
+| Tier | LLM | Cuándo |
+|------|-----|--------|
+| `smoke` | mock | PR |
+| `ci` | mock | main |
+| `nightly` | ollama | cron |
+| `release` | ollama ×3 runs | tag |
 
 ---
 
@@ -222,5 +232,6 @@ Heurísticas (`artifact_leak_rate`, latencia) son deterministas y corren en cada
 | [architecture.md](architecture.md) | Metrics transversal, Gateway |
 | [i18n.md](i18n.md) | Tres ejes de idioma; casos multilingües |
 | [renderer.md](renderer.md) | Prosa hacia LLM; artifact_leak |
+| [benchmark-harness.md](benchmark-harness.md) | Diseño harness (capas, código, CI, schema) |
 | [spec-gaps.md](spec-gaps.md) | Checklist cierre pre-implementación |
 | [ingest.md](ingest.md) | ContextBundle, casos multilingües |

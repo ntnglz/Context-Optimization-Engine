@@ -1,0 +1,35 @@
+{
+  "id": "acme_budget_v1",
+  "version": 1,
+  "tags": ["core", "single_turn", "en"],
+  "description": "ACME example from foundational doc — who approved budget",
+
+  "blocks": [
+    {
+      "id": "A",
+      "source_type": "rag",
+      "content": "Empresa: ACME\nCliente: Globex\nJuan works at ACME."
+    },
+    {
+      "id": "B",
+      "source_type": "rag",
+      "content": "Empresa: ACME\nPresupuesto: 50k\nJuan approved the budget."
+    },
+    {
+      "id": "C",
+      "source_type": "rag",
+      "content": "Empresa: ACME\nCliente: Globex\nPedro works at ACME."
+    }
+  ],
+
+  "question": "Who approved the ACME budget?",
+  "expected_facts": ["Juan", "approved", "budget"],
+  "response_lang": "en",
+  "user_message_lang": "en",
+  "system_addendum": "Answer in English. Be clear for a non-technical user.",
+
+  "mock": {
+    "arm_a_response": "Juan approved the ACME budget.",
+    "arm_b_response": "Juan approved the ACME budget."
+  }
+}

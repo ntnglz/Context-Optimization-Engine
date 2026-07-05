@@ -18,7 +18,8 @@ Contexto bruto (N bloques)  →  COE  →  Representación compacta  →  LLM
 | [L0 Ingest](docs/l0-ingest.md) | ✅ Aprobado · sin implementar |
 | [Context Ingest](docs/ingest.md) | ✅ Spec cerrada |
 | [Renderer](docs/renderer.md) | ✅ Spec cerrada |
-| [Benchmarks y KPIs](docs/benchmarks.md) | ✅ Aprobado · harness pendiente |
+| [Benchmarks y KPIs](docs/benchmarks.md) | ✅ Aprobado |
+| [Harness de benchmarks](docs/benchmark-harness.md) | ✅ Diseño |
 | [Cierre spec](docs/spec-gaps.md) | ✅ Checklist |
 | [Nivel 1 — spec](docs/level1.md) | ✅ Aprobado |
 | [Nivel 2 — spec](docs/level2.md) | ✅ Aprobado |
@@ -96,8 +97,9 @@ Context-Optimization-Engine/
 │   └── level1/
 │       ├── deduplicator.py   # Nivel 1: eliminación de redundancias
 │       └── render.py         # Serialización legible para LLM
-├── data/examples/
-│   └── level1_acme.json      # Ejemplo ACME (documento fundacional)
+├── data/
+│   ├── examples/           # Demo N1 (ACME)
+│   └── benchmarks/         # Casos, perfiles, runs (ver README ahí)
 ├── tests/
 │   └── test_level1.py
 └── run.py

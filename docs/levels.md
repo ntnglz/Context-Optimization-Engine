@@ -13,6 +13,7 @@ COE aplica **transformaciones composables** sobre el contexto. **L0** (Ingest) p
 | [i18n.md](i18n.md) | Principios multilingües, locale packs | ✅ Aprobado |
 | [l0-ingest.md](l0-ingest.md) | Normalización de idioma (Ingest) | ✅ Aprobado · sin implementar |
 | [benchmarks.md](benchmarks.md) | KPIs comprensión, redacción, latencia COE | ✅ Aprobado · harness pendiente |
+| [benchmark-harness.md](benchmark-harness.md) | Diseño harness (capas, CI, schema) | ✅ Diseño cerrado |
 | [spec-gaps.md](spec-gaps.md) | Checklist cierre pre-implementación | ✅ Cerrado |
 | [ingest.md](ingest.md) | Context Ingest + Normalizer | ✅ Cerrado |
 | [renderer.md](renderer.md) | Prosa obligatoria hacia LLM | ✅ Cerrado |

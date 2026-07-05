@@ -17,6 +17,7 @@ En [Prompt-Compression-Middleware](https://github.com/ntnglz/Prompt-Compression-
 | [i18n.md](i18n.md) | Multilingüe: `target_lang`, locale packs ✅ aprobado |
 | [l0-ingest.md](l0-ingest.md) | Spec L0 — normalización de idioma ✅ aprobada |
 | [benchmarks.md](benchmarks.md) | KPIs comprensión, redacción, latencia COE ✅ aprobado |
+| [benchmark-harness.md](benchmark-harness.md) | Diseño del harness de calidad ✅ |
 | [spec-gaps.md](spec-gaps.md) | Checklist cierre pre-implementación ✅ |
 | [ingest.md](ingest.md) | Context Ingest + Normalizer ✅ |
 | [renderer.md](renderer.md) | Prosa hacia LLM ✅ |

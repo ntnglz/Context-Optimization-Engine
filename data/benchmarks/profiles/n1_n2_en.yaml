@@ -1,0 +1,19 @@
+id: n1_n2_en
+description: N1 + N2 factorization, English locale — first E2E gate
+levels: [1, 2]
+target_lang: en
+locale: en
+l0: false
+options:
+  cite_sources: false
+gate:
+  t_coe_p95_ms: 120
+  comprehension_similarity: 0.90
+  factual_recall: 0.95
+  readability_score_min: 3.5
+  readability_delta_max: 0.3
+  artifact_leak_rate_max: 0.02
+  user_language_match: 0.95
+tier:
+  ci: true
+  release: true
