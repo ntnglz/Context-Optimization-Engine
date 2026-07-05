@@ -105,7 +105,7 @@ Excepción v1: flag `include_pending_turn=true` si merge difiere de commit (work
 | N5 TTL / archivado | 14 ✅ |
 | Entity linking fuzzy | 15 ✅ |
 | Store distribuido | 16 ✅ |
-| Normalizer zh + locale pack | 17 |
+| Normalizer zh + locale pack | 17 ✅ |
 | Ingest `structured` / `code` | 18 |
 | CIR v1.1 Opción B (`stage` N1–N3) | 19 (opcional) |
 
@@ -132,7 +132,7 @@ Excepción v1: flag `include_pending_turn=true` si merge difiere de commit (work
 | 15 | N5 TTL + archivado | 14 ✅ |
 | 16 | Entity linking fuzzy | 15 ✅ |
 | 17 | `SQLiteStateStore` | 16 ✅ |
-| 18 | Locale pack `zh` | 17 |
+| 18 | Locale pack `zh` | 17 ✅ |
 | 19 | Ingest structured/code/glossary | 18 |
 
 Checklist spec:

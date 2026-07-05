@@ -277,7 +277,7 @@ Resumen; detalle de entregables en secciones siguientes (fases 6–18).
 
 ---
 
-### Fase 17 — Locale `zh` ⏳ **activa**
+### Fase 17 — Locale `zh` ✅
 
 **Objetivo:** Segundo locale pack completo según [i18n.md](i18n.md).
 
@@ -293,7 +293,7 @@ Resumen; detalle de entregables en secciones siguientes (fases 6–18).
 
 ---
 
-### Fase 18 — Ingest `structured` y `code`
+### Fase 18 — Ingest `structured` y `code` ⏳ **activa**
 
 **Objetivo:** Reducir passthrough en matriz [ingest.md](ingest.md).
 
@@ -360,8 +360,8 @@ Temas de [Context Optimization Engine (COE).md](Context%20Optimization%20Engine%
 | 14 | N5 operaciones (TTL) | ✅ cerrada | 76c3683 |
 | 15 | Entity linking fuzzy | ✅ cerrada | e8b45d5 |
 | 16 | Store distribuido | ✅ cerrada | 8d23a72 |
-| 17 | Locale `zh` | ⏳ **activa** | — |
-| 18 | Ingest structured/code | ⏳ pendiente | — |
+| 17 | Locale `zh` | ✅ cerrada | 6ec6435 |
+| 18 | Ingest structured/code | ⏳ **activa** | — |
 | 19 | CIR v1.1 Opción B | ⏳ opcional | — |
 
 **Leyenda:** ⏳ pendiente · 🔄 en curso · ✅ cerrada · 📝 diferido · 🚫 omitida
@@ -416,6 +416,7 @@ flowchart LR
 | 2026-07-05 | Cierre Fase 11 PCM+COE | 594f63b — optimize_with_pcm, perfil coe_pcm_n1_en |
 | 2026-07-05 | Cierre Fase 12 HTTP | b191a62 — FastAPI /optimize, /estimate, /health |
 | 2026-07-05 | Cierre Fase 13 Model Adapter | 8b84bb5 — target_model, adaptadores default/mistral/openai |
+| 2026-07-05 | Cierre Fase 17 locale zh | 6ec6435 — pack zh, segmentación, L0 EN→ZH stub, benchmark n1_n2_zh |
 | 2026-07-05 | Cierre Fase 16 store SQLite | 8d23a72 — SQLiteStateStore, state_store_backend/path, WAL v1 |
 | 2026-07-05 | Cierre Fase 15 entity linking fuzzy | e8b45d5 — fuzzy_link_threshold, alias map, merge N5 |
 
