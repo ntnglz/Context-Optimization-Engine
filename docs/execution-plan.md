@@ -27,7 +27,7 @@ Este plan **reemplaza** `architecture.md` §9 como orden de trabajo. La arquitec
 | Renderer unificado | ✅ | ✅ | Ensamblaje Gateway según `renderer.md` |
 | Harness capa 0–1 | ✅ | ✅ | 8 perfiles smoke mock |
 | Harness capa 2 (Ollama) | ✅ | ✅ | `scripts/ci/release-dev-agent.sh`; fuera de `--ci` |
-| MCP | ✅ acotado | ❌ | Fase 5 |
+| MCP | ✅ acotado | ✅ | `optimize_context`, `estimate_savings` vía stdio |
 | CIR formal | 📝 diferido | ❌ | Fase 6 — no bloquea |
 | Casos benchmark | — | 6 | 2 core, 1 ES, 1 multi_turn, 2 dev_agent |
 
@@ -160,7 +160,7 @@ Este plan **reemplaza** `architecture.md` §9 como orden de trabajo. La arquitec
 | 2 | Renderer + ensamblaje Gateway | ✅ cerrada | — |
 | 3 | N5 producción | ✅ cerrada | d733bb7 |
 | 4 | Harness madurez + casos reales | ✅ cerrada | b8de213 |
-| 5 | MCP COE | ⏳ pendiente | — |
+| 5 | MCP COE | ✅ cerrada | (este commit) |
 | 6 | CIR formal | 📝 diferido | — |
 
 **Leyenda:** ⏳ pendiente · 🔄 en curso · ✅ cerrada · 📝 diferido

@@ -45,10 +45,12 @@ python run.py --test
 python run.py --ci
 # equivalente: bash scripts/ci/smoke.sh
 
-# Benchmark smoke individual (mock)
-python scripts/benchmark/run.py --tier smoke --profile n1_n2_en \
-  --compare-baseline data/benchmarks/baselines/n1_n2_en_smoke.json
+# Servidor MCP para agentes (Cursor, Claude Desktop)
+pip install -r requirements-mcp.txt
+python scripts/mcp/run_server.py
 ```
+
+Ver configuración MCP en [architecture.md §7.2](docs/architecture.md).
 
 ## Gateway (pipeline composable)
 
@@ -132,11 +134,13 @@ Context-Optimization-Engine/
 │   ├── level3/               # Estructuración relacional
 │   ├── level4/               # Grafo de conocimiento efímero
 │   ├── level5/               # StateView, sesión multi-turno
+│   ├── mcp/                  # Servidor MCP (optimize_context, estimate_savings)
 │   ├── renderer/             # Plantillas prosa N1
 │   └── benchmark/            # Harness H1–H5
 ├── scripts/
 │   ├── benchmark/            # run.py, compare.py
-│   └── ci/                   # smoke.sh, nightly-mock.sh (CI local)
+│   ├── mcp/                  # run_server.py (stdio MCP)
+│   └── ci/                   # smoke.sh, nightly-mock.sh, release-dev-agent.sh
 ├── data/
 │   ├── examples/             # Demo N1 (ACME)
 │   └── benchmarks/           # Casos, perfiles, baselines, runs

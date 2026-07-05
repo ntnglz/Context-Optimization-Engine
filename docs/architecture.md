@@ -240,15 +240,56 @@ result.metrics       # ahorro, latencia
 result.to_json()     # pipelines / logs
 ```
 
-### 7.2 Servicios (futuro)
+### 7.2 Servicios (MCP)
 
 | Interfaz | Uso |
 |----------|-----|
 | **CLI** | `run.py --demo`, benchmarks locales |
 | **MCP** | Herramientas `optimize_context`, `estimate_savings` para agentes |
-| **HTTP** | Middleware transparente en pipelines RAG |
+| **HTTP** | Middleware transparente en pipelines RAG (futuro) |
 
-PCM ya expone MCP/HTTP para compresión; COE seguirá el mismo patrón de integración cuando el pipeline esté maduro.
+#### MCP COE (stdio)
+
+Servidor en `src/coe/mcp/`; arranque:
+
+```bash
+python scripts/mcp/run_server.py
+# o desde el repo con PYTHONPATH=src:
+python -m coe.mcp.server
+```
+
+Configuración Cursor (`.cursor/mcp.json` o ajustes MCP):
+
+```json
+{
+  "mcpServers": {
+    "coe": {
+      "command": "python",
+      "args": ["/ruta/al/Context-Optimization-Engine/scripts/mcp/run_server.py"],
+      "env": {}
+    }
+  }
+}
+```
+
+**`optimize_context`** — entrada: lista de bloques `{id, content, source_type?}` + opciones (`levels`, `locale`, `l0`, `session_id`, …). Salida: JSON con `text` (prosa hacia el LLM) y `metrics`.
+
+```json
+{
+  "blocks": [
+    {"id": "A", "source_type": "rag", "content": "Empresa: ACME\nJuan works at ACME."},
+    {"id": "B", "source_type": "rag", "content": "Empresa: ACME\nPresupuesto: 50k"}
+  ],
+  "levels": [1, 2],
+  "locale": "en"
+}
+```
+
+**`estimate_savings`** — mismas opciones; devuelve solo métricas (`original_tokens`, `optimized_tokens`, `tokens_saved`, `compression_ratio`, `latency_ms`) sin prosa y sin evaluador LLM.
+
+Dependencia: `pip install -r requirements-mcp.txt` (incluye `mcp`).
+
+PCM ya expone MCP/HTTP para compresión; COE sigue el mismo patrón de integración stdio para agentes locales.
 
 ---
 
@@ -283,7 +324,7 @@ Los benchmarks vivirán en `data/` + `tests/` + `scripts/comprehension_benchmark
 | **B** | Gateway `optimize_context` | ✅ L0, N1–N5 |
 | **C** | N2 factorización | ✅ |
 | **D** | CIR + refactor pipeline | 📝 Fase 6 — diferido |
-| **E** | MCP + benchmark RAG | ⏳ Fase 5 |
+| **E** | MCP + benchmark RAG | ✅ MCP stdio (`optimize_context`, `estimate_savings`) |
 | **F** | N3–N5 + State Store | ✅ N3–N5 v1; Store producción (auto-store, retención, conflictos) |
 
 ### Orden vigente (resumen)
@@ -297,7 +338,7 @@ Ver [execution-plan.md](execution-plan.md) para entregables, criterios de hecho 
 | 2 | Renderer + ensamblaje Gateway | ✅ |
 | 3 | N5 producción | ✅ |
 | 4 | Harness madurez + casos reales | ✅ |
-| 5 | MCP COE | ⏳ |
+| 5 | MCP COE | ✅ |
 | 6 | CIR formal | 📝 diferido |
 
 ### Histórico (fases A–F originales)
