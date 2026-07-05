@@ -43,6 +43,12 @@ def main() -> int:
         default=None,
         help="Baseline report.json; fail if KPIs regress",
     )
+    parser.add_argument(
+        "--embedding-backend",
+        default=None,
+        choices=["auto", "simple", "sentence_transformers"],
+        help="Backend for comprehension_similarity (default: simple / COE_EMBEDDING_BACKEND)",
+    )
     args = parser.parse_args()
 
     root = args.benchmark_root or default_benchmark_root()
@@ -54,6 +60,7 @@ def main() -> int:
             tier=args.tier,
             tags=tags,
             benchmark_root=root,
+            embedding_backend=args.embedding_backend,
         )
     except (ValueError, FileNotFoundError) as exc:
         print(f"Error: {exc}", file=sys.stderr)
@@ -65,9 +72,10 @@ def main() -> int:
         ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
         out_dir = root / "runs" / f"{args.profile}_{args.tier}_{ts}"
 
-    json_path, md_path = save_report(report, out_dir)
+    json_path, md_path, config_path = save_report(report, out_dir)
     print(f"Wrote {json_path}")
     print(f"Wrote {md_path}")
+    print(f"Wrote {config_path}")
     print(f"Gate: {'PASS' if report.gate_passed else 'FAIL'}")
     if report.gate_failures:
         for item in report.gate_failures:

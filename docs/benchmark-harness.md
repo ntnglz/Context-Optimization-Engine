@@ -3,7 +3,7 @@
 > KPIs y umbrales: [benchmarks.md](benchmarks.md) · Pipeline COE: [levels.md](levels.md) · Render: [renderer.md](renderer.md)  
 > Hermano conceptual: PCM `e2e_benchmark` (instrucción); COE mide **contexto**.
 
-**Estado:** diseño aprobado para implementación · decisiones operativas cerradas (§15) · código pendiente
+**Estado:** H1–H2 implementados · H3 (embedding, compare) implementado · H4+ pendiente
 
 El harness no es un script auxiliar: es el **sistema de calidad** que validará cada nivel (N2→N5), cada cambio de locale pack y cada perfil de despliegue. Debe ser **rápido en CI**, **reproducible**, **barato** en volumen y **estricto** en pre-release.
 
@@ -429,8 +429,8 @@ Sin dependencias LLM en capa 1 — CI funciona offline.
 |------|------------|------------|
 | **H1** | `schema`, `dataset`, `profile`, scorers deterministas, mock evaluator, CLI smoke | ✅ Implementado (N1 pipeline) |
 | **H2** | `gateway.optimize_context`, `arms`, N1 `render_prose`, harness vía Gateway | ✅ Implementado |
-| **H3** | `factual`, embedding similarity, `report`, compare | Siguiente |
-| **H4** | Ollama evaluator, readability judge, casos core E2E | Pre-release |
+| **H3** | `factual` F1, embedding similarity, `report`/`compare`, gate comprensión | ✅ Implementado |
+| **H4** | Ollama evaluator, readability judge, casos core E2E | Siguiente |
 | **H5** | multi_turn N5, multilingual, nightly workflow | N5 |
 
 ---

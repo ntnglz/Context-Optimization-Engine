@@ -15,6 +15,4 @@ Informes de referencia para `compare.py` en PR. **No** gitignore — forman part
 3. Copiar a `data/benchmarks/baselines/{profile}_smoke.json`.
 4. PR dedicado: título `benchmark: refresh baseline n1_n2_en`.
 
-Los baselines incluyen `harness_version`, `embedding_model`, `git_sha` en metadata.
-
-**Nota:** los baselines se generan tras implementar H3 (compare + report). Hasta entonces este directorio es placeholder.
+Los baselines incluyen `harness_version`, `embedding_model`, `embedding_backend` y `git_sha` en `metadata` / `config.json`.

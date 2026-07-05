@@ -71,6 +71,7 @@ class BenchmarkCase:
 class GateConfig:
     t_coe_p95_ms: float | None = None
     comprehension_similarity: float | None = None
+    comprehension_delta_min: float | None = None
     factual_recall: float | None = None
     readability_score_min: float | None = None
     readability_delta_max: float | None = None
@@ -106,6 +107,7 @@ class PipelineProfile:
             gate=GateConfig(
                 t_coe_p95_ms=gate_raw.get("t_coe_p95_ms"),
                 comprehension_similarity=gate_raw.get("comprehension_similarity"),
+                comprehension_delta_min=gate_raw.get("comprehension_delta_min"),
                 factual_recall=gate_raw.get("factual_recall"),
                 readability_score_min=gate_raw.get("readability_score_min"),
                 readability_delta_max=gate_raw.get("readability_delta_max"),
@@ -125,6 +127,9 @@ class CaseMetrics:
     prose_ratio: float
     artifact_leak: bool
     factual_recall: float | None = None
+    factual_f1: float | None = None
+    comprehension_similarity: float | None = None
+    comprehension_delta: float | None = None
 
 
 @dataclass
@@ -150,9 +155,10 @@ class BenchmarkReport:
     gate_failures: list[str]
     results: list[CaseResult] = field(default_factory=list)
     summary: dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        data: dict[str, Any] = {
             "harness_version": self.harness_version,
             "profile_id": self.profile_id,
             "tier": self.tier,
@@ -174,9 +180,15 @@ class BenchmarkReport:
                         "prose_ratio": round(r.metrics.prose_ratio, 4),
                         "artifact_leak": r.metrics.artifact_leak,
                         "factual_recall": r.metrics.factual_recall,
+                        "factual_f1": r.metrics.factual_f1,
+                        "comprehension_similarity": r.metrics.comprehension_similarity,
+                        "comprehension_delta": r.metrics.comprehension_delta,
                     },
                     "optimized_context_preview": r.optimized_context_preview[:500],
                 }
                 for r in self.results
             ],
         }
+        if self.metadata:
+            data["metadata"] = self.metadata
+        return data

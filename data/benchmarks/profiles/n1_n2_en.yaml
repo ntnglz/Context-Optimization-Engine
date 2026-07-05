@@ -9,6 +9,7 @@ options:
 gate:
   t_coe_p95_ms: 120
   comprehension_similarity: 0.90
+  comprehension_delta_min: -0.10
   factual_recall: 0.95
   readability_score_min: 3.5
   readability_delta_max: 0.3

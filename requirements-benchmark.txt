@@ -1,0 +1,2 @@
+# Optional dependencies for full benchmark E2E (embedding gate)
+sentence-transformers>=3.0

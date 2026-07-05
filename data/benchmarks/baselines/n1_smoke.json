@@ -1,5 +1,5 @@
 {
-  "harness_version": "0.1.0",
+  "harness_version": "0.2.0",
   "profile_id": "n1",
   "tier": "smoke",
   "evaluator": "mock",
@@ -11,7 +11,10 @@
     "factual_recall_mean": 1.0,
     "t_coe_p95_ms": 0.04,
     "artifact_leak_rate": 0.0,
-    "prose_ratio_mean": 1.6512
+    "prose_ratio_mean": 1.6512,
+    "comprehension_similarity_mean": 1.0,
+    "comprehension_delta_mean": 0.0,
+    "factual_f1_mean": 1.0
   },
   "results": [
     {
@@ -24,8 +27,16 @@
         "original_tokens": 43,
         "prose_ratio": 1.6512,
         "artifact_leak": false,
-        "factual_recall": 1.0
+        "factual_recall": 1.0,
+        "factual_f1": 1.0,
+        "comprehension_similarity": 1.0,
+        "comprehension_delta": 0.0
       }
     }
-  ]
+  ],
+  "metadata": {
+    "git_sha": "5dc81b4",
+    "embedding_backend": "simple",
+    "embedding_model": "paraphrase-multilingual-MiniLM-L12-v2"
+  }
 }

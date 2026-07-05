@@ -9,10 +9,15 @@ from .dataset import load_cases
 from .evaluators.mock import mock_responses
 from .pipeline_runner import run_pipeline_on_case
 from .profile import load_profile_by_id
-from .report import evaluate_gate
+from .report import build_report_metadata, evaluate_gate
 from .schema import BenchmarkCase, BenchmarkReport, CaseMetrics, CaseResult, PipelineProfile
 from .scorers.artifacts import detect_artifact_leak
-from .scorers.factual import factual_recall
+from .scorers.embedding import DEFAULT_BACKEND, EmbeddingBackend, resolve_backend
+from .scorers.factual import (
+    comprehension_delta,
+    factual_f1,
+    factual_recall,
+)
 from .scorers.latency import latency_ok
 
 
@@ -23,14 +28,24 @@ def run_suite(
     tier: str = "smoke",
     tags: set[str] | None = None,
     evaluator: str = "mock",
+    embedding_backend: EmbeddingBackend | None = None,
 ) -> BenchmarkReport:
     cases = load_cases(cases_dir, tags=tags)
     if not cases:
         raise ValueError(f"No cases found in {cases_dir} with tags={tags}")
 
+    resolved_backend = resolve_backend(embedding_backend)
     results: list[CaseResult] = []
     for case in cases:
-        results.append(_run_case(case, profile, tier=tier, evaluator=evaluator))
+        results.append(
+            _run_case(
+                case,
+                profile,
+                tier=tier,
+                evaluator=evaluator,
+                embedding_backend=embedding_backend,
+            )
+        )
 
     report = BenchmarkReport(
         harness_version=HARNESS_VERSION,
@@ -42,6 +57,7 @@ def run_suite(
         gate_passed=False,
         gate_failures=[],
         results=results,
+        metadata=build_report_metadata(embedding_backend=resolved_backend),
     )
     report.summary = _build_summary(results)
     report.gate_passed, report.gate_failures = evaluate_gate(report, profile)
@@ -54,6 +70,7 @@ def _run_case(
     *,
     tier: str,
     evaluator: str,
+    embedding_backend: EmbeddingBackend | None,
 ) -> CaseResult:
     pipeline = run_pipeline_on_case(case, profile)
     prose_ratio = (
@@ -72,6 +89,9 @@ def _run_case(
         failures.append("artifact_leak in optimized context")
 
     recall: float | None = None
+    f1: float | None = None
+    similarity: float | None = None
+    delta: float | None = None
     arm_a = ""
     arm_b = ""
     if tier in ("smoke", "ci", "nightly", "release"):
@@ -80,12 +100,35 @@ def _run_case(
             arm_a = mock.arm_a_response
             arm_b = mock.arm_b_response
             recall = factual_recall(arm_b, case.expected_facts)
+            f1 = factual_f1(arm_b, case.expected_facts)
             if profile.gate.factual_recall is not None and recall < profile.gate.factual_recall:
                 failures.append(
                     f"factual_recall {recall:.2f} < {profile.gate.factual_recall}"
                 )
+
+            from .scorers.embedding import comprehension_similarity
+
+            similarity = comprehension_similarity(
+                arm_a,
+                arm_b,
+                backend=embedding_backend,
+            )
+            delta = comprehension_delta(similarity)
+            if (
+                profile.gate.comprehension_similarity is not None
+                and similarity < profile.gate.comprehension_similarity
+            ):
+                failures.append(
+                    f"comprehension_similarity {similarity:.4f} < "
+                    f"{profile.gate.comprehension_similarity}"
+                )
+            delta_min = profile.gate.comprehension_delta_min
+            if delta_min is not None and delta < delta_min:
+                failures.append(
+                    f"comprehension_delta {delta:.4f} < {delta_min}"
+                )
         elif evaluator != "mock":
-            failures.append(f"evaluator {evaluator!r} not implemented in H1")
+            failures.append(f"evaluator {evaluator!r} not implemented before H4")
 
     metrics = CaseMetrics(
         t_coe_ms=pipeline.t_coe_ms,
@@ -94,6 +137,9 @@ def _run_case(
         prose_ratio=prose_ratio,
         artifact_leak=artifact,
         factual_recall=recall,
+        factual_f1=f1,
+        comprehension_similarity=similarity,
+        comprehension_delta=delta,
     )
     return CaseResult(
         case_id=case.id,
@@ -110,10 +156,15 @@ def _build_summary(results: list[CaseResult]) -> dict:
     if not results:
         return {}
     n = len(results)
-    return {
-        "factual_recall_mean": round(
-            sum(r.metrics.factual_recall or 0 for r in results) / n, 4
-        ),
+
+    def _mean(values: list[float | None]) -> float | None:
+        present = [v for v in values if v is not None]
+        if not present:
+            return None
+        return round(sum(present) / len(present), 4)
+
+    summary = {
+        "factual_recall_mean": _mean([r.metrics.factual_recall for r in results]) or 0.0,
         "t_coe_p95_ms": round(
             sorted(r.metrics.t_coe_ms for r in results)[max(0, int(n * 0.95) - 1)],
             2,
@@ -125,6 +176,16 @@ def _build_summary(results: list[CaseResult]) -> dict:
             sum(r.metrics.prose_ratio for r in results) / n, 4
         ),
     }
+    sim_mean = _mean([r.metrics.comprehension_similarity for r in results])
+    delta_mean = _mean([r.metrics.comprehension_delta for r in results])
+    f1_mean = _mean([r.metrics.factual_f1 for r in results])
+    if sim_mean is not None:
+        summary["comprehension_similarity_mean"] = sim_mean
+    if delta_mean is not None:
+        summary["comprehension_delta_mean"] = delta_mean
+    if f1_mean is not None:
+        summary["factual_f1_mean"] = f1_mean
+    return summary
 
 
 def default_benchmark_root() -> Path:
@@ -137,6 +198,7 @@ def run_suite_from_ids(
     tier: str = "smoke",
     tags: set[str] | None = None,
     benchmark_root: Path | None = None,
+    embedding_backend: EmbeddingBackend | None = None,
 ) -> BenchmarkReport:
     root = benchmark_root or default_benchmark_root()
     profile = load_profile_by_id(root / "profiles", profile_id)
@@ -149,4 +211,5 @@ def run_suite_from_ids(
         tier=tier,
         tags=tag_filter,
         evaluator="mock",
+        embedding_backend=embedding_backend or DEFAULT_BACKEND,
     )
