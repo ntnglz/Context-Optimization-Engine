@@ -4,6 +4,16 @@ from __future__ import annotations
 
 from ..models import FactorizationResult, SharedFact
 
+_COMPANY_PHRASE = {
+    "en": "works at {company}",
+    "es": "trabaja en {company}",
+}
+
+_CONJUNCTION = {
+    "en": {"pair": " and ", "list": ", "},
+    "es": {"pair": " y ", "list": ", "},
+}
+
 
 def render_factorization_prose(
     result: FactorizationResult,
@@ -11,7 +21,7 @@ def render_factorization_prose(
     locale: str | None = "en",
 ) -> str:
     """Modo ``prose_compact``: sujeto explícito una vez por entidad."""
-    _ = locale
+    loc = (locale or "en").split("-")[0].lower()
     sections: list[str] = []
 
     if result.shared_facts:
@@ -19,7 +29,7 @@ def render_factorization_prose(
         sections.append("")
 
     for entity in result.entities:
-        sections.append(_render_entity_prose(entity))
+        sections.append(_render_entity_prose(entity, locale=loc))
 
     for line in result.unparsed:
         sections.append(line)
@@ -32,11 +42,13 @@ def _render_shared_facts(facts: list[SharedFact]) -> str:
     return "\n".join(lines)
 
 
-def _render_entity_prose(entity) -> str:
+def _render_entity_prose(entity, *, locale: str) -> str:
+    loc = locale if locale in _COMPANY_PHRASE else "en"
+    conj = _CONJUNCTION[loc]
     parts: list[str] = []
     company = entity.attributes.get("company")
     if company:
-        parts.append(f"works at {company}")
+        parts.append(_COMPANY_PHRASE[loc].format(company=company))
     parts.extend(entity.actions)
 
     if not parts:
@@ -47,9 +59,10 @@ def _render_entity_prose(entity) -> str:
 
     head = f"{entity.name} {parts[0]}"
     if len(parts) == 2:
-        return f"{head} and {parts[1]}."
-    middle = ", ".join(parts[1:-1])
-    return f"{head}, {middle}, and {parts[-1]}."
+        return f"{head}{conj['pair']}{parts[1]}."
+
+    middle = conj["list"].join(parts[1:-1])
+    return f"{head}{conj['list']}{middle}{conj['pair']}{parts[-1]}."
 
 
 def render_factorization_structured(result: FactorizationResult) -> str:

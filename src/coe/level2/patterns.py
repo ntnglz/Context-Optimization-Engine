@@ -1,27 +1,64 @@
-"""Patrones de extracción N2 (locale pack EN v1)."""
+"""Patrones de extracción N2 (locale packs EN/ES v1)."""
 
 from __future__ import annotations
 
 import re
 from dataclasses import dataclass
 
-WORKS_AT_RE = re.compile(
-    r"^(?P<entity>[A-Z][a-zA-Z0-9]*)\s+works\s+at\s+(?P<company>.+?)\.?\s*$",
-    re.IGNORECASE,
-)
 
-ACTION_VERBS = frozenset(
-    {
-        "approved",
-        "created",
-        "leads",
-        "manages",
-        "owns",
-        "rejected",
-        "updated",
-        "works",
-    }
-)
+@dataclass(frozen=True)
+class LocalePack:
+    works_at_re: re.Pattern[str]
+    action_verbs: frozenset[str]
+    pronoun_subjects: frozenset[str]
+    works_at_action_prefix: str
+
+
+_LOCALE_PACKS: dict[str, LocalePack] = {
+    "en": LocalePack(
+        works_at_re=re.compile(
+            r"^(?P<entity>[A-Z][a-zA-Z0-9]*)\s+works\s+at\s+(?P<company>.+?)\.?\s*$",
+            re.IGNORECASE,
+        ),
+        action_verbs=frozenset(
+            {
+                "approved",
+                "created",
+                "leads",
+                "manages",
+                "owns",
+                "rejected",
+                "updated",
+                "works",
+            }
+        ),
+        pronoun_subjects=frozenset({"he", "she", "they", "it"}),
+        works_at_action_prefix="works at ",
+    ),
+    "es": LocalePack(
+        works_at_re=re.compile(
+            r"^(?P<entity>[A-ZÁÉÍÓÚÑ][a-záéíóúñA-Z0-9]*(?:\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñA-Z0-9]*)*)"
+            r"\s+trabaja\s+en\s+(?P<company>.+?)\.?\s*$",
+            re.IGNORECASE,
+        ),
+        action_verbs=frozenset(
+            {
+                "aprobó",
+                "creó",
+                "lidera",
+                "gestiona",
+                "posee",
+                "rechazó",
+                "actualizó",
+                "trabaja",
+            }
+        ),
+        pronoun_subjects=frozenset(
+            {"él", "ella", "ellos", "ellas", "usted", "ustedes", "lo", "la", "los", "las"}
+        ),
+        works_at_action_prefix="trabaja en ",
+    ),
+}
 
 
 @dataclass(frozen=True)
@@ -35,15 +72,17 @@ class ParsedStatement:
 
 
 def parse_line(line: str, *, locale: str = "en") -> ParsedStatement | None:
-    """Parsea una línea con sujeto explícito repetido (EN v1)."""
-    if locale.split("-")[0].lower() != "en":
+    """Parsea una línea con sujeto explícito repetido."""
+    key = locale.split("-")[0].lower()
+    pack = _LOCALE_PACKS.get(key)
+    if pack is None:
         raise NotImplementedError(f"Locale pack not implemented: {locale!r}")
 
     text = line.strip()
     if not text:
         return None
 
-    match = WORKS_AT_RE.match(text)
+    match = pack.works_at_re.match(text)
     if match:
         return ParsedStatement(
             entity=_normalize_entity(match.group("entity")),
@@ -59,18 +98,18 @@ def parse_line(line: str, *, locale: str = "en") -> ParsedStatement | None:
 
     verb_idx = None
     for idx, token in enumerate(tokens[1:], start=1):
-        if token.lower() in ACTION_VERBS:
+        if token.lower() in pack.action_verbs:
             verb_idx = idx
             break
     if verb_idx is None:
         return None
 
     entity = _normalize_entity(" ".join(tokens[:verb_idx]))
-    if not entity or entity.lower() in {"he", "she", "they", "it"}:
+    if not entity or entity.lower() in pack.pronoun_subjects:
         return None
 
     action_text = " ".join(tokens[verb_idx:])
-    if action_text.lower().startswith("works at "):
+    if action_text.lower().startswith(pack.works_at_action_prefix):
         return None
 
     return ParsedStatement(

@@ -54,6 +54,17 @@ class TestMultilingualCase:
         assert report.cases_run == 1
         assert report.summary.get("user_language_match_rate") == 1.0
 
+    def test_n1_n2_es_profile_mock(self):
+        report = run_suite_from_ids(
+            profile_id="n1_n2_es",
+            tier="smoke",
+            tags={"multilingual"},
+            benchmark_root=BENCH,
+        )
+        assert report.cases_run == 1
+        assert report.gate_passed
+        assert "trabaja en ACME" in (report.results[0].optimized_context_preview or "")
+
 
 class TestTierConfig:
     def test_smoke_tags(self):

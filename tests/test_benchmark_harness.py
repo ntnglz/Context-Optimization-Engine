@@ -84,3 +84,37 @@ class TestProfile:
         assert profile.id == "n1_n2_en"
         assert profile.levels == [1, 2]
         assert profile.gate.comprehension_similarity == 0.90
+
+    def test_load_n1_n2_es_profile(self):
+        profile = load_profile(BENCH / "profiles" / "n1_n2_es.yaml")
+        assert profile.id == "n1_n2_es"
+        assert profile.levels == [1, 2]
+        assert profile.locale == "es"
+
+
+class TestHarnessMultilingualN2:
+    def test_run_n1_n2_es_smoke(self):
+        report = run_suite_from_ids(
+            profile_id="n1_n2_es",
+            tier="smoke",
+            tags={"multilingual"},
+            benchmark_root=BENCH,
+        )
+        assert report.cases_run == 1
+        assert report.gate_passed
+        assert report.summary["comprehension_similarity_mean"] >= 0.9
+        assert "entity:" not in (report.results[0].optimized_context_preview or "")
+
+    def test_n1_n2_es_baseline_compare(self):
+        import json
+
+        report = run_suite_from_ids(
+            profile_id="n1_n2_es",
+            tier="smoke",
+            tags={"multilingual"},
+            benchmark_root=BENCH,
+        )
+        baseline = json.loads(
+            (BENCH / "baselines" / "n1_n2_es_smoke.json").read_text(encoding="utf-8")
+        )
+        assert compare_reports(report.to_dict(), baseline) == []
