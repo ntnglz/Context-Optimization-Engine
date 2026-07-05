@@ -242,3 +242,141 @@ class StructuredContext:
 
     def to_json(self, indent: int = 2) -> str:
         return json.dumps(self.to_dict(), indent=indent, ensure_ascii=False)
+
+
+GRAPH_SCHEMA_VERSION = "0.1"
+
+
+@dataclass
+class GraphNode:
+    """Nodo del grafo N4."""
+
+    id: str
+    kind: str
+    labels: list[str] = field(default_factory=list)
+    properties: dict[str, Any] = field(default_factory=dict)
+    source_refs: list[str] = field(default_factory=list)
+
+
+@dataclass
+class GraphEdge:
+    """Arista tipada del grafo N4."""
+
+    from_id: str
+    to_id: str
+    type: str
+    properties: dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass
+class GraphOrphan:
+    """Texto no graficable con trazabilidad."""
+
+    text: str
+    source_refs: list[str] = field(default_factory=list)
+
+
+@dataclass
+class GraphComplexity:
+    node_count: int
+    edge_count: int
+    orphan_count: int
+
+
+@dataclass
+class ContextGraph:
+    """Resultado del optimizador Nivel 4."""
+
+    nodes: list[GraphNode]
+    edges: list[GraphEdge]
+    orphans: list[GraphOrphan]
+    schema_version: str
+    original_tokens: int
+    optimized_tokens: int = 0
+    internal_tokens: int = 0
+    active_nodes: list[GraphNode] | None = None
+    active_edges: list[GraphEdge] | None = None
+    query_context: str | None = None
+    max_hops: int = 2
+    include_orphans: bool = True
+
+    @property
+    def complexity(self) -> GraphComplexity:
+        from .level4.builder import graph_complexity
+
+        return graph_complexity(self)
+
+    @property
+    def internal_ratio(self) -> float:
+        if self.original_tokens == 0:
+            return 0.0
+        return 1.0 - (self.internal_tokens / self.original_tokens)
+
+    @property
+    def prose_ratio(self) -> float:
+        if self.original_tokens == 0:
+            return 0.0
+        return 1.0 - (self.optimized_tokens / self.original_tokens)
+
+    def render_prose(self, *, locale: str | None = "en") -> str:
+        from .level4.render import render_graph_prose
+
+        return render_graph_prose(
+            self,
+            locale=locale,
+            include_orphans=self.include_orphans,
+        )
+
+    def serialize_internal(self) -> str:
+        from .level4.render import serialize_graph_internal
+
+        return serialize_graph_internal(self)
+
+    def to_dict(self) -> dict[str, Any]:
+        active_nodes = self.active_nodes or self.nodes
+        active_edges = self.active_edges or self.edges
+        complexity = self.complexity
+        return {
+            "schema_version": self.schema_version,
+            "nodes": [
+                {
+                    "id": node.id,
+                    "kind": node.kind,
+                    "labels": list(node.labels),
+                    "properties": dict(node.properties),
+                    "source_refs": list(node.source_refs),
+                }
+                for node in self.nodes
+            ],
+            "edges": [
+                {
+                    "from": edge.from_id,
+                    "to": edge.to_id,
+                    "type": edge.type,
+                    "properties": dict(edge.properties),
+                }
+                for edge in self.edges
+            ],
+            "orphans": [
+                {"text": orphan.text, "source_refs": list(orphan.source_refs)}
+                for orphan in self.orphans
+            ],
+            "active_node_ids": [node.id for node in active_nodes],
+            "active_edge_count": len(active_edges),
+            "query_context": self.query_context,
+            "max_hops": self.max_hops,
+            "include_orphans": self.include_orphans,
+            "complexity": {
+                "node_count": complexity.node_count,
+                "edge_count": complexity.edge_count,
+                "orphan_count": complexity.orphan_count,
+            },
+            "original_tokens": self.original_tokens,
+            "optimized_tokens": self.optimized_tokens,
+            "internal_tokens": self.internal_tokens,
+            "internal_ratio": round(self.internal_ratio, 4),
+            "prose_ratio": round(self.prose_ratio, 4),
+        }
+
+    def to_json(self, indent: int = 2) -> str:
+        return json.dumps(self.to_dict(), indent=indent, ensure_ascii=False)

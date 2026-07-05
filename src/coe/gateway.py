@@ -10,6 +10,7 @@ from .ingest import IngestTrace, normalize_language
 from .level1 import deduplicate_context
 from .level2 import factorize_context
 from .level3 import structure_context
+from .level4 import build_context_graph
 from .level5 import InMemoryStateStore, StateView, update_semantic_state
 from .level5.store import StateStore
 from .models import (
@@ -17,11 +18,12 @@ from .models import (
     DeduplicationResult,
     FactorizationResult,
     StructuredContext,
+    ContextGraph,
     estimate_tokens,
 )
 from .renderer import render_raw_context
 
-_SUPPORTED_LEVELS = frozenset({1, 2, 3, 5})
+_SUPPORTED_LEVELS = frozenset({1, 2, 3, 4, 5})
 
 
 @dataclass
@@ -58,6 +60,7 @@ class OptimizeResult:
     deduplication: DeduplicationResult | None = None
     factorization: FactorizationResult | None = None
     structured: StructuredContext | None = None
+    context_graph: ContextGraph | None = None
     state_view: StateView | None = None
     commit_id: str | None = None
     ingest_trace: IngestTrace | None = None
@@ -87,6 +90,8 @@ class OptimizeResult:
             data["factorization"] = self.factorization.to_dict()
         if self.structured is not None:
             data["structured"] = self.structured.to_dict()
+        if self.context_graph is not None:
+            data["context_graph"] = self.context_graph.to_dict()
         if self.commit_id is not None:
             data["commit_id"] = self.commit_id
         return data
@@ -105,7 +110,7 @@ def optimize_context(
     """
     Ejecuta el pipeline COE sobre un bundle de bloques.
 
-    Niveles soportados: **1** (dedup), **2** (factorización), **3** (estructura), **5** (estado).
+    Niveles soportados: **1** (dedup), **2** (factorización), **3** (estructura), **4** (grafo), **5** (estado).
     L0 opcional con ``l0=True`` y ``target_lang``.
     """
     opts = OptimizeOptions(
@@ -154,14 +159,16 @@ def _optimize(blocks: list[ContextBlock], opts: OptimizeOptions) -> OptimizeResu
     dedup: DeduplicationResult | None = None
     factorized: FactorizationResult | None = None
     structured: StructuredContext | None = None
+    context_graph: ContextGraph | None = None
     state_view: StateView | None = None
     commit_id: str | None = None
     text = original_text
 
     run_n5 = 5 in opts.levels
     run_n1 = 1 in opts.levels and not run_n5
-    run_n2 = 2 in opts.levels or 3 in opts.levels
-    run_n3 = 3 in opts.levels and not run_n5
+    run_n2 = 2 in opts.levels or 3 in opts.levels or 4 in opts.levels
+    run_n3 = (3 in opts.levels or 4 in opts.levels) and not run_n5
+    run_n4 = 4 in opts.levels and not run_n5
 
     if run_n5:
         sub_levels = [n for n in opts.levels if n != 5] or [1]
@@ -194,7 +201,7 @@ def _optimize(blocks: list[ContextBlock], opts: OptimizeOptions) -> OptimizeResu
         latency_by_level["n2"] = elapsed
         trace.append(LevelTrace(level=2, latency_ms=elapsed, detail="factorize"))
 
-    if run_n3:
+    if run_n3 and not run_n4:
         t0 = time.perf_counter()
         if factorized is None:
             source = dedup if dedup is not None else blocks_work
@@ -204,6 +211,18 @@ def _optimize(blocks: list[ContextBlock], opts: OptimizeOptions) -> OptimizeResu
         elapsed = (time.perf_counter() - t0) * 1000.0
         latency_by_level["n3"] = elapsed
         trace.append(LevelTrace(level=3, latency_ms=elapsed, detail="structure+prose"))
+    elif run_n4:
+        t0 = time.perf_counter()
+        if factorized is None:
+            source = dedup if dedup is not None else blocks_work
+            factorized = factorize_context(source, locale=opts.locale)
+        if structured is None:
+            structured = structure_context(factorized, locale=opts.locale)
+        context_graph = build_context_graph(structured, locale=opts.locale)
+        text = context_graph.render_prose(locale=opts.locale)
+        elapsed = (time.perf_counter() - t0) * 1000.0
+        latency_by_level["n4"] = elapsed
+        trace.append(LevelTrace(level=4, latency_ms=elapsed, detail="graph+prose"))
     elif run_n2 and factorized is not None:
         text = factorized.render_prose(locale=opts.locale)
     elif run_n1 and dedup is not None:
@@ -230,6 +249,7 @@ def _optimize(blocks: list[ContextBlock], opts: OptimizeOptions) -> OptimizeResu
         deduplication=dedup,
         factorization=factorized,
         structured=structured,
+        context_graph=context_graph,
         state_view=state_view,
         commit_id=commit_id,
         ingest_trace=ingest_trace,

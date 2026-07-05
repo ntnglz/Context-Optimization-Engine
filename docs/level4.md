@@ -3,7 +3,7 @@
 > Definición conceptual: [documento fundacional](Context%20Optimization%20Engine%20(COE).md#nivel-4--grafo-de-conocimiento).  
 > Nivel anterior: [level3.md](level3.md) · Índice: [levels.md](levels.md)
 
-**Estado:** ✅ Spec aprobada · sin implementar
+**Estado:** ✅ Spec aprobada · **v1 implementado** (`src/coe/level4/` · grafo efímero, slice, `render_prose`)
 
 ## Alineación con la visión fundacional
 

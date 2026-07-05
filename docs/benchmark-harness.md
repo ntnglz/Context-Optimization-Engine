@@ -3,7 +3,7 @@
 > KPIs y umbrales: [benchmarks.md](benchmarks.md) · Pipeline COE: [levels.md](levels.md) · Render: [renderer.md](renderer.md)  
 > Hermano conceptual: PCM `e2e_benchmark` (instrucción); COE mide **contexto**.
 
-**Estado:** H1–H5 implementados · **CI local** smoke en 6 perfiles (mock, compare baseline)
+**Estado:** H1–H5 implementados · **CI local** smoke en 7 perfiles (mock, compare baseline)
 
 El harness no es un script auxiliar: es el **sistema de calidad** que validará cada nivel (N2→N5), cada cambio de locale pack y cada perfil de despliegue. Debe ser **rápido en CI**, **reproducible**, **barato** en volumen y **estricto** en pre-release.
 
@@ -140,6 +140,7 @@ data/benchmarks/
 │   ├── n1.yaml
 │   ├── n1_n2_en.yaml
 │   ├── n1_n2_n3_en.yaml
+│   ├── n1_n2_n3_n4_en.yaml
 │   ├── l0_n1_n4_en.yaml
 │   └── n5_session.yaml
 ├── fixtures/           # mock evaluator: case_id → {arm_a, arm_b} text
@@ -260,6 +261,7 @@ tier:
 | `n1` | [1] | structural + latencia 80ms |
 | `n1_n2_en` | [1,2] | + E2E core subset |
 | `n1_n2_n3_en` | [1,2,3] | + relaciones tipadas (`knows`) |
+| `n1_n2_n3_n4_en` | [1,2,3,4] | + ContextGraph efímero |
 | `l0_n1_n4_en` | L0+[1..4] | latencia 200ms |
 | `n5_session` | +5 | multi_turn + 350ms |
 
@@ -365,6 +367,7 @@ data/benchmarks/baselines/
 ├── n1_smoke.json
 ├── n1_n2_en_smoke.json
 ├── n1_n2_n3_en_smoke.json
+├── n1_n2_n3_n4_en_smoke.json
 ├── n1_n2_es_smoke.json
 ├── l0_n1_en_smoke.json
 ├── n5_session_smoke.json
@@ -382,7 +385,7 @@ data/benchmarks/baselines/
 | **`nightly`** | 1 + 2 | all `single_turn` | **mock** u **ollama** | manual (`scripts/ci/nightly-mock.sh`) |
 | **`release`** | 1 + 2 ×3 runs | all + multilingual + multi_turn | **ollama** | tag / manual local |
 
-**Decisión CI:** no hay GitHub Actions (coste cero en la nube). El gate habitual es **local**: `python run.py --ci` = pytest + 6 perfiles smoke con compare baseline. Capa 2 usa **mock**; Ollama solo en release manual.
+**Decisión CI:** no hay GitHub Actions (coste cero en la nube). El gate habitual es **local**: `python run.py --ci` = pytest + 7 perfiles smoke con compare baseline. Capa 2 usa **mock**; Ollama solo en release manual.
 
 ```bash
 # Gate habitual — un comando

@@ -5,6 +5,7 @@ from __future__ import annotations
 from ..level1 import deduplicate_context
 from ..level2 import factorize_context
 from ..level3 import structure_context
+from ..level4 import build_context_graph
 from ..models import ContextBlock
 from .state import SemanticState, StateView, UpdateResult
 from .store import InMemoryStateStore, StateStore
@@ -70,7 +71,12 @@ def _materialize_prose(
     levels: list[int],
 ) -> str:
     dedup = deduplicate_context(blocks)
-    if 3 in levels:
+    if 4 in levels:
+        factorized = factorize_context(dedup, locale=locale)
+        structured = structure_context(factorized, locale=locale)
+        graph = build_context_graph(structured, locale=locale)
+        body = graph.render_prose(locale=locale)
+    elif 3 in levels:
         factorized = factorize_context(dedup, locale=locale)
         structured = structure_context(factorized, locale=locale)
         body = structured.render_prose(locale=locale)

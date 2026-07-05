@@ -45,5 +45,8 @@ run_benchmark n5_session data/benchmarks/baselines/n5_session_smoke.json --tags 
 step "benchmark smoke n1_n2_n3_en"
 run_benchmark n1_n2_n3_en data/benchmarks/baselines/n1_n2_n3_en_smoke.json
 
+step "benchmark smoke n1_n2_n3_n4_en"
+run_benchmark n1_n2_n3_n4_en data/benchmarks/baselines/n1_n2_n3_n4_en_smoke.json
+
 echo ""
 echo "CI smoke: PASS"
