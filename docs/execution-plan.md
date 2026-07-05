@@ -350,7 +350,7 @@ Resumen; detalle de entregables en secciones siguientes (fases 6–18).
 
 **Fuera de alcance Fase 20:** reescribir level1–5; Pista I; `pyproject.toml` / PyPI (opcional enmienda posterior); Docker (opcional enmienda posterior).
 
-**Gate:** revisión manual «visitante limpio» (clonar → README → demo o MCP en &lt;15 min) + `python run.py --ci` PASS si solo docs/ejemplos.
+**Gate:** revisión manual «visitante limpio» (clonar → README → demo o MCP en <15 min) + `python run.py --ci` PASS — **234 tests, 10 smokes PASS** (2026-07-05). Commit: `dde77a1`.
 
 **Requiere:** Fases 0–18 ✅.
 
@@ -453,6 +453,7 @@ flowchart LR
 | 2026-07-05 | Cierre Fase 11 PCM+COE | 594f63b — optimize_with_pcm, perfil coe_pcm_n1_en |
 | 2026-07-05 | Cierre Fase 12 HTTP | b191a62 — FastAPI /optimize, /estimate, /health |
 | 2026-07-05 | Cierre Fase 13 Model Adapter | 8b84bb5 — target_model, adaptadores default/mistral/openai |
+| 2026-07-05 | Cierre Fase 20 docs visitante | dde77a1 — README, getting-started, FAQ, STATUS, ejemplos, LICENSE, CHANGELOG 1.0.1 |
 | 2026-07-05 | Fase 20 docs visitante | Reorganizar README, getting-started, STATUS, FAQ y ejemplos para adopción GitHub |
 | 2026-07-05 | Producto v1 cerrado; Fase 19 omitida | Fases 0–18 ✅; CIR v1.1 sin demanda; Pista I para investigación |
 | 2026-07-05 | Cierre Fase 18 ingest structured/code/glossary | 2c91a7e — flatten JSON/CSV/log, code dedup, N5 glossary |
