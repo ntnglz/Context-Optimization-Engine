@@ -23,6 +23,7 @@ class ContextBlocksRequest(BaseModel):
     max_commits: int | None = None
     max_context_tokens: int | None = None
     target_model: str | None = None
+    session_ttl_hours: float | None = None
 
     def handler_kwargs(self) -> dict[str, Any]:
         return {
@@ -39,4 +40,5 @@ class ContextBlocksRequest(BaseModel):
             "max_commits": self.max_commits,
             "max_context_tokens": self.max_context_tokens,
             "target_model": self.target_model,
+            "session_ttl_hours": self.session_ttl_hours,
         }

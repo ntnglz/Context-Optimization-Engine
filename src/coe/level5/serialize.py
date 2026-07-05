@@ -84,6 +84,8 @@ def semantic_state_to_dict(state: SemanticState) -> dict[str, Any]:
         "commit_count": state.commit_count,
         "max_commits": state.max_commits,
         "retract_log": [retract_record_to_dict(record) for record in state.retract_log],
+        "updated_at": state.updated_at,
+        "history_pruned_total": state.history_pruned_total,
     }
 
 
@@ -100,4 +102,6 @@ def semantic_state_from_dict(data: dict[str, Any]) -> SemanticState:
         retract_log=[
             retract_record_from_dict(item) for item in data.get("retract_log") or []
         ],
+        updated_at=float(data["updated_at"]) if data.get("updated_at") is not None else None,
+        history_pruned_total=int(data.get("history_pruned_total") or 0),
     )

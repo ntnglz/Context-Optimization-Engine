@@ -12,7 +12,8 @@ from .level2 import factorize_context
 from .level3 import structure_context
 from .level4 import build_context_graph
 from .level5 import StateView, update_semantic_state
-from .level5.store import StateStore
+from .level5.store import StateStore, resolve_state_store
+from .level5.operations import collect_store_metrics
 from .models import (
     ContextBlock,
     DeduplicationResult,
@@ -43,6 +44,7 @@ class OptimizeOptions:
     max_commits: int | None = None
     max_context_tokens: int | None = None
     target_model: str | None = None
+    session_ttl_hours: float | None = None
 
 
 @dataclass
@@ -64,6 +66,7 @@ class OptimizationMetrics:
     pre_truncation_tokens: int | None = None
     target_model: str | None = None
     model_adapter: str | None = None
+    store_metrics: dict[str, int] | None = None
 
 
 @dataclass
@@ -102,6 +105,8 @@ class OptimizeResult:
             data["metrics"]["target_model"] = self.metrics.target_model
         if self.metrics.model_adapter is not None:
             data["metrics"]["model_adapter"] = self.metrics.model_adapter
+        if self.metrics.store_metrics is not None:
+            data["metrics"]["store"] = self.metrics.store_metrics
         if self.metrics.pre_truncation_tokens is not None:
             data["metrics"]["pre_truncation_tokens"] = self.metrics.pre_truncation_tokens
         if self.deduplication is not None:
@@ -131,6 +136,7 @@ def optimize_context(
     max_commits: int | None = None,
     max_context_tokens: int | None = None,
     target_model: str | None = None,
+    session_ttl_hours: float | None = None,
 ) -> OptimizeResult:
     """
     Ejecuta el pipeline COE sobre bloques o un ``ContextBundle``.
@@ -144,6 +150,7 @@ def optimize_context(
     bundle_max_commits: int | None = None
     bundle_max_context_tokens: int | None = None
     bundle_target_model: str | None = None
+    bundle_session_ttl_hours: float | None = None
     if isinstance(blocks, ContextBundle):
         bundle = blocks
         blocks_list = bundle.blocks
@@ -155,6 +162,7 @@ def optimize_context(
         bundle_max_commits = bundle.options.max_commits
         bundle_max_context_tokens = bundle.options.max_context_tokens
         bundle_target_model = bundle.options.target_model
+        bundle_session_ttl_hours = bundle.options.session_ttl_hours
     else:
         blocks_list = blocks
         locale = locale if locale is not None else "en"
@@ -190,6 +198,11 @@ def optimize_context(
             else bundle_max_context_tokens
         ),
         target_model=target_model if target_model is not None else bundle_target_model,
+        session_ttl_hours=(
+            session_ttl_hours
+            if session_ttl_hours is not None
+            else bundle_session_ttl_hours
+        ),
     )
     return _optimize(blocks_list, opts, ingest_notes=level_notes)
 
@@ -269,17 +282,25 @@ def _optimize(
     run_n3 = (3 in opts.levels or 4 in opts.levels) and not run_n5
     run_n4 = 4 in opts.levels and not run_n5
 
+    store_metrics_snapshot: dict[str, int] | None = None
+
     if run_n5:
         sub_levels = [n for n in opts.levels if n != 5] or [1]
+        n5_store = opts.state_store or resolve_state_store(
+            opts.session_id,
+            None,
+            session_ttl_hours=opts.session_ttl_hours,
+        )
         t0 = time.perf_counter()
         n5_result = update_semantic_state(
             blocks_work,
             session_id=opts.session_id or "_ephemeral",
-            store=opts.state_store,
+            store=n5_store,
             locale=opts.locale,
             levels=sub_levels,
             query_context=opts.query_context,
             max_commits=opts.max_commits,
+            session_ttl_hours=opts.session_ttl_hours,
         )
         elapsed = (time.perf_counter() - t0) * 1000.0
         latency_by_level["n5"] = elapsed
@@ -303,6 +324,13 @@ def _optimize(
             locale=opts.locale,
             section_delimiters=opts.section_delimiters,
         )
+        snapshot = collect_store_metrics(n5_store)
+        store_metrics_snapshot = {
+            "active_sessions": snapshot.active_sessions,
+            "total_bytes": snapshot.total_bytes,
+            "archive_bytes": snapshot.archive_bytes,
+            "history_pruned_total": snapshot.history_pruned_total,
+        }
     elif run_n1:
         t0 = time.perf_counter()
         dedup = deduplicate_context(blocks_work)
@@ -402,6 +430,7 @@ def _optimize(
         pre_truncation_tokens=pre_truncation_tokens if truncated else None,
         target_model=opts.target_model,
         model_adapter=model_adapter_id,
+        store_metrics=store_metrics_snapshot,
     )
 
     return OptimizeResult(

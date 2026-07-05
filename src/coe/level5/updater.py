@@ -19,6 +19,7 @@ def update_semantic_state(
     levels: list[int] | None = None,
     query_context: str | None = None,
     max_commits: int | None = None,
+    session_ttl_hours: float | None = None,
 ) -> UpdateResult:
     """
     Integra el grafo del turno en el State Store y materializa ``StateView``.
@@ -33,7 +34,7 @@ def update_semantic_state(
     if 5 in sub_levels:
         sub_levels = [n for n in sub_levels if n != 5] or [1]
 
-    state_store = resolve_state_store(session_id, store)
+    state_store = resolve_state_store(session_id, store, session_ttl_hours=session_ttl_hours)
     state = state_store.load(session_id) or SemanticState(session_id=session_id)
     if max_commits is not None:
         state.max_commits = max_commits
@@ -72,7 +73,9 @@ def update_semantic_state(
 
     state.history.append(Commit(commit_id=commit_id, graph=_clone_graph(state.graph)))
     state.head_commit_id = commit_id
-    prune_history(state)
+    pruned = prune_history(state)
+    if pruned:
+        state.history_pruned_total += pruned
     state_store.save(state)
 
     return UpdateResult(

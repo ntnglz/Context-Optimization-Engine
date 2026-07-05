@@ -102,7 +102,7 @@ Excepción v1: flag `include_pending_turn=true` si merge difiere de commit (work
 | Presupuesto ventana COE+PCM | 11 ✅ |
 | HTTP API | 12 ✅ |
 | Model Adapter | 13 ✅ |
-| N5 TTL / archivado | 14 |
+| N5 TTL / archivado | 14 ✅ |
 | Entity linking fuzzy | 15 |
 | Store distribuido | 16 |
 | Normalizer zh + locale pack | 17 |
@@ -129,7 +129,7 @@ Excepción v1: flag `include_pending_turn=true` si merge difiere de commit (work
 | 12 | Composición PCM+COE + harness `coe+pcm` | 11 ✅ |
 | 13 | HTTP `/optimize` + `/estimate` | 12 ✅ |
 | 14 | Model Adapter + `target_model` | 13 ✅ |
-| 15 | N5 TTL + archivado | 14 |
+| 15 | N5 TTL + archivado | 14 ✅ |
 | 16 | Entity linking fuzzy | 15 |
 | 17 | `SQLiteStateStore` | 16 |
 | 18 | Locale pack `zh` | 17 |

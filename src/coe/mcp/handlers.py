@@ -23,6 +23,7 @@ def _resolve_input(
     max_commits: int | None = None,
     max_context_tokens: int | None = None,
     target_model: str | None = None,
+    session_ttl_hours: float | None = None,
 ):
     if not blocks:
         raise ValueError("blocks must not be empty")
@@ -45,6 +46,8 @@ def _resolve_input(
         bundle.options.max_context_tokens = max_context_tokens
     if target_model is not None:
         bundle.options.target_model = target_model
+    if session_ttl_hours is not None:
+        bundle.options.session_ttl_hours = session_ttl_hours
     return bundle
 
 
@@ -63,6 +66,7 @@ def handle_optimize_context(
     max_commits: int | None = None,
     max_context_tokens: int | None = None,
     target_model: str | None = None,
+    session_ttl_hours: float | None = None,
 ) -> dict[str, Any]:
     """Ejecuta el pipeline COE y devuelve prosa optimizada + métricas."""
     bundle = _resolve_input(
@@ -77,6 +81,7 @@ def handle_optimize_context(
         max_commits=max_commits,
         max_context_tokens=max_context_tokens,
         target_model=target_model,
+        session_ttl_hours=session_ttl_hours,
     )
     result = optimize_context(
         bundle,
@@ -86,6 +91,7 @@ def handle_optimize_context(
         l0=l0,
         session_id=session_id,
         target_model=target_model,
+        session_ttl_hours=session_ttl_hours,
     )
     payload = result.to_dict()
     payload["text"] = result.text
@@ -109,6 +115,7 @@ def handle_estimate_savings(
     max_commits: int | None = None,
     max_context_tokens: int | None = None,
     target_model: str | None = None,
+    session_ttl_hours: float | None = None,
 ) -> dict[str, Any]:
     """Estima tokens ahorrados sin devolver prosa ni invocar evaluador LLM."""
     bundle = _resolve_input(
@@ -123,6 +130,7 @@ def handle_estimate_savings(
         max_commits=max_commits,
         max_context_tokens=max_context_tokens,
         target_model=target_model,
+        session_ttl_hours=session_ttl_hours,
     )
     result = optimize_context(
         bundle,
@@ -132,6 +140,7 @@ def handle_estimate_savings(
         l0=l0,
         session_id=session_id,
         target_model=target_model,
+        session_ttl_hours=session_ttl_hours,
     )
     original = result.metrics.original_tokens
     optimized = result.metrics.optimized_tokens
@@ -151,6 +160,8 @@ def handle_estimate_savings(
         payload["target_model"] = result.metrics.target_model
     if result.metrics.model_adapter is not None:
         payload["model_adapter"] = result.metrics.model_adapter
+    if result.metrics.store_metrics is not None:
+        payload["store"] = result.metrics.store_metrics
     if result.metrics.pre_truncation_tokens is not None:
         payload["pre_truncation_tokens"] = result.metrics.pre_truncation_tokens
     return payload

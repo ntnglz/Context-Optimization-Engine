@@ -21,6 +21,7 @@ class IngestOptions:
     include_pending_turn: bool = False
     max_commits: int | None = None
     target_model: str | None = None
+    session_ttl_hours: float | None = None
 
 
 @dataclass

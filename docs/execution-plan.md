@@ -25,9 +25,9 @@ Orden de las fases 6–18 según **dependencias técnicas** y **cierre de deuda*
 5. **N5 escala tras CIR** — TTL, fuzzy linking y store remoto asumen envelope y merge probados.
 6. **Investigación explícita** — hipótesis no validadas (ML, CIR hacia LLM) fuera del producto v1; pista I al final.
 
-**Deuda cerrada (fases 0–13):** L0 v2, `case.schema.json`, presupuesto tokens COE, PCM+COE, HTTP API, Model Adapter, CIR v1.0, harness, MCP, Gateway/N1–N5, README al día.
+**Deuda cerrada (fases 0–14):** L0 v2, `case.schema.json`, presupuesto tokens COE, PCM+COE, HTTP API, Model Adapter, N5 TTL/archivado, CIR v1.0, harness, MCP, Gateway/N1–N5, README al día.
 
-**Deuda pendiente (fases 14–19):** N5 post-v1 (TTL, archivado, fuzzy, store distribuido), locale `zh`, ingest `structured`/`code`, CIR v1.1 opcional.
+**Deuda pendiente (fases 15–19):** entity linking fuzzy, store distribuido, locale `zh`, ingest `structured`/`code`, CIR v1.1 opcional.
 
 **Fuera de alcance producto v1:** optimización por ML, representación no-prosa hacia el LLM, parser semántico dedicado, «capa universal» como estándar de industria.
 
@@ -53,7 +53,7 @@ Orden de las fases 6–18 según **dependencias técnicas** y **cierre de deuda*
 | PCM+COE runtime | ✅ | ✅ | **11** |
 | HTTP API | ✅ doc | ✅ | **12** |
 | Model Adapter | ✅ acotado | ✅ | **13** |
-| N5 TTL / archivado | ✅ doc | ❌ | **14** |
+| N5 TTL / archivado | ✅ doc | ✅ | **14** |
 | Entity linking fuzzy | ✅ diferido | ❌ | **15** |
 | Store distribuido | ✅ doc | ❌ | **16** |
 | Locale `zh` | ✅ doc | ❌ | **17** |
@@ -94,6 +94,7 @@ Resumen; detalle de entregables en secciones siguientes (fases 6–18).
 | 11 | Integración PCM+COE | 594f63b |
 | 12 | HTTP API | b191a62 |
 | 13 | Model Adapter | 8b84bb5 |
+| 14 | N5 operaciones (TTL) | — |
 
 ---
 
@@ -230,7 +231,7 @@ Resumen; detalle de entregables en secciones siguientes (fases 6–18).
 
 ---
 
-### Fase 14 — N5 operaciones (TTL y archivado)
+### Fase 14 — N5 operaciones (TTL y archivado) ✅
 
 **Objetivo:** Store listo para sesiones largas sin crecimiento ilimitado.
 
@@ -355,8 +356,8 @@ Temas de [Context Optimization Engine (COE).md](Context%20Optimization%20Engine%
 | 11 | Integración PCM+COE | ✅ cerrada | 594f63b |
 | 12 | HTTP API | ✅ cerrada | b191a62 |
 | 13 | Model Adapter | ✅ cerrada | 8b84bb5 |
-| 14 | N5 operaciones (TTL) | ⏳ **activa** | — |
-| 15 | Entity linking fuzzy | ⏳ pendiente | — |
+| 14 | N5 operaciones (TTL) | ✅ cerrada | — |
+| 15 | Entity linking fuzzy | ⏳ **activa** | — |
 | 16 | Store distribuido | ⏳ pendiente | — |
 | 17 | Locale `zh` | ⏳ pendiente | — |
 | 18 | Ingest structured/code | ⏳ pendiente | — |

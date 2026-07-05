@@ -1,5 +1,13 @@
 """Nivel 5 — estado semántico multi-turno."""
 
+from .operations import (
+    ArchiveResult,
+    StoreMetrics,
+    archive_session,
+    collect_store_metrics,
+    session_is_expired,
+    sweep_expired_sessions,
+)
 from .state import Commit, RetractRecord, SemanticState, StateView, UpdateResult
 from .store import (
     FilesystemStateStore,
@@ -10,6 +18,7 @@ from .store import (
 from .updater import update_semantic_state
 
 __all__ = [
+    "ArchiveResult",
     "Commit",
     "FilesystemStateStore",
     "InMemoryStateStore",
@@ -17,7 +26,12 @@ __all__ = [
     "SemanticState",
     "StateStore",
     "StateView",
+    "StoreMetrics",
     "UpdateResult",
+    "archive_session",
+    "collect_store_metrics",
     "resolve_state_store",
+    "session_is_expired",
+    "sweep_expired_sessions",
     "update_semantic_state",
 ]

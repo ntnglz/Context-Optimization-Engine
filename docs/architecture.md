@@ -418,8 +418,8 @@ Ver [execution-plan.md](execution-plan.md) para entregables, criterios de hecho 
 | 11 | Integración PCM+COE | ✅ |
 | 12 | HTTP API | ✅ |
 | 13 | Model Adapter | ✅ |
-| 14 | N5 operaciones (TTL) | ⏳ **activa** |
-| 15 | Entity linking fuzzy | ⏳ |
+| 14 | N5 operaciones (TTL) | ✅ |
+| 15 | Entity linking fuzzy | ⏳ **activa** |
 | 16 | Store distribuido | ⏳ |
 | 17 | Locale `zh` | ⏳ |
 | 18 | Ingest structured/code | ⏳ |

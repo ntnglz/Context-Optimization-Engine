@@ -47,6 +47,8 @@ class SemanticState:
     commit_count: int = 0
     max_commits: int = 100
     retract_log: list[RetractRecord] = field(default_factory=list)
+    updated_at: float | None = None
+    history_pruned_total: int = 0
 
 
 @dataclass
