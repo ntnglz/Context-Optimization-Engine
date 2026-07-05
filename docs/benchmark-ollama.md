@@ -29,6 +29,8 @@ Perfil **`n5_graph_session_release`**: `comprehension_similarity` ≥ **0.86**, 
 | **pcm-granite:latest** | ~17 s | 0.532 | 0.50 | FAIL | Modelo PCM; no calibrado para evaluación chat |
 | **gemma3:4b** | ~18 s | 0.474 | 0.50 | FAIL | Rápido; similar a Granite en gate |
 | **qwen3.5:9b** | ~20 min / 3 runs | 0.489 | 0.50 | FAIL | Más capaz en otros tasks; peor en este benchmark |
+| **mistral:7b** | **~14 s** | 0.514 | 0.50 | FAIL | EN decente (0.76); **ES muy flojo** (0.26) — peor que Granite en español |
+| **cas/salamandra-7b-instruct** | **~13 s** | 0.513 | 0.50 | FAIL | Modelo ES (Barcelona Supercomputing Center); ES **0.42** — mejor que Mistral/Granite 3b, peor que Granite 8b |
 
 Perfil estricto **`n5_graph_session`** (similitud ≥ 0.90): **qwen3:4b** falla por 0.894 — usar **`qwen3:8b`** tras `ollama pull` si se exige gate estricto.
 
@@ -49,6 +51,20 @@ Perfil estricto **`n5_graph_session`** (similitud ≥ 0.90): **qwen3:4b** falla 
 | `dev_warnings_session_v1` | 0.223 | 0.50 | 4.0 |
 
 El caso en **español** (`dev_warnings_session_v1`) penaliza más a Granite/Gemma: respuestas A/B divergen y baja `factual_recall`.
+
+## Detalle por caso — mistral:7b (fast, curiosidad ES, 2026-07-05)
+
+| Caso | similitud | factual | readability | Notas |
+|------|-----------|---------|-------------|-------|
+| `dev_pytest_failure_session_v1` | **0.763** | 0.50 | 4.0 | Cerca del umbral EN; factual flojo |
+| `dev_warnings_session_v1` | **0.265** | 0.50 | 3.0 | Peor ES de la matriz fast — no compensa hipótesis «Mistral en español» |
+
+## Detalle por caso — cas/salamandra-7b-instruct (fast, curiosidad ES, 2026-07-05)
+
+| Caso | similitud | factual | readability | Notas |
+|------|-----------|---------|-------------|-------|
+| `dev_pytest_failure_session_v1` | 0.607 | 0.50 | — | readability B no parseable |
+| `dev_warnings_session_v1` | **0.418** | 0.50 | — | Mejor ES que Mistral; aún lejos de Qwen (0.93) y Granite 8b (0.47) |
 
 ---
 
@@ -87,6 +103,8 @@ bash scripts/ci/benchmark-dev-agent-fast.sh
 OLLAMA_MODEL=gemma3:4b bash scripts/ci/benchmark-dev-agent-fast.sh
 OLLAMA_MODEL=granite4.1:8b bash scripts/ci/benchmark-dev-agent-fast.sh   # ~28 s, mejor EN
 OLLAMA_MODEL=granite4.1:3b RUNS=1 bash scripts/ci/benchmark-dev-agent-fast.sh
+OLLAMA_MODEL=mistral:7b RUNS=1 bash scripts/ci/benchmark-dev-agent-fast.sh
+OLLAMA_MODEL=cas/salamandra-7b-instruct RUNS=1 bash scripts/ci/benchmark-dev-agent-fast.sh
 ```
 
 Manual equivalente:
