@@ -27,7 +27,7 @@ def blocks_to_context_graph(
     else:
         structured = _dedup_to_structured(dedup)
 
-    return build_context_graph(structured, locale=locale)
+    return build_context_graph(structured, source_blocks=blocks, locale=locale)
 
 
 def render_state_view(

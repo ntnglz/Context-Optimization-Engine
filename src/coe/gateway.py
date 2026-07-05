@@ -301,7 +301,9 @@ def _optimize(
                 source = dedup if dedup is not None else blocks_work
                 factorized = factorize_context(source, locale=opts.locale)
             structured = structure_context(factorized, locale=opts.locale)
-            context_graph = build_context_graph(structured, locale=opts.locale)
+            context_graph = build_context_graph(
+                structured, source_blocks=blocks_work, locale=opts.locale
+            )
             elapsed = (time.perf_counter() - t0) * 1000.0
             latency_by_level["n4"] = elapsed
             trace.append(LevelTrace(level=4, latency_ms=elapsed, detail="graph+prose"))

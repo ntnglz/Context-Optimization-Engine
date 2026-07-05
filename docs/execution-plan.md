@@ -44,7 +44,7 @@ Orden de las fases 6–18 según **dependencias técnicas** y **cierre de deuda*
 | Harness smoke + release script | ✅ | ✅ | 4 |
 | MCP stdio | ✅ | ✅ | 5 |
 | L0 | ✅ | ⚠️ parcial | **9** |
-| CIR formal | 📝 borrador | ❌ | **6** |
+| CIR formal | ✅ | ✅ | **6** |
 | `case.schema.json` | — | ❌ | **8** |
 | Casos benchmark | — | 6 | **8** |
 | Presupuesto tokens COE | ✅ parcial | ❌ | **10** |
@@ -89,7 +89,7 @@ Resumen; detalle histórico en commits de cierre.
 
 ## Fases pendientes (6–18)
 
-### Fase 6 — CIR formal ⏳
+### Fase 6 — CIR formal ✅
 
 **Objetivo:** Contrato interno del grafo (Opción A). Base para store distribuido y persistencia intercambiable.
 
@@ -337,8 +337,8 @@ Temas de [Context Optimization Engine (COE).md](Context%20Optimization%20Engine%
 | 3 | N5 producción | ✅ cerrada | d733bb7 |
 | 4 | Harness madurez + casos reales | ✅ cerrada | b8de213 |
 | 5 | MCP COE | ✅ cerrada | bf9ddf2 |
-| 6 | CIR formal | ⏳ **activa** | — |
-| 7 | Sincronización documental | ⏳ pendiente | — |
+| 6 | CIR formal | ✅ cerrada | — |
+| 7 | Sincronización documental | ⏳ **activa** | — |
 | 8 | Harness contrato + corpus | ⏳ pendiente | — |
 | 9 | L0 v2 | ⏳ pendiente | — |
 | 10 | Presupuesto tokens COE | ⏳ pendiente | — |
@@ -397,6 +397,7 @@ flowchart LR
 | 2026-07-05 | Plan inicial | Desvío respecto a `architecture.md` §9; acuerdo de seguimiento estricto |
 | 2026-07-05 | CIR v1.0 diseño | Opción A: solo grafo serializado; N1–N3 en Python; `document`/`chunk`; `action` arista |
 | 2026-07-05 | Fases 6–18 + Pista I | Cierre de deuda sin presión de fechas; Fase 6 activa; 19 opcional |
+| 2026-07-05 | Fase 6 CIR v1.0 | Envelope, schema, action aristas, document/chunk RAG |
 
 ---
 
@@ -407,7 +408,8 @@ flowchart LR
 | [architecture.md](architecture.md) | Piezas y relaciones (qué construimos) |
 | [execution-plan.md](execution-plan.md) | **Orden de trabajo (cuándo y en qué secuencia)** |
 | [spec-gaps.md](spec-gaps.md) | Decisiones de diseño y deuda → fase |
-| [cir-v1-draft.md](cir-v1-draft.md) | Borrador CIR v1.0 (Fase 6) |
+| [cir-v1.md](cir-v1.md) | Spec CIR v1.0 congelada (Fase 6) |
+| [cir-v1-draft.md](cir-v1-draft.md) | Borrador histórico CIR v1.0 |
 | [l0-ingest.md](l0-ingest.md) | Spec Fase 9 |
 | [ingest.md](ingest.md) | Spec Fases 1, 10, 18 |
 | [benchmark-harness.md](benchmark-harness.md) | Spec Fase 8 |

@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://coe.local/schema/cir-1.0.json",
+  "title": "CIR v1.0 Envelope",
+  "type": "object",
+  "required": ["cir_version", "graph"],
+  "properties": {
+    "cir_version": { "const": "1.0" },
+    "graph": {
+      "type": "object",
+      "required": ["nodes", "edges", "orphans"],
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "kind", "labels", "source_refs"],
+            "properties": {
+              "id": { "type": "string" },
+              "kind": {
+                "enum": ["person", "organization", "concept", "document", "chunk"]
+              },
+              "labels": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "properties": { "type": "object" },
+              "source_refs": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["from", "to", "type"],
+            "properties": {
+              "from": { "type": "string" },
+              "to": { "type": "string" },
+              "type": {
+                "enum": ["company", "knows", "action", "contains", "reference"]
+              },
+              "properties": { "type": "object" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "orphans": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["text", "source_refs"],
+            "properties": {
+              "text": { "type": "string" },
+              "source_refs": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "view": {
+      "type": "object",
+      "properties": {
+        "active_node_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "slice": {
+      "type": "object",
+      "properties": {
+        "query_context": { "type": ["string", "null"] },
+        "max_hops": { "type": "integer", "minimum": 0 },
+        "include_orphans": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "original_tokens": { "type": "integer", "minimum": 0 },
+        "optimized_tokens": { "type": "integer", "minimum": 0 },
+        "internal_tokens": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

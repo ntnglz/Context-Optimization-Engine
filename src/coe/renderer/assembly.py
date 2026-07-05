@@ -74,7 +74,7 @@ def render_turn_prose(
             source = dedup if dedup is not None else blocks
             factorized = factorize_context(source, locale=loc)
         structured = structure_context(factorized, locale=loc)
-        context_graph = build_context_graph(structured, locale=loc)
+        context_graph = build_context_graph(structured, source_blocks=blocks, locale=loc)
         return context_graph.render_prose(locale=loc)
 
     if run_n3:

@@ -52,6 +52,9 @@ def graph_to_structured_view(
             entities.append(_person_to_entity(node, node_by_id=node_by_id, edges=edges))
 
     unparsed = [orphan.text for orphan in graph.orphans] if include_orphans else []
+    for node in nodes:
+        if node.kind == "chunk" and node.labels:
+            unparsed.append(node.labels[0])
 
     return StructuredContext(
         entities=sorted(entities, key=lambda e: e.name),
@@ -71,13 +74,17 @@ def _person_to_entity(
 ) -> StructuredEntity:
     relations: list[StructuredRelation] = []
 
-    for action in node.properties.get("actions", []):
-        relations.append(StructuredRelation(type="action", value=action))
-
     for edge in edges:
         if edge.from_id != node.id:
             continue
-        if edge.type == "company":
+        if edge.type == "action":
+            value = edge.properties.get("value")
+            if not value:
+                target = node_by_id.get(edge.to_id)
+                value = target.labels[0] if target and target.labels else None
+            if value:
+                relations.append(StructuredRelation(type="action", value=value))
+        elif edge.type == "company":
             org = node_by_id.get(edge.to_id)
             company = org.labels[0] if org and org.labels else edge.to_id
             relations.append(StructuredRelation(type="company", value=company))
@@ -95,11 +102,7 @@ def serialize_graph_internal(graph: ContextGraph) -> str:
     lines: list[str] = []
 
     for node in nodes:
-        props = []
-        for action in node.properties.get("actions", []):
-            props.append(f"action={action}")
-        prop_suffix = f" {{{', '.join(props)}}}" if props else ""
-        lines.append(f"node:{node.id}:{node.kind}{prop_suffix}")
+        lines.append(f"node:{node.id}:{node.kind}")
 
     for edge in edges:
         lines.append(f"edge:{edge.from_id}->{edge.to_id}:{edge.type}")

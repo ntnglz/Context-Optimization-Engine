@@ -323,7 +323,7 @@ Los benchmarks vivirán en `data/` + `tests/` + `scripts/comprehension_benchmark
 | **A** | Ingest mínimo + N1 + Renderer + Metrics | ✅ Fases 1–2 |
 | **B** | Gateway `optimize_context` | ✅ L0, N1–N5 |
 | **C** | N2 factorización | ✅ |
-| **D** | CIR + refactor pipeline | ⏳ Fase 6 |
+| **D** | CIR + refactor pipeline | ✅ Fase 6 |
 | **E** | MCP + benchmark RAG | ✅ MCP; harness Fase 8 |
 | **F** | N3–N5 + State Store | ✅ v1; escala Fases 14–16 |
 | **G** | Integración despliegue | ⏳ Fases 10–13 (tokens, PCM, HTTP, adapter) |
@@ -336,8 +336,8 @@ Ver [execution-plan.md](execution-plan.md) para entregables, criterios de hecho 
 | Fase | Nombre | Estado |
 |------|--------|--------|
 | 0–5 | Núcleo v1 (Ingest → MCP) | ✅ |
-| 6 | CIR formal | ⏳ activa |
-| 7 | Sincronización documental | ⏳ |
+| 6 | CIR formal | ✅ |
+| 7 | Sincronización documental | ⏳ activa |
 | 8 | Harness contrato + corpus | ⏳ |
 | 9 | L0 v2 | ⏳ |
 | 10 | Presupuesto tokens COE | ⏳ |

@@ -19,7 +19,7 @@
 | 6 | N5: entity linking inter-turno v1 | [level5.md](level5.md) | ✅ Cerrado |
 | 7 | N5: conflictos y retracts en prosa | [level5.md](level5.md) | ✅ Cerrado |
 | 8 | Principio «sin pérdida» acotado (N5) | [levels.md](levels.md) | ✅ Cerrado |
-| 9 | CIR formal (gramática, versión) | Fase 6 · [cir-v1-draft.md](cir-v1-draft.md) Opción A | ⏳ Fase 6 |
+| 9 | CIR formal (gramática, versión) | Fase 6 · [cir-v1.md](cir-v1.md) Opción A | ✅ Cerrado |
 | 10 | Model Adapter spec | [architecture.md](architecture.md) §3.4 | ⏳ Fase 13 |
 | 11 | Presupuesto tokens global (COE+PCM) | [ingest.md](ingest.md) + Gateway | ⏳ Fases 10–11 |
 | 12 | Robustez estadística benchmarks | [benchmarks.md](benchmarks.md) §9 | ✅ Cerrado |
@@ -121,7 +121,7 @@ Excepción v1: flag `include_pending_turn=true` si merge difiere de commit (work
 | 4 | N5 producción: auto-store, retención, conflictos | 3 ✅ |
 | 5 | Casos `dev_agent` + tier release Ollama | 4 ✅ |
 | 6 | MCP `optimize_context` / `estimate_savings` | 5 ✅ |
-| 7 | CIR v1.0 grafo + schema + envelope N5 | 6 |
+| 7 | CIR v1.0 grafo + schema + envelope N5 | 6 ✅ |
 | 8 | README + architecture §9 + vision al día | 7 |
 | 9 | `case.schema.json` + ≥4 casos nuevos | 8 |
 | 10 | L0 v2 (detección, `TranslationBackend`) | 9 |

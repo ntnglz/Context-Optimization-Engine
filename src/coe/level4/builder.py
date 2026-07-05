@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+from ..cir import CIRNodeKind, CIREdgeType
 from ..models import (
     GRAPH_SCHEMA_VERSION,
+    ContextBlock,
     ContextGraph,
     GraphComplexity,
     GraphEdge,
@@ -21,6 +23,7 @@ from .slice import apply_query_slice
 def build_context_graph(
     structured: StructuredContext,
     *,
+    source_blocks: list[ContextBlock] | None = None,
     query_context: str | None = None,
     max_hops: int = 2,
     include_orphans: bool = True,
@@ -35,7 +38,7 @@ def build_context_graph(
         node_id = _concept_id(fact)
         nodes[node_id] = GraphNode(
             id=node_id,
-            kind="concept",
+            kind=CIRNodeKind.CONCEPT,
             labels=[fact.canonical_line.strip()],
             properties={"canonical_line": fact.canonical_line.strip()},
             source_refs=list(fact.source_ids),
@@ -46,6 +49,9 @@ def build_context_graph(
 
     for line in structured.unparsed:
         orphans.append(GraphOrphan(text=line, source_refs=[]))
+
+    if source_blocks:
+        _materialize_rag_blocks(source_blocks, nodes=nodes, edges=edges)
 
     graph = ContextGraph(
         nodes=list(nodes.values()),
@@ -80,7 +86,7 @@ def _materialize_entity(
     if person is None:
         person = GraphNode(
             id=entity.id,
-            kind="person",
+            kind=CIRNodeKind.PERSON,
             labels=[entity.name],
             properties={},
             source_refs=[entity.id],
@@ -93,35 +99,97 @@ def _materialize_entity(
             if org_id not in nodes:
                 nodes[org_id] = GraphNode(
                     id=org_id,
-                    kind="organization",
+                    kind=CIRNodeKind.ORGANIZATION,
                     labels=[rel.value],
                     properties={"name": rel.value},
                     source_refs=[entity.id],
                 )
-            edges.append(GraphEdge(from_id=entity.id, to_id=org_id, type="company"))
+            edges.append(
+                GraphEdge(from_id=entity.id, to_id=org_id, type=CIREdgeType.COMPANY)
+            )
         elif rel.type == "knows" and rel.target:
             target = nodes.get(rel.target)
             if target is None:
                 target_name = rel.target.replace("_", " ").title()
                 target = GraphNode(
                     id=rel.target,
-                    kind="person",
+                    kind=CIRNodeKind.PERSON,
                     labels=[target_name],
                     properties={},
                     source_refs=[entity.id],
                 )
                 nodes[rel.target] = target
-            edges.append(GraphEdge(from_id=entity.id, to_id=rel.target, type="knows"))
+            edges.append(
+                GraphEdge(from_id=entity.id, to_id=rel.target, type=CIREdgeType.KNOWS)
+            )
         elif rel.type == "action" and rel.value:
-            actions = list(person.properties.get("actions", []))
-            if rel.value not in actions:
-                actions.append(rel.value)
-            person.properties["actions"] = actions
+            concept_id = _action_concept_id(rel.value)
+            if concept_id not in nodes:
+                nodes[concept_id] = GraphNode(
+                    id=concept_id,
+                    kind=CIRNodeKind.CONCEPT,
+                    labels=[rel.value],
+                    properties={"canonical_line": rel.value},
+                    source_refs=[entity.id],
+                )
+            edges.append(
+                GraphEdge(
+                    from_id=entity.id,
+                    to_id=concept_id,
+                    type=CIREdgeType.ACTION,
+                    properties={"value": rel.value},
+                )
+            )
+
+
+def _materialize_rag_blocks(
+    blocks: list[ContextBlock],
+    *,
+    nodes: dict[str, GraphNode],
+    edges: list[GraphEdge],
+) -> None:
+    """Bloques ``source_type=rag`` → nodos ``document`` + ``chunk``."""
+    for block in blocks:
+        if block.source_type != "rag":
+            continue
+        doc_id = f"doc_{block.id}"
+        label = block.metadata.get("source_label") or block.id
+        uri = block.metadata.get("source_uri")
+        props: dict = {}
+        if uri:
+            props["uri"] = uri
+        nodes[doc_id] = GraphNode(
+            id=doc_id,
+            kind=CIRNodeKind.DOCUMENT,
+            labels=[str(label)],
+            properties=props,
+            source_refs=[block.id],
+        )
+        for idx, line in enumerate(block.content.splitlines()):
+            stripped = line.strip()
+            if not stripped:
+                continue
+            chunk_id = f"chunk_{block.id}_{idx}"
+            nodes[chunk_id] = GraphNode(
+                id=chunk_id,
+                kind=CIRNodeKind.CHUNK,
+                labels=[stripped],
+                properties={"parent_doc": doc_id},
+                source_refs=[block.id],
+            )
+            edges.append(
+                GraphEdge(from_id=doc_id, to_id=chunk_id, type=CIREdgeType.CONTAINS)
+            )
 
 
 def _concept_id(fact: SharedFact) -> str:
     slug = fact.canonical_line.strip().lower().replace(" ", "_").replace(":", "")
     return f"concept_{slug[:48]}"
+
+
+def _action_concept_id(action_text: str) -> str:
+    slug = action_text.strip().lower().replace(" ", "_")[:48]
+    return f"concept_action_{slug}"
 
 
 def _org_id(name: str) -> str:

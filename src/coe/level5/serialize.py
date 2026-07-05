@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from ..models import ContextBlock, ContextGraph
+from ..cir import envelope_from_context_graph, context_graph_from_envelope
 from .state import Commit, RetractRecord, SemanticState
 
 STATE_SCHEMA_VERSION = "0.1"
@@ -38,7 +39,9 @@ def context_block_from_dict(data: dict[str, Any]) -> ContextBlock:
 def commit_to_dict(commit: Commit) -> dict[str, Any]:
     return {
         "commit_id": commit.commit_id,
-        "graph": commit.graph.to_dict() if commit.graph is not None else None,
+        "graph": envelope_from_context_graph(commit.graph)
+        if commit.graph is not None
+        else None,
     }
 
 
@@ -46,7 +49,7 @@ def commit_from_dict(data: dict[str, Any]) -> Commit:
     graph_data = data.get("graph")
     return Commit(
         commit_id=data["commit_id"],
-        graph=ContextGraph.from_dict(graph_data) if graph_data else None,
+        graph=context_graph_from_envelope(graph_data) if graph_data else None,
     )
 
 
@@ -73,7 +76,9 @@ def semantic_state_to_dict(state: SemanticState) -> dict[str, Any]:
         "schema_version": STATE_SCHEMA_VERSION,
         "session_id": state.session_id,
         "blocks": [context_block_to_dict(block) for block in state.blocks],
-        "graph": state.graph.to_dict() if state.graph is not None else None,
+        "graph": envelope_from_context_graph(state.graph)
+        if state.graph is not None
+        else None,
         "head_commit_id": state.head_commit_id,
         "history": [commit_to_dict(commit) for commit in state.history],
         "commit_count": state.commit_count,
@@ -87,7 +92,7 @@ def semantic_state_from_dict(data: dict[str, Any]) -> SemanticState:
     return SemanticState(
         session_id=data["session_id"],
         blocks=[context_block_from_dict(item) for item in data.get("blocks") or []],
-        graph=ContextGraph.from_dict(graph_data) if graph_data else None,
+        graph=context_graph_from_envelope(graph_data) if graph_data else None,
         head_commit_id=data.get("head_commit_id"),
         history=[commit_from_dict(item) for item in data.get("history") or []],
         commit_count=int(data.get("commit_count") or 0),
