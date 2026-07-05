@@ -148,3 +148,32 @@ class TestHarnessN5Session:
             (BENCH / "baselines" / "n5_session_smoke.json").read_text(encoding="utf-8")
         )
         assert compare_reports(report.to_dict(), baseline) == []
+
+
+class TestHarnessL0:
+    def test_run_l0_n1_en_multilingual(self):
+        report = run_suite_from_ids(
+            profile_id="l0_n1_en",
+            tier="smoke",
+            tags={"multilingual"},
+            benchmark_root=BENCH,
+        )
+        assert report.cases_run == 1
+        assert report.gate_passed
+        preview = report.results[0].optimized_context_preview or ""
+        assert "works at ACME" in preview
+        assert "trabaja" not in preview
+
+    def test_l0_n1_en_baseline_compare(self):
+        import json
+
+        report = run_suite_from_ids(
+            profile_id="l0_n1_en",
+            tier="smoke",
+            tags={"multilingual"},
+            benchmark_root=BENCH,
+        )
+        baseline = json.loads(
+            (BENCH / "baselines" / "l0_n1_en_smoke.json").read_text(encoding="utf-8")
+        )
+        assert compare_reports(report.to_dict(), baseline) == []

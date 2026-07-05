@@ -20,6 +20,7 @@ class ContextBlock:
 
     id: str
     content: str
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def token_count(self) -> int:
         return estimate_tokens(self.content)

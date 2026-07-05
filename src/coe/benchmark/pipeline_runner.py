@@ -46,8 +46,8 @@ def run_pipeline_on_case(
     original_text = render_raw_context(blocks)
     original_tokens = estimate_tokens(original_text)
 
-    if profile.l0:
-        raise NotImplementedError("L0 not implemented in benchmark pipeline yet")
+    if profile.l0 and not profile.target_lang:
+        raise ValueError(f"Profile {profile.id!r} has l0=true but target_lang is missing")
 
     levels = _resolve_levels(profile)
     if 5 in levels and is_multi_turn(case):

@@ -6,6 +6,7 @@ import time
 from dataclasses import dataclass, field
 from typing import Any
 
+from .ingest import IngestTrace, normalize_language
 from .level1 import deduplicate_context
 from .level2 import factorize_context
 from .level5 import InMemoryStateStore, StateView, update_semantic_state
@@ -56,6 +57,7 @@ class OptimizeResult:
     factorization: FactorizationResult | None = None
     state_view: StateView | None = None
     commit_id: str | None = None
+    ingest_trace: IngestTrace | None = None
     trace: list[LevelTrace] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
@@ -99,7 +101,7 @@ def optimize_context(
     Ejecuta el pipeline COE sobre un bundle de bloques.
 
     Niveles soportados: **1** (dedup), **2** (factorización), **5** (estado).
-    L0 pendiente.
+    L0 opcional con ``l0=True`` y ``target_lang``.
     """
     opts = OptimizeOptions(
         levels=_normalize_levels(levels or [1]),
@@ -119,9 +121,6 @@ def _normalize_levels(levels: list[int]) -> list[int]:
 
 
 def _optimize(blocks: list[ContextBlock], opts: OptimizeOptions) -> OptimizeResult:
-    if opts.l0:
-        raise NotImplementedError("L0 language normalization not implemented yet")
-
     unsupported = [n for n in opts.levels if n not in _SUPPORTED_LEVELS]
     if unsupported:
         raise NotImplementedError(f"Levels not implemented: {unsupported}")
@@ -131,13 +130,27 @@ def _optimize(blocks: list[ContextBlock], opts: OptimizeOptions) -> OptimizeResu
 
     trace: list[LevelTrace] = []
     latency_by_level: dict[str, float] = {}
+    ingest_trace: IngestTrace | None = None
+    blocks_work = blocks
+
+    t_total = time.perf_counter()
+
+    if opts.l0:
+        if not opts.target_lang:
+            raise ValueError("target_lang is required when l0=True")
+        t0 = time.perf_counter()
+        l0_result = normalize_language(blocks_work, target_lang=opts.target_lang)
+        blocks_work = l0_result.blocks
+        ingest_trace = l0_result.ingest_trace
+        elapsed = (time.perf_counter() - t0) * 1000.0
+        latency_by_level["l0"] = elapsed
+        trace.append(LevelTrace(level=0, latency_ms=elapsed, detail="normalize_language"))
+
     dedup: DeduplicationResult | None = None
     factorized: FactorizationResult | None = None
     state_view: StateView | None = None
     commit_id: str | None = None
     text = original_text
-
-    t_total = time.perf_counter()
 
     run_n5 = 5 in opts.levels
     run_n1 = 1 in opts.levels and not run_n5
@@ -147,7 +160,7 @@ def _optimize(blocks: list[ContextBlock], opts: OptimizeOptions) -> OptimizeResu
         sub_levels = [n for n in opts.levels if n != 5] or [1]
         t0 = time.perf_counter()
         n5_result = update_semantic_state(
-            blocks,
+            blocks_work,
             session_id=opts.session_id or "_ephemeral",
             store=opts.state_store or InMemoryStateStore(),
             locale=opts.locale,
@@ -161,14 +174,14 @@ def _optimize(blocks: list[ContextBlock], opts: OptimizeOptions) -> OptimizeResu
         text = state_view.render()
     elif run_n1:
         t0 = time.perf_counter()
-        dedup = deduplicate_context(blocks)
+        dedup = deduplicate_context(blocks_work)
         elapsed = (time.perf_counter() - t0) * 1000.0
         latency_by_level["n1"] = elapsed
         trace.append(LevelTrace(level=1, latency_ms=elapsed, detail="deduplicate"))
 
     if run_n2:
         t0 = time.perf_counter()
-        source = dedup if dedup is not None else blocks
+        source = dedup if dedup is not None else blocks_work
         factorized = factorize_context(source, locale=opts.locale)
         text = factorized.render_prose(locale=opts.locale)
         elapsed = (time.perf_counter() - t0) * 1000.0
@@ -199,5 +212,6 @@ def _optimize(blocks: list[ContextBlock], opts: OptimizeOptions) -> OptimizeResu
         factorization=factorized,
         state_view=state_view,
         commit_id=commit_id,
+        ingest_trace=ingest_trace,
         trace=trace,
     )
