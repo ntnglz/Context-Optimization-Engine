@@ -339,7 +339,7 @@ Temas de [Context Optimization Engine (COE).md](Context%20Optimization%20Engine%
 | 5 | MCP COE | ✅ cerrada | bf9ddf2 |
 | 6 | CIR formal | ✅ cerrada | dd51755 |
 | 7 | Sincronización documental | ✅ cerrada | 727a182 |
-| 8 | Harness contrato + corpus | ✅ cerrada | — |
+| 8 | Harness contrato + corpus | ✅ cerrada | 872d5d1 |
 | 9 | L0 v2 | ⏳ **activa** | — |
 | 10 | Presupuesto tokens COE | ⏳ pendiente | — |
 | 11 | Integración PCM+COE | ⏳ pendiente | — |
