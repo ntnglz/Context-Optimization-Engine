@@ -247,9 +247,22 @@ Protocolo de merge con `retracts` — detalle en implementación; invariante: **
 - Toda arista en la vista debe existir en el grafo del `head` o en el diff adjunto.
 - Política de retención configurable (TTL, max commits); archivado, no borrado silencioso.
 
+## Store backends (v1)
+
+| Backend | Clase | Selección Gateway |
+|---------|-------|-------------------|
+| `filesystem` (default) | `FilesystemStateStore` | JSON por sesión en `data/sessions/` |
+| `sqlite` | `SQLiteStateStore` | `state_store_backend="sqlite"`, `state_store_path` opcional |
+
+### Concurrencia SQLite v1
+
+- Modo **WAL** + `timeout=30s` en lecturas/escrituras.
+- **Single-writer** recomendado por sesión; lectores concurrentes OK.
+- Escritores simultáneos sobre la misma DB pueden bloquearse hasta timeout — no hay lock distribuido en v1.
+
 ## Límites previstos (v1)
 
-- Store **local** (filesystem/SQLite); backend distribuido en fase posterior.
+- Store **local** (filesystem/SQLite); backend distribuido remoto — fase posterior.
 - Materialización de vista con heurísticas (subgrafo + diff en prosa), sin LLM para selección en v1.
 - **`StateView.render()` obligatorio**; el store nunca sustituye al benchmark de prosa.
 - Un `session_id` por conversación; multi-agente compartiendo store — diseño posterior.

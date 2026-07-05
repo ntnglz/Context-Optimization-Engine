@@ -85,7 +85,12 @@ def archive_session(
     """
     from .store import FilesystemStateStore, InMemoryStateStore
 
+    from .store import FilesystemStateStore, InMemoryStateStore
+    from .sqlite_store import SQLiteStateStore
+
     if isinstance(store, FilesystemStateStore):
+        return store.archive_session(session_id, remove_active=remove_active)
+    if isinstance(store, SQLiteStateStore):
         return store.archive_session(session_id, remove_active=remove_active)
     if isinstance(store, InMemoryStateStore):
         return store.archive_session(session_id, remove_active=remove_active)
@@ -105,8 +110,11 @@ def archive_session(
 
 def collect_store_metrics(store: StateStore) -> StoreMetrics:
     from .store import FilesystemStateStore, InMemoryStateStore
+    from .sqlite_store import SQLiteStateStore
 
     if isinstance(store, FilesystemStateStore):
+        return store.collect_metrics()
+    if isinstance(store, SQLiteStateStore):
         return store.collect_metrics()
     if isinstance(store, InMemoryStateStore):
         return store.collect_metrics()
@@ -121,8 +129,11 @@ def collect_store_metrics(store: StateStore) -> StoreMetrics:
 def sweep_expired_sessions(store: StateStore, *, now: float | None = None) -> list[str]:
     """Elimina (tras archivar) sesiones cuyo TTL expiró. Devuelve ids barridos."""
     from .store import FilesystemStateStore, InMemoryStateStore
+    from .sqlite_store import SQLiteStateStore
 
     if isinstance(store, FilesystemStateStore):
+        return store.sweep_expired_sessions(now=now)
+    if isinstance(store, SQLiteStateStore):
         return store.sweep_expired_sessions(now=now)
     if isinstance(store, InMemoryStateStore):
         return store.sweep_expired_sessions(now=now)

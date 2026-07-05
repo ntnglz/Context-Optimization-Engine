@@ -25,6 +25,8 @@ class ContextBlocksRequest(BaseModel):
     target_model: str | None = None
     session_ttl_hours: float | None = None
     fuzzy_link_threshold: float | None = None
+    state_store_backend: str | None = None
+    state_store_path: str | None = None
 
     def handler_kwargs(self) -> dict[str, Any]:
         return {
@@ -43,4 +45,6 @@ class ContextBlocksRequest(BaseModel):
             "target_model": self.target_model,
             "session_ttl_hours": self.session_ttl_hours,
             "fuzzy_link_threshold": self.fuzzy_link_threshold,
+            "state_store_backend": self.state_store_backend,
+            "state_store_path": self.state_store_path,
         }

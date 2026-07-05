@@ -25,6 +25,8 @@ def _resolve_input(
     target_model: str | None = None,
     session_ttl_hours: float | None = None,
     fuzzy_link_threshold: float | None = None,
+    state_store_backend: str | None = None,
+    state_store_path: str | None = None,
 ):
     if not blocks:
         raise ValueError("blocks must not be empty")
@@ -51,6 +53,10 @@ def _resolve_input(
         bundle.options.session_ttl_hours = session_ttl_hours
     if fuzzy_link_threshold is not None:
         bundle.options.fuzzy_link_threshold = fuzzy_link_threshold
+    if state_store_backend is not None:
+        bundle.options.state_store_backend = state_store_backend
+    if state_store_path is not None:
+        bundle.options.state_store_path = state_store_path
     return bundle
 
 
@@ -71,6 +77,8 @@ def handle_optimize_context(
     target_model: str | None = None,
     session_ttl_hours: float | None = None,
     fuzzy_link_threshold: float | None = None,
+    state_store_backend: str | None = None,
+    state_store_path: str | None = None,
 ) -> dict[str, Any]:
     """Ejecuta el pipeline COE y devuelve prosa optimizada + métricas."""
     bundle = _resolve_input(
@@ -87,6 +95,8 @@ def handle_optimize_context(
         target_model=target_model,
         session_ttl_hours=session_ttl_hours,
         fuzzy_link_threshold=fuzzy_link_threshold,
+        state_store_backend=state_store_backend,
+        state_store_path=state_store_path,
     )
     result = optimize_context(
         bundle,
@@ -98,6 +108,8 @@ def handle_optimize_context(
         target_model=target_model,
         session_ttl_hours=session_ttl_hours,
         fuzzy_link_threshold=fuzzy_link_threshold,
+        state_store_backend=state_store_backend,
+        state_store_path=state_store_path,
     )
     payload = result.to_dict()
     payload["text"] = result.text
@@ -123,6 +135,8 @@ def handle_estimate_savings(
     target_model: str | None = None,
     session_ttl_hours: float | None = None,
     fuzzy_link_threshold: float | None = None,
+    state_store_backend: str | None = None,
+    state_store_path: str | None = None,
 ) -> dict[str, Any]:
     """Estima tokens ahorrados sin devolver prosa ni invocar evaluador LLM."""
     bundle = _resolve_input(
@@ -139,6 +153,8 @@ def handle_estimate_savings(
         target_model=target_model,
         session_ttl_hours=session_ttl_hours,
         fuzzy_link_threshold=fuzzy_link_threshold,
+        state_store_backend=state_store_backend,
+        state_store_path=state_store_path,
     )
     result = optimize_context(
         bundle,
@@ -150,6 +166,8 @@ def handle_estimate_savings(
         target_model=target_model,
         session_ttl_hours=session_ttl_hours,
         fuzzy_link_threshold=fuzzy_link_threshold,
+        state_store_backend=state_store_backend,
+        state_store_path=state_store_path,
     )
     original = result.metrics.original_tokens
     optimized = result.metrics.optimized_tokens

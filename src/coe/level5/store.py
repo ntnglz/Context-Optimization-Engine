@@ -19,9 +19,10 @@ from .operations import (
 from .serialize import semantic_state_from_dict, semantic_state_to_dict
 from .state import SemanticState
 
-_SAFE_SESSION_ID = re.compile(r"^[\w.-]+$")
 DEFAULT_SESSIONS_ROOT = Path("data/sessions")
+DEFAULT_SQLITE_PATH = Path("data/sessions/coe_sessions.db")
 _EPHEMERAL_SESSION = "_ephemeral"
+_STATE_STORE_BACKENDS = frozenset({"filesystem", "sqlite"})
 
 
 def resolve_state_store(
@@ -30,16 +31,32 @@ def resolve_state_store(
     *,
     root: str | Path | None = None,
     session_ttl_hours: float | None = None,
+    backend: str | None = None,
+    store_path: str | Path | None = None,
 ) -> StateStore:
     """Elige store durable si hay ``session_id`` real y no se pasó uno explícito."""
     if store is not None:
         return store
     if session_id and session_id != _EPHEMERAL_SESSION:
+        resolved_backend = (backend or "filesystem").strip().lower()
+        if resolved_backend not in _STATE_STORE_BACKENDS:
+            raise ValueError(f"Unknown state_store backend: {backend!r}")
+        resolved_path = store_path if store_path is not None else root
+        if resolved_backend == "sqlite":
+            from .sqlite_store import SQLiteStateStore
+
+            return SQLiteStateStore(
+                resolved_path or DEFAULT_SQLITE_PATH,
+                session_ttl_hours=session_ttl_hours,
+            )
         return FilesystemStateStore(
-            root or DEFAULT_SESSIONS_ROOT,
+            resolved_path or DEFAULT_SESSIONS_ROOT,
             session_ttl_hours=session_ttl_hours,
         )
     return InMemoryStateStore(session_ttl_hours=session_ttl_hours)
+
+
+_SAFE_SESSION_ID = re.compile(r"^[\w.-]+$")
 
 
 class StateStore(Protocol):

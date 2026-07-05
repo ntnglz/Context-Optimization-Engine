@@ -10,6 +10,7 @@ from .operations import (
     sweep_expired_sessions,
 )
 from .state import Commit, RetractRecord, SemanticState, StateView, UpdateResult
+from .sqlite_store import DEFAULT_SQLITE_PATH, SQLiteStateStore
 from .store import (
     FilesystemStateStore,
     InMemoryStateStore,
@@ -22,10 +23,12 @@ __all__ = [
     "ArchiveResult",
     "Commit",
     "DEFAULT_FUZZY_THRESHOLD",
+    "DEFAULT_SQLITE_PATH",
     "FilesystemStateStore",
     "InMemoryStateStore",
     "RetractRecord",
     "SemanticState",
+    "SQLiteStateStore",
     "StateStore",
     "StateView",
     "StoreMetrics",

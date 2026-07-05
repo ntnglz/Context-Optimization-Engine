@@ -23,6 +23,8 @@ class IngestOptions:
     target_model: str | None = None
     session_ttl_hours: float | None = None
     fuzzy_link_threshold: float | None = None
+    state_store_backend: str | None = None
+    state_store_path: str | None = None
 
 
 @dataclass
