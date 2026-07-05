@@ -18,4 +18,6 @@ htmlcov/
 .vscode/
 data/benchmarks/runs/*
 !data/benchmarks/runs/.gitkeep
-data/benchmarks/corpus/raw/
+# Transcripts locales (exports Cursor, chats, etc.) — ver data/benchmarks/corpus/README.md
+data/benchmarks/corpus/transcripts/*
+!data/benchmarks/corpus/transcripts/.gitkeep
