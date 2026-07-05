@@ -52,10 +52,22 @@ def run_tests() -> int:
     )
 
 
+def run_ci() -> int:
+    import subprocess
+
+    script = ROOT / "scripts" / "ci" / "smoke.sh"
+    return subprocess.call(["bash", str(script)], cwd=ROOT)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Context Optimization Engine (COE)")
     parser.add_argument("--demo", action="store_true", help="Demo Nivel 1 deduplicación")
     parser.add_argument("--test", action="store_true", help="Ejecutar tests")
+    parser.add_argument(
+        "--ci",
+        action="store_true",
+        help="CI smoke local: pytest + 6 perfiles benchmark con compare baseline",
+    )
     parser.add_argument(
         "--benchmark",
         action="store_true",
@@ -68,6 +80,8 @@ def main() -> int:
         return run_demo()
     if args.test:
         return run_tests()
+    if args.ci:
+        return run_ci()
     if args.benchmark:
         import subprocess
 

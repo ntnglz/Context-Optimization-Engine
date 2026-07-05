@@ -12,13 +12,13 @@ Contexto bruto (N bloques)  →  COE  →  Representación compacta  →  LLM
 |------------|------|----------------|
 | [Visión fundacional](docs/Context%20Optimization%20Engine%20(COE).md) | ✅ | — |
 | [Diseño global](docs/architecture.md) | ✅ | Parcial |
-| [Pipeline L0 → N1–N5](docs/levels.md) | ✅ | L0 v1 · N1 · N2 · N5 v1 · N3/N4 pendientes |
+| [Pipeline L0 → N1–N5](docs/levels.md) | ✅ | L0 v1 · N1 · N2 · N3 v1 · N5 v1 · N4 pendiente |
 | [Multilingüe (i18n)](docs/i18n.md) | ✅ | Locale packs N2 EN/ES en código |
 | [L0 Ingest](docs/l0-ingest.md) | ✅ | v1 (heurística + ES→EN) |
 | [Context Ingest](docs/ingest.md) | ✅ | Parcial (`ContextBlock` + L0) |
 | [Renderer](docs/renderer.md) | ✅ | N1/N2 `render_prose` |
 | [Benchmarks y KPIs](docs/benchmarks.md) | ✅ | — |
-| [Harness de benchmarks](docs/benchmark-harness.md) | ✅ | ✅ H1–H5 · CI smoke (5 perfiles) |
+| [Harness de benchmarks](docs/benchmark-harness.md) | ✅ | ✅ H1–H5 · CI local smoke (6 perfiles) |
 | [Nivel 1](docs/level1.md) | ✅ | ✅ |
 | [Nivel 2](docs/level2.md) | ✅ | ✅ v1 (EN/ES) |
 | [Nivel 3](docs/level3.md) | ✅ | ✅ v1 (relaciones tipadas) |
@@ -41,7 +41,11 @@ python run.py --demo
 # Tests
 python run.py --test
 
-# Benchmark smoke (mock, compare baselines)
+# CI local (pytest + 6 perfiles smoke, compare baseline — antes de push)
+python run.py --ci
+# equivalente: bash scripts/ci/smoke.sh
+
+# Benchmark smoke individual (mock)
 python scripts/benchmark/run.py --tier smoke --profile n1_n2_en \
   --compare-baseline data/benchmarks/baselines/n1_n2_en_smoke.json
 ```
@@ -120,7 +124,7 @@ Context-Optimization-Engine/
 │   ├── renderer.md         # Prosa hacia LLM
 │   ├── level1.md … level5.md
 ├── src/coe/
-│   ├── gateway.py            # optimize_context — L0, N1, N2, N5
+│   ├── gateway.py            # optimize_context — L0, N1, N2, N3, N5
 │   ├── models.py             # ContextBlock, resultados por nivel
 │   ├── ingest/               # L0 normalize_language
 │   ├── level1/               # Deduplicación
@@ -129,11 +133,13 @@ Context-Optimization-Engine/
 │   ├── level5/               # StateView, sesión multi-turno
 │   ├── renderer/             # Plantillas prosa N1
 │   └── benchmark/            # Harness H1–H5
-├── scripts/benchmark/        # run.py, compare.py
+├── scripts/
+│   ├── benchmark/            # run.py, compare.py
+│   └── ci/                   # smoke.sh, nightly-mock.sh (CI local)
 ├── data/
 │   ├── examples/             # Demo N1 (ACME)
 │   └── benchmarks/           # Casos, perfiles, baselines, runs
-├── tests/                    # pytest (~82 tests)
+├── tests/                    # pytest (~92 tests)
 └── run.py
 ```
 

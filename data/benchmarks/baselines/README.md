@@ -11,9 +11,17 @@ Informes de referencia para `compare.py` en PR. **No** gitignore — forman part
 | `n5_session_smoke.json` | `n5_session` | smoke · `multi_turn` | Tras cambiar N5 o casos sesión |
 | `n1_n2_n3_en_smoke.json` | `n1_n2_n3_en` | smoke · `core` | Tras cambiar N3 o casos `core` |
 
-## CI
+## CI local
 
-En PR y `main`, `.github/workflows/benchmark.yml` ejecuta **pytest** + los seis perfiles anteriores con `--compare-baseline`. Evaluador **mock** (sin Ollama).
+**GitHub Actions está desactivado** (sin coste en la nube). El gate de calidad se ejecuta en local antes de push:
+
+```bash
+python run.py --ci
+```
+
+Equivale a `pytest` + los seis perfiles smoke con `--compare-baseline` (evaluador mock, sin Ollama). Ver [`.github/workflows/README.md`](../../.github/workflows/README.md).
+
+Nightly mock opcional: `bash scripts/ci/nightly-mock.sh`.
 
 ## Refrescar baseline (proceso)
 

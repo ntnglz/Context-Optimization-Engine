@@ -3,7 +3,7 @@
 > KPIs y umbrales: [benchmarks.md](benchmarks.md) · Pipeline COE: [levels.md](levels.md) · Render: [renderer.md](renderer.md)  
 > Hermano conceptual: PCM `e2e_benchmark` (instrucción); COE mide **contexto**.
 
-**Estado:** H1–H5 implementados · CI smoke en 6 perfiles (mock, compare baseline)
+**Estado:** H1–H5 implementados · **CI local** smoke en 6 perfiles (mock, compare baseline)
 
 El harness no es un script auxiliar: es el **sistema de calidad** que validará cada nivel (N2→N5), cada cambio de locale pack y cada perfil de despliegue. Debe ser **rápido en CI**, **reproducible**, **barato** en volumen y **estricto** en pre-release.
 
@@ -352,7 +352,7 @@ data/benchmarks/runs/{profile}_{tier}_{timestamp}/
 
 ### Compare en PR (baseline en repo)
 
-**Decisión:** si el PR toca `src/coe/level*/`, `src/coe/benchmark/` o `data/benchmarks/cases/`, CI ejecuta:
+**Decisión:** si el PR toca `src/coe/level*/`, `src/coe/benchmark/` o `data/benchmarks/cases/`, ejecutar **CI local** (`python run.py --ci`) antes de push.
 
 1. `run.py --tier smoke` → `report.json`
 2. `compare.py report.json data/benchmarks/baselines/{profile}_smoke.json`
@@ -377,30 +377,22 @@ data/benchmarks/baselines/
 
 | Tier | Capas | Casos | Evaluador | Cuándo |
 |------|-------|-------|-----------|--------|
-| **`smoke`** | 0 + 1 + 2 mock | `core` + perfiles con `--tags` | **mock** | PR / `main` |
+| **`smoke`** | 0 + 1 + 2 mock | `core` + perfiles con `--tags` | **mock** | Antes de push (`python run.py --ci`) |
 | **`ci`** | 0 + 1 + 2 mock | `tags=core` (~12) | **mock** | alias de smoke ampliado |
-| **`nightly`** | 1 + 2 | all `single_turn` | **ollama** | cron |
-| **`release`** | 1 + 2 ×3 runs | all + multilingual + multi_turn | **ollama** | tag / manual |
+| **`nightly`** | 1 + 2 | all `single_turn` | **mock** u **ollama** | manual (`scripts/ci/nightly-mock.sh`) |
+| **`release`** | 1 + 2 ×3 runs | all + multilingual + multi_turn | **ollama** | tag / manual local |
 
-**Decisión CI:** PR y `main` **no** llaman a Ollama en capa 2 — solo fixtures `mock`. La validación semántica **real** (respuestas LLM + juez redacción) ocurre en **nightly** y **release**.
+**Decisión CI:** no hay GitHub Actions (coste cero en la nube). El gate habitual es **local**: `python run.py --ci` = pytest + 6 perfiles smoke con compare baseline. Capa 2 usa **mock**; Ollama solo en release manual.
 
 ```bash
-# PR — pytest + 6 perfiles smoke con compare (sin Ollama)
-python -m pytest tests/ -q
-python scripts/benchmark/run.py --tier smoke --profile n1 \
-  --compare-baseline data/benchmarks/baselines/n1_smoke.json
-python scripts/benchmark/run.py --tier smoke --profile n1_n2_en \
-  --compare-baseline data/benchmarks/baselines/n1_n2_en_smoke.json
-python scripts/benchmark/run.py --tier smoke --profile n1_n2_n3_en \
-  --compare-baseline data/benchmarks/baselines/n1_n2_n3_en_smoke.json
-python scripts/benchmark/run.py --tier smoke --profile n1_n2_es --tags multilingual \
-  --compare-baseline data/benchmarks/baselines/n1_n2_es_smoke.json
-python scripts/benchmark/run.py --tier smoke --profile l0_n1_en --tags multilingual \
-  --compare-baseline data/benchmarks/baselines/l0_n1_en_smoke.json
-python scripts/benchmark/run.py --tier smoke --profile n5_session --tags multi_turn \
-  --compare-baseline data/benchmarks/baselines/n5_session_smoke.json
+# Gate habitual — un comando
+python run.py --ci
+# equivalente: bash scripts/ci/smoke.sh
 
-# Pre-release — coste real (Ollama)
+# Nightly mock (opcional)
+bash scripts/ci/nightly-mock.sh
+
+# Pre-release — coste real (Ollama local)
 python scripts/benchmark/run.py --tier release --profile n1 \
   --evaluator ollama:qwen3:8b --runs 3
 ```
@@ -449,7 +441,7 @@ Sin dependencias LLM en capa 1 — CI funciona offline.
 | **H2** | `gateway.optimize_context`, `arms`, N1 `render_prose`, harness vía Gateway | ✅ Implementado |
 | **H3** | `factual` F1, embedding similarity, `report`/`compare`, gate comprensión | ✅ Implementado |
 | **H4** | Ollama evaluator, readability judge, casos core E2E, `--evaluator` CLI | ✅ Implementado |
-| **H5** | multi_turn schema, multilingual casos/perfiles, tier config, GitHub workflows | ✅ Implementado |
+| **H5** | multi_turn schema, multilingual casos/perfiles, tier config, scripts CI local | ✅ Implementado |
 
 ---
 
@@ -458,8 +450,8 @@ Sin dependencias LLM en capa 1 — CI funciona offline.
 | Tema | Decisión |
 |------|----------|
 | **`comprehension_similarity`** | Embedding local (`sentence-transformers`, modelo multilingual fijado) — gate en CI y release; **no** juez LLM para similitud |
-| **CI `main` / PR capa 2** | Solo **mock**; Ollama real en **nightly + release** |
-| **Compare en PR** | **Obligatorio** si toca pipeline o casos; baseline versionado en `data/benchmarks/baselines/` |
+| **CI local (pre-push)** | Solo **mock** en smoke; Ollama opcional en release manual |
+| **Compare en PR** | **Obligatorio** vía `python run.py --ci` si toca pipeline o casos; baseline versionado en `data/benchmarks/baselines/` |
 
 ---
 
