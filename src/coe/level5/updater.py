@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from ..models import ContextBlock, estimate_tokens
+from .entity_linking import DEFAULT_FUZZY_THRESHOLD, build_alias_map
 from .materialize import blocks_to_context_graph, render_state_view
 from .merge import merge_context_graphs, _clone_graph
 from .retention import DEFAULT_MAX_COMMITS, prune_history
@@ -20,6 +21,7 @@ def update_semantic_state(
     query_context: str | None = None,
     max_commits: int | None = None,
     session_ttl_hours: float | None = None,
+    fuzzy_link_threshold: float | None = DEFAULT_FUZZY_THRESHOLD,
 ) -> UpdateResult:
     """
     Integra el grafo del turno en el State Store y materializa ``StateView``.
@@ -56,7 +58,12 @@ def update_semantic_state(
             max_hops=turn_graph.max_hops,
         )
 
-    state.graph = merge_context_graphs(state.graph, turn_graph)
+    state.graph = merge_context_graphs(
+        state.graph,
+        turn_graph,
+        alias_map=build_alias_map(blocks),
+        fuzzy_link_threshold=fuzzy_link_threshold,
+    )
     if state.graph is not None:
         prose_body = state.graph.render_prose(locale=loc)
         state.graph.optimized_tokens = estimate_tokens(prose_body)

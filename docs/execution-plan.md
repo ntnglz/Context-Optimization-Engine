@@ -25,9 +25,9 @@ Orden de las fases 6–18 según **dependencias técnicas** y **cierre de deuda*
 5. **N5 escala tras CIR** — TTL, fuzzy linking y store remoto asumen envelope y merge probados.
 6. **Investigación explícita** — hipótesis no validadas (ML, CIR hacia LLM) fuera del producto v1; pista I al final.
 
-**Deuda cerrada (fases 0–14):** L0 v2, `case.schema.json`, presupuesto tokens COE, PCM+COE, HTTP API, Model Adapter, N5 TTL/archivado, CIR v1.0, harness, MCP, Gateway/N1–N5, README al día.
+**Deuda cerrada (fases 0–15):** L0 v2, `case.schema.json`, presupuesto tokens COE, PCM+COE, HTTP API, Model Adapter, N5 TTL/archivado, entity linking fuzzy, CIR v1.0, harness, MCP, Gateway/N1–N5, README al día.
 
-**Deuda pendiente (fases 15–19):** entity linking fuzzy, store distribuido, locale `zh`, ingest `structured`/`code`, CIR v1.1 opcional.
+**Deuda pendiente (fases 16–19):** store distribuido, locale `zh`, ingest `structured`/`code`, CIR v1.1 opcional.
 
 **Fuera de alcance producto v1:** optimización por ML, representación no-prosa hacia el LLM, parser semántico dedicado, «capa universal» como estándar de industria.
 
@@ -54,7 +54,7 @@ Orden de las fases 6–18 según **dependencias técnicas** y **cierre de deuda*
 | HTTP API | ✅ doc | ✅ | **12** |
 | Model Adapter | ✅ acotado | ✅ | **13** |
 | N5 TTL / archivado | ✅ doc | ✅ | **14** |
-| Entity linking fuzzy | ✅ diferido | ❌ | **15** |
+| Entity linking fuzzy | ✅ diferido | ✅ | **15** |
 | Store distribuido | ✅ doc | ❌ | **16** |
 | Locale `zh` | ✅ doc | ❌ | **17** |
 | Ingest `structured`/`code` | ✅ matriz | ⚠️ passthrough | **18** |
@@ -95,6 +95,7 @@ Resumen; detalle de entregables en secciones siguientes (fases 6–18).
 | 12 | HTTP API | b191a62 |
 | 13 | Model Adapter | 8b84bb5 |
 | 14 | N5 operaciones (TTL) | 76c3683 |
+| 15 | Entity linking fuzzy | — |
 
 ---
 
@@ -245,7 +246,7 @@ Resumen; detalle de entregables en secciones siguientes (fases 6–18).
 
 ---
 
-### Fase 15 — Entity linking fuzzy v2
+### Fase 15 — Entity linking fuzzy v2 ✅
 
 **Objetivo:** Cerrar deuda [spec-gaps.md](spec-gaps.md) §7 post-v1 N5.
 
@@ -357,8 +358,8 @@ Temas de [Context Optimization Engine (COE).md](Context%20Optimization%20Engine%
 | 12 | HTTP API | ✅ cerrada | b191a62 |
 | 13 | Model Adapter | ✅ cerrada | 8b84bb5 |
 | 14 | N5 operaciones (TTL) | ✅ cerrada | 76c3683 |
-| 15 | Entity linking fuzzy | ⏳ **activa** | — |
-| 16 | Store distribuido | ⏳ pendiente | — |
+| 15 | Entity linking fuzzy | ✅ cerrada | — |
+| 16 | Store distribuido | ⏳ **activa** | — |
 | 17 | Locale `zh` | ⏳ pendiente | — |
 | 18 | Ingest structured/code | ⏳ pendiente | — |
 | 19 | CIR v1.1 Opción B | ⏳ opcional | — |

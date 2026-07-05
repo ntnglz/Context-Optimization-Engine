@@ -9,7 +9,7 @@
   "gate_failures": [],
   "summary": {
     "factual_recall_mean": 1.0,
-    "t_coe_p95_ms": 0.18,
+    "t_coe_p95_ms": 0.28,
     "artifact_leak_rate": 0.0,
     "prose_ratio_mean": 1.8919,
     "comprehension_similarity_mean": 1.0,

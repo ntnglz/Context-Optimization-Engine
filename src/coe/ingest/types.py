@@ -22,6 +22,7 @@ class IngestOptions:
     max_commits: int | None = None
     target_model: str | None = None
     session_ttl_hours: float | None = None
+    fuzzy_link_threshold: float | None = None
 
 
 @dataclass

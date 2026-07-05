@@ -1,5 +1,6 @@
 """Nivel 5 — estado semántico multi-turno."""
 
+from .entity_linking import DEFAULT_FUZZY_THRESHOLD, build_alias_map
 from .operations import (
     ArchiveResult,
     StoreMetrics,
@@ -20,6 +21,7 @@ from .updater import update_semantic_state
 __all__ = [
     "ArchiveResult",
     "Commit",
+    "DEFAULT_FUZZY_THRESHOLD",
     "FilesystemStateStore",
     "InMemoryStateStore",
     "RetractRecord",
@@ -29,6 +31,7 @@ __all__ = [
     "StoreMetrics",
     "UpdateResult",
     "archive_session",
+    "build_alias_map",
     "collect_store_metrics",
     "resolve_state_store",
     "session_is_expired",

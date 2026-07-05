@@ -24,6 +24,7 @@ def _resolve_input(
     max_context_tokens: int | None = None,
     target_model: str | None = None,
     session_ttl_hours: float | None = None,
+    fuzzy_link_threshold: float | None = None,
 ):
     if not blocks:
         raise ValueError("blocks must not be empty")
@@ -48,6 +49,8 @@ def _resolve_input(
         bundle.options.target_model = target_model
     if session_ttl_hours is not None:
         bundle.options.session_ttl_hours = session_ttl_hours
+    if fuzzy_link_threshold is not None:
+        bundle.options.fuzzy_link_threshold = fuzzy_link_threshold
     return bundle
 
 
@@ -67,6 +70,7 @@ def handle_optimize_context(
     max_context_tokens: int | None = None,
     target_model: str | None = None,
     session_ttl_hours: float | None = None,
+    fuzzy_link_threshold: float | None = None,
 ) -> dict[str, Any]:
     """Ejecuta el pipeline COE y devuelve prosa optimizada + métricas."""
     bundle = _resolve_input(
@@ -82,6 +86,7 @@ def handle_optimize_context(
         max_context_tokens=max_context_tokens,
         target_model=target_model,
         session_ttl_hours=session_ttl_hours,
+        fuzzy_link_threshold=fuzzy_link_threshold,
     )
     result = optimize_context(
         bundle,
@@ -92,6 +97,7 @@ def handle_optimize_context(
         session_id=session_id,
         target_model=target_model,
         session_ttl_hours=session_ttl_hours,
+        fuzzy_link_threshold=fuzzy_link_threshold,
     )
     payload = result.to_dict()
     payload["text"] = result.text
@@ -116,6 +122,7 @@ def handle_estimate_savings(
     max_context_tokens: int | None = None,
     target_model: str | None = None,
     session_ttl_hours: float | None = None,
+    fuzzy_link_threshold: float | None = None,
 ) -> dict[str, Any]:
     """Estima tokens ahorrados sin devolver prosa ni invocar evaluador LLM."""
     bundle = _resolve_input(
@@ -131,6 +138,7 @@ def handle_estimate_savings(
         max_context_tokens=max_context_tokens,
         target_model=target_model,
         session_ttl_hours=session_ttl_hours,
+        fuzzy_link_threshold=fuzzy_link_threshold,
     )
     result = optimize_context(
         bundle,
@@ -141,6 +149,7 @@ def handle_estimate_savings(
         session_id=session_id,
         target_model=target_model,
         session_ttl_hours=session_ttl_hours,
+        fuzzy_link_threshold=fuzzy_link_threshold,
     )
     original = result.metrics.original_tokens
     optimized = result.metrics.optimized_tokens

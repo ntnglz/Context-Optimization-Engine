@@ -12,6 +12,7 @@ from ..models import (
 )
 from ..level4.builder import _dedupe_edges
 from ..level4.render import serialize_graph_internal
+from .entity_linking import DEFAULT_FUZZY_THRESHOLD, link_incoming_entities
 
 
 _SKIP_PROPERTY_KEYS = frozenset({"conflict", "conflict_entries", "retracts", "superseded_by"})
@@ -20,14 +21,28 @@ _SKIP_PROPERTY_KEYS = frozenset({"conflict", "conflict_entries", "retracts", "su
 def merge_context_graphs(
     base: ContextGraph | None,
     incoming: ContextGraph,
+    *,
+    alias_map: dict[str, str] | None = None,
+    fuzzy_link_threshold: float | None = DEFAULT_FUZZY_THRESHOLD,
 ) -> ContextGraph:
     """Fusiona el grafo del turno en el head acumulado (mismo id canónico → un nodo)."""
     if base is None:
         return _clone_graph(incoming)
 
+    linked_incoming = link_incoming_entities(
+        base,
+        incoming,
+        alias_map=alias_map,
+        fuzzy_threshold=(
+            DEFAULT_FUZZY_THRESHOLD
+            if fuzzy_link_threshold is None
+            else fuzzy_link_threshold
+        ),
+    )
+
     nodes_by_id: dict[str, GraphNode] = {node.id: _clone_node(node) for node in base.nodes}
 
-    for node in incoming.nodes:
+    for node in linked_incoming.nodes:
         if node.id not in nodes_by_id:
             nodes_by_id[node.id] = _clone_node(node)
             continue
@@ -38,11 +53,11 @@ def merge_context_graphs(
         if not existing.labels and node.labels:
             existing.labels = list(node.labels)
 
-    edges = _dedupe_edges([*base.edges, *incoming.edges])
+    edges = _dedupe_edges([*base.edges, *linked_incoming.edges])
 
     orphan_texts = {orphan.text for orphan in base.orphans}
     orphans = [_clone_orphan(orphan) for orphan in base.orphans]
-    for orphan in incoming.orphans:
+    for orphan in linked_incoming.orphans:
         if orphan.text in orphan_texts:
             continue
         orphans.append(_clone_orphan(orphan))
@@ -53,7 +68,7 @@ def merge_context_graphs(
         edges=edges,
         orphans=orphans,
         schema_version=GRAPH_SCHEMA_VERSION,
-        original_tokens=base.original_tokens + incoming.original_tokens,
+        original_tokens=base.original_tokens + linked_incoming.original_tokens,
     )
     internal = serialize_graph_internal(merged)
     merged.internal_tokens = estimate_tokens(internal)

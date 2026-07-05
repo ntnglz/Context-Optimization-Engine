@@ -45,6 +45,7 @@ class OptimizeOptions:
     max_context_tokens: int | None = None
     target_model: str | None = None
     session_ttl_hours: float | None = None
+    fuzzy_link_threshold: float | None = None
 
 
 @dataclass
@@ -137,6 +138,7 @@ def optimize_context(
     max_context_tokens: int | None = None,
     target_model: str | None = None,
     session_ttl_hours: float | None = None,
+    fuzzy_link_threshold: float | None = None,
 ) -> OptimizeResult:
     """
     Ejecuta el pipeline COE sobre bloques o un ``ContextBundle``.
@@ -151,6 +153,7 @@ def optimize_context(
     bundle_max_context_tokens: int | None = None
     bundle_target_model: str | None = None
     bundle_session_ttl_hours: float | None = None
+    bundle_fuzzy_link_threshold: float | None = None
     if isinstance(blocks, ContextBundle):
         bundle = blocks
         blocks_list = bundle.blocks
@@ -163,6 +166,7 @@ def optimize_context(
         bundle_max_context_tokens = bundle.options.max_context_tokens
         bundle_target_model = bundle.options.target_model
         bundle_session_ttl_hours = bundle.options.session_ttl_hours
+        bundle_fuzzy_link_threshold = bundle.options.fuzzy_link_threshold
     else:
         blocks_list = blocks
         locale = locale if locale is not None else "en"
@@ -202,6 +206,11 @@ def optimize_context(
             session_ttl_hours
             if session_ttl_hours is not None
             else bundle_session_ttl_hours
+        ),
+        fuzzy_link_threshold=(
+            fuzzy_link_threshold
+            if fuzzy_link_threshold is not None
+            else bundle_fuzzy_link_threshold
         ),
     )
     return _optimize(blocks_list, opts, ingest_notes=level_notes)
@@ -301,6 +310,7 @@ def _optimize(
             query_context=opts.query_context,
             max_commits=opts.max_commits,
             session_ttl_hours=opts.session_ttl_hours,
+            fuzzy_link_threshold=opts.fuzzy_link_threshold,
         )
         elapsed = (time.perf_counter() - t0) * 1000.0
         latency_by_level["n5"] = elapsed

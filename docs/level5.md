@@ -228,7 +228,7 @@ Al integrar el `ContextGraph` del turno en el store:
 |-------|----------------|
 | **Id canónico** | Mismo `id` normalizado (casefold + strip) que N3/N4 → **fusionar** nodos; unir aristas |
 | **Alias explícitos** | `metadata.entity_aliases` en [Ingest](ingest.md) mapea variantes → id canónico |
-| **Sin alias** | «Juan» y «J. Pérez» → **nodos distintos** en v1 (no fuzzy, no LLM) |
+| **Sin alias** | «Juan» y «J. Pérez» → fuzzy conservador (apellido + inicial, umbral 0.85) si no hay `conflict` |
 | **Duplicados post-merge** | Deduplicar aristas idénticas (mismo from, to, type, value) |
 
 ## Conflictos y retracciones
