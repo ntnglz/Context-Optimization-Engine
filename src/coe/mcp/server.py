@@ -37,6 +37,8 @@ def optimize_context_tool(
     section_delimiters: bool | None = None,
     include_pending_turn: bool | None = None,
     max_commits: int | None = None,
+    max_context_tokens: int | None = None,
+    target_model: str | None = None,
 ) -> str:
     """
     Run COE on raw context blocks.
@@ -53,6 +55,8 @@ def optimize_context_tool(
         section_delimiters: Include section headers in gateway output.
         include_pending_turn: With N5, also render pending turn prose.
         max_commits: N5 history retention limit.
+        max_context_tokens: Hard cap on optimized context tokens (post-render budget).
+        target_model: Optional model id (e.g. mistral-large, gpt-4o) for post-render format adaptation.
     """
     result = handle_optimize_context(
         blocks,
@@ -66,6 +70,8 @@ def optimize_context_tool(
         section_delimiters=section_delimiters,
         include_pending_turn=include_pending_turn,
         max_commits=max_commits,
+        max_context_tokens=max_context_tokens,
+        target_model=target_model,
     )
     return format_tool_result(result)
 
@@ -89,6 +95,8 @@ def estimate_savings_tool(
     section_delimiters: bool | None = None,
     include_pending_turn: bool | None = None,
     max_commits: int | None = None,
+    max_context_tokens: int | None = None,
+    target_model: str | None = None,
 ) -> str:
     """
     Return token savings metrics only (no optimized text).
@@ -107,6 +115,8 @@ def estimate_savings_tool(
         section_delimiters=section_delimiters,
         include_pending_turn=include_pending_turn,
         max_commits=max_commits,
+        max_context_tokens=max_context_tokens,
+        target_model=target_model,
     )
     return format_tool_result(result)
 

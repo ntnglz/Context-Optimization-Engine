@@ -20,6 +20,7 @@ class IngestOptions:
     section_delimiters: bool = True
     include_pending_turn: bool = False
     max_commits: int | None = None
+    target_model: str | None = None
 
 
 @dataclass

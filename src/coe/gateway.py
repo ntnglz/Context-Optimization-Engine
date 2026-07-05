@@ -21,6 +21,7 @@ from .models import (
     ContextGraph,
     estimate_tokens,
 )
+from .model_adapter import adapt_for_model
 from .renderer import render_raw_context
 from .renderer.assembly import assemble_gateway_output, render_turn_prose
 from .budget import apply_assembled_budget, truncate_text_to_tokens
@@ -41,6 +42,7 @@ class OptimizeOptions:
     include_pending_turn: bool = False
     max_commits: int | None = None
     max_context_tokens: int | None = None
+    target_model: str | None = None
 
 
 @dataclass
@@ -60,6 +62,8 @@ class OptimizationMetrics:
     latency_budget_ok: bool = True
     truncated: bool = False
     pre_truncation_tokens: int | None = None
+    target_model: str | None = None
+    model_adapter: str | None = None
 
 
 @dataclass
@@ -94,6 +98,10 @@ class OptimizeResult:
                 for t in self.trace
             ],
         }
+        if self.metrics.target_model is not None:
+            data["metrics"]["target_model"] = self.metrics.target_model
+        if self.metrics.model_adapter is not None:
+            data["metrics"]["model_adapter"] = self.metrics.model_adapter
         if self.metrics.pre_truncation_tokens is not None:
             data["metrics"]["pre_truncation_tokens"] = self.metrics.pre_truncation_tokens
         if self.deduplication is not None:
@@ -122,6 +130,7 @@ def optimize_context(
     include_pending_turn: bool | None = None,
     max_commits: int | None = None,
     max_context_tokens: int | None = None,
+    target_model: str | None = None,
 ) -> OptimizeResult:
     """
     Ejecuta el pipeline COE sobre bloques o un ``ContextBundle``.
@@ -134,6 +143,7 @@ def optimize_context(
     bundle_include_pending_turn = False
     bundle_max_commits: int | None = None
     bundle_max_context_tokens: int | None = None
+    bundle_target_model: str | None = None
     if isinstance(blocks, ContextBundle):
         bundle = blocks
         blocks_list = bundle.blocks
@@ -144,6 +154,7 @@ def optimize_context(
         bundle_include_pending_turn = bundle.options.include_pending_turn
         bundle_max_commits = bundle.options.max_commits
         bundle_max_context_tokens = bundle.options.max_context_tokens
+        bundle_target_model = bundle.options.target_model
     else:
         blocks_list = blocks
         locale = locale if locale is not None else "en"
@@ -178,6 +189,7 @@ def optimize_context(
             if max_context_tokens is not None
             else bundle_max_context_tokens
         ),
+        target_model=target_model if target_model is not None else bundle_target_model,
     )
     return _optimize(blocks_list, opts, ingest_notes=level_notes)
 
@@ -359,6 +371,20 @@ def _optimize(
             )
             truncated = True
 
+    model_adapter_id: str | None = None
+    if opts.target_model:
+        t0 = time.perf_counter()
+        text, model_adapter_id = adapt_for_model(text, opts.target_model)
+        elapsed = (time.perf_counter() - t0) * 1000.0
+        latency_by_level["model_adapter"] = elapsed
+        trace.append(
+            LevelTrace(
+                level=0,
+                latency_ms=elapsed,
+                detail=f"model_adapter:{model_adapter_id}",
+            )
+        )
+
     optimized_tokens = estimate_tokens(text)
     latency_ms = (time.perf_counter() - t_total) * 1000.0
 
@@ -374,6 +400,8 @@ def _optimize(
         latency_ms_by_level=latency_by_level,
         truncated=truncated,
         pre_truncation_tokens=pre_truncation_tokens if truncated else None,
+        target_model=opts.target_model,
+        model_adapter=model_adapter_id,
     )
 
     return OptimizeResult(

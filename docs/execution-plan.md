@@ -50,7 +50,7 @@ Orden de las fases 6–18 según **dependencias técnicas** y **cierre de deuda*
 | Presupuesto tokens COE | ✅ | ✅ | **10** |
 | PCM+COE runtime | ✅ | ✅ | **11** |
 | HTTP API | ✅ doc | ✅ | **12** |
-| Model Adapter | ✅ acotado | ❌ | **13** |
+| Model Adapter | ✅ acotado | ✅ | **13** |
 | N5 TTL / archivado | ✅ doc | ❌ | **14** |
 | Entity linking fuzzy | ✅ diferido | ❌ | **15** |
 | Store distribuido | ✅ doc | ❌ | **16** |
@@ -206,7 +206,7 @@ Resumen; detalle histórico en commits de cierre.
 
 ---
 
-### Fase 13 — Model Adapter
+### Fase 13 — Model Adapter ✅
 
 **Objetivo:** Post-renderer según [architecture.md](architecture.md) §3.4.
 
@@ -344,8 +344,8 @@ Temas de [Context Optimization Engine (COE).md](Context%20Optimization%20Engine%
 | 10 | Presupuesto tokens COE | ✅ cerrada | — |
 | 11 | Integración PCM+COE | ✅ cerrada | — |
 | 12 | HTTP API | ✅ cerrada | — |
-| 13 | Model Adapter | ⏳ **activa** | — |
-| 14 | N5 operaciones (TTL) | ⏳ pendiente | — |
+| 13 | Model Adapter | ✅ cerrada | — |
+| 14 | N5 operaciones (TTL) | ⏳ **activa** | — |
 | 15 | Entity linking fuzzy | ⏳ pendiente | — |
 | 16 | Store distribuido | ⏳ pendiente | — |
 | 17 | Locale `zh` | ⏳ pendiente | — |

@@ -39,21 +39,26 @@ flowchart LR
 |------------|------|---------|--------|
 | **PCM** | [Prompt-Compression-Middleware](https://github.com/ntnglz/Prompt-Compression-Middleware) | Prompt en lenguaje natural | Instrucción compacta (`TASK=…`) |
 | **COE** | este repo | Bloques de contexto | Contexto optimizado |
-| **Model Adapter** | futuro / externo | Contexto optimizado | Formato preferido del modelo |
+| **Model Adapter** | post-renderer opcional | Contexto optimizado | Formato preferido del modelo | ✅ `src/coe/model_adapter/` |
 
 PCM y COE pueden usarse de forma independiente. El pipeline completo maximiza el ahorro cuando conviven.
 
 ### 3.4 Model Adapter (acotado)
 
-Componente **opcional externo** post-Renderer:
+Componente **opcional** post-Renderer (Gateway aplica tras truncado de presupuesto):
 
 | Hace | No hace |
 |------|---------|
-| Ajustar formato al gusto del modelo (markdown, bullets) | Traducir idioma (L0) |
-| Tokenizer-specific layout si aplica | Cambiar hechos ni omitir contenido |
-| | Sustituir benchmarks de comprensión |
+| Ajustar formato al gusto del modelo (markdown, bullets, marcadores instruct) | Traducir idioma (L0) |
+| Resolver adaptador por `target_model` (`mistral-*`, `gpt-*`, …) | Cambiar hechos ni omitir contenido |
+| Trazas en `metrics.model_adapter` y `latency_ms_by_level.model_adapter` | Sustituir benchmarks de comprensión |
 
-Entrada: `optimized_context` en prosa (`target_lang`). Spec detallada en fase posterior; ver [renderer.md](renderer.md).
+Adaptadores registrados: `default` (passthrough), `mistral` (`[SECTION]`, `[AVAILABLE CONTEXT]`), `openai` (`##` + `<optimized_context>`).
+
+```python
+result = optimize_context(blocks, levels=[1, 2], target_model="gpt-4o")
+result.metrics.model_adapter  # "openai"
+```
 
 ---
 
@@ -412,7 +417,7 @@ Ver [execution-plan.md](execution-plan.md) para entregables, criterios de hecho 
 | 10 | Presupuesto tokens COE | ⏳ |
 | 11 | Integración PCM+COE | ✅ |
 | 12 | HTTP API | ✅ |
-| 13 | Model Adapter | ⏳ |
+| 13 | Model Adapter | ✅ |
 | 14 | N5 operaciones (TTL) | ⏳ |
 | 15 | Entity linking fuzzy | ⏳ |
 | 16 | Store distribuido | ⏳ |

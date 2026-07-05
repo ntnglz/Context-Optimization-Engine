@@ -22,6 +22,7 @@ class ContextBlocksRequest(BaseModel):
     include_pending_turn: bool | None = None
     max_commits: int | None = None
     max_context_tokens: int | None = None
+    target_model: str | None = None
 
     def handler_kwargs(self) -> dict[str, Any]:
         return {
@@ -37,4 +38,5 @@ class ContextBlocksRequest(BaseModel):
             "include_pending_turn": self.include_pending_turn,
             "max_commits": self.max_commits,
             "max_context_tokens": self.max_context_tokens,
+            "target_model": self.target_model,
         }

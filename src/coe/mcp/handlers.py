@@ -22,6 +22,7 @@ def _resolve_input(
     include_pending_turn: bool | None = None,
     max_commits: int | None = None,
     max_context_tokens: int | None = None,
+    target_model: str | None = None,
 ):
     if not blocks:
         raise ValueError("blocks must not be empty")
@@ -42,6 +43,8 @@ def _resolve_input(
         bundle.options.max_commits = max_commits
     if max_context_tokens is not None:
         bundle.options.max_context_tokens = max_context_tokens
+    if target_model is not None:
+        bundle.options.target_model = target_model
     return bundle
 
 
@@ -59,6 +62,7 @@ def handle_optimize_context(
     include_pending_turn: bool | None = None,
     max_commits: int | None = None,
     max_context_tokens: int | None = None,
+    target_model: str | None = None,
 ) -> dict[str, Any]:
     """Ejecuta el pipeline COE y devuelve prosa optimizada + métricas."""
     bundle = _resolve_input(
@@ -72,6 +76,7 @@ def handle_optimize_context(
         include_pending_turn=include_pending_turn,
         max_commits=max_commits,
         max_context_tokens=max_context_tokens,
+        target_model=target_model,
     )
     result = optimize_context(
         bundle,
@@ -80,6 +85,7 @@ def handle_optimize_context(
         target_lang=target_lang,
         l0=l0,
         session_id=session_id,
+        target_model=target_model,
     )
     payload = result.to_dict()
     payload["text"] = result.text
@@ -102,6 +108,7 @@ def handle_estimate_savings(
     include_pending_turn: bool | None = None,
     max_commits: int | None = None,
     max_context_tokens: int | None = None,
+    target_model: str | None = None,
 ) -> dict[str, Any]:
     """Estima tokens ahorrados sin devolver prosa ni invocar evaluador LLM."""
     bundle = _resolve_input(
@@ -115,6 +122,7 @@ def handle_estimate_savings(
         include_pending_turn=include_pending_turn,
         max_commits=max_commits,
         max_context_tokens=max_context_tokens,
+        target_model=target_model,
     )
     result = optimize_context(
         bundle,
@@ -123,6 +131,7 @@ def handle_estimate_savings(
         target_lang=target_lang,
         l0=l0,
         session_id=session_id,
+        target_model=target_model,
     )
     original = result.metrics.original_tokens
     optimized = result.metrics.optimized_tokens
@@ -138,6 +147,10 @@ def handle_estimate_savings(
         "truncated": result.metrics.truncated,
         "levels": levels or [1],
     }
+    if result.metrics.target_model is not None:
+        payload["target_model"] = result.metrics.target_model
+    if result.metrics.model_adapter is not None:
+        payload["model_adapter"] = result.metrics.model_adapter
     if result.metrics.pre_truncation_tokens is not None:
         payload["pre_truncation_tokens"] = result.metrics.pre_truncation_tokens
     return payload

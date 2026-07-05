@@ -8,7 +8,7 @@ Contexto bruto (N bloques)  →  COE  →  Representación compacta  →  LLM
 
 ## Estado
 
-> Orden de trabajo: [execution-plan.md](docs/execution-plan.md) · **Fases 0–12 ✅** · activa: **Fase 13**
+> Orden de trabajo: [execution-plan.md](docs/execution-plan.md) · **Fases 0–13 ✅** · activa: **Fase 14**
 
 | Componente | Spec | Implementación |
 |------------|------|----------------|
@@ -32,6 +32,7 @@ Contexto bruto (N bloques)  →  COE  →  Representación compacta  →  LLM
 | **Gateway** (`optimize_context`) | ✅ | ✅ L0 + N1–N5 + métricas |
 | **MCP** (agentes) | ✅ | ✅ `optimize_context`, `estimate_savings` (stdio) |
 | **HTTP API** (RAG / despliegue) | ✅ | ✅ `POST /optimize`, `POST /estimate`, `GET /health` |
+| **Model Adapter** (`target_model`) | ✅ | ✅ `default`, `mistral`, `openai` post-renderer |
 
 ## Inicio rápido
 

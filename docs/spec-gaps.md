@@ -20,7 +20,7 @@
 | 7 | N5: conflictos y retracts en prosa | [level5.md](level5.md) | ✅ Cerrado |
 | 8 | Principio «sin pérdida» acotado (N5) | [levels.md](levels.md) | ✅ Cerrado |
 | 9 | CIR formal (gramática, versión) | Fase 6 · [cir-v1.md](cir-v1.md) Opción A | ✅ Cerrado |
-| 10 | Model Adapter spec | [architecture.md](architecture.md) §3.4 | ⏳ Fase 13 |
+| 10 | Model Adapter spec | [architecture.md](architecture.md) §3.4 | ✅ Fase 13 |
 | 11 | Presupuesto tokens global (COE+PCM) | [ingest.md](ingest.md) + Gateway | ⏳ Fases 10–11 |
 | 12 | Robustez estadística benchmarks | [benchmarks.md](benchmarks.md) §9 | ✅ Cerrado |
 | 13 | Aprobar N5 + benchmarks | ✅ Cerrado |
@@ -128,7 +128,7 @@ Excepción v1: flag `include_pending_turn=true` si merge difiere de commit (work
 | 11 | `max_context_tokens` en Gateway | 10 |
 | 12 | Composición PCM+COE + harness `coe+pcm` | 11 |
 | 13 | HTTP `/optimize` + `/estimate` | 12 |
-| 14 | Model Adapter + `target_model` | 13 |
+| 14 | Model Adapter + `target_model` | ✅ |
 | 15 | N5 TTL + archivado | 14 |
 | 16 | Entity linking fuzzy | 15 |
 | 17 | `SQLiteStateStore` | 16 |
