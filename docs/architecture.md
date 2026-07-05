@@ -420,8 +420,8 @@ Ver [execution-plan.md](execution-plan.md) para entregables, criterios de hecho 
 | 13 | Model Adapter | ✅ |
 | 14 | N5 operaciones (TTL) | ✅ |
 | 15 | Entity linking fuzzy | ✅ |
-| 16 | Store distribuido | ⏳ **activa** |
-| 17 | Locale `zh` | ⏳ |
+| 16 | Store distribuido | ✅ |
+| 17 | Locale `zh` | ⏳ **activa** |
 | 18 | Ingest structured/code | ⏳ |
 | 19 | CIR v1.1 Opción B | ⏳ opcional |
 | I | Investigación (ML, CIR→LLM) | sin fase |

@@ -8,7 +8,7 @@ Contexto bruto (N bloques)  →  COE  →  Representación compacta  →  LLM
 
 ## Estado
 
-> Orden de trabajo: [execution-plan.md](docs/execution-plan.md) · **Fases 0–15 ✅** · activa: **Fase 16**
+> Orden de trabajo: [execution-plan.md](docs/execution-plan.md) · **Fases 0–16 ✅** · activa: **Fase 17**
 
 | Componente | Spec | Implementación |
 |------------|------|----------------|
@@ -28,7 +28,7 @@ Contexto bruto (N bloques)  →  COE  →  Representación compacta  →  LLM
 | [Nivel 2](docs/level2.md) | ✅ | ✅ (EN/ES) |
 | [Nivel 3](docs/level3.md) | ✅ | ✅ (relaciones tipadas) |
 | [Nivel 4](docs/level4.md) | ✅ | ✅ (`ContextGraph`, CIR materializado) |
-| [Nivel 5](docs/level5.md) | ✅ | ✅ (graph merge, commits, `FilesystemStateStore`) |
+| [Nivel 5](docs/level5.md) | ✅ | ✅ (graph merge, commits, `FilesystemStateStore` / `SQLiteStateStore`) |
 | **Gateway** (`optimize_context`) | ✅ | ✅ L0 + N1–N5 + métricas |
 | **MCP** (agentes) | ✅ | ✅ `optimize_context`, `estimate_savings` (stdio) |
 | **HTTP API** (RAG / despliegue) | ✅ | ✅ `POST /optimize`, `POST /estimate`, `GET /health` |
