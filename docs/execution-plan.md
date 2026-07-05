@@ -47,7 +47,7 @@ Orden de las fases 6–18 según **dependencias técnicas** y **cierre de deuda*
 | CIR formal | ✅ | ✅ | **6** |
 | `case.schema.json` | ✅ | ✅ | **8** |
 | Casos benchmark | — | 10 | **8** |
-| Presupuesto tokens COE | ✅ parcial | ❌ | **10** |
+| Presupuesto tokens COE | ✅ | ✅ | **10** |
 | PCM+COE runtime | ✅ doc | ❌ | **11** |
 | HTTP API | ✅ doc | ❌ | **12** |
 | Model Adapter | ✅ acotado | ❌ | **13** |
@@ -159,7 +159,7 @@ Resumen; detalle histórico en commits de cierre.
 
 ---
 
-### Fase 10 — Presupuesto tokens COE
+### Fase 10 — Presupuesto tokens COE ✅
 
 **Objetivo:** Implementar [ingest.md](ingest.md) § presupuesto para salida COE sola.
 
@@ -341,8 +341,8 @@ Temas de [Context Optimization Engine (COE).md](Context%20Optimization%20Engine%
 | 7 | Sincronización documental | ✅ cerrada | 727a182 |
 | 8 | Harness contrato + corpus | ✅ cerrada | 872d5d1 |
 | 9 | L0 v2 | ✅ cerrada | — |
-| 10 | Presupuesto tokens COE | ⏳ **activa** | — |
-| 11 | Integración PCM+COE | ⏳ pendiente | — |
+| 10 | Presupuesto tokens COE | ✅ cerrada | — |
+| 11 | Integración PCM+COE | ⏳ **activa** | — |
 | 12 | HTTP API | ⏳ pendiente | — |
 | 13 | Model Adapter | ⏳ pendiente | — |
 | 14 | N5 operaciones (TTL) | ⏳ pendiente | — |

@@ -50,6 +50,8 @@ def render_turn_prose(
     *,
     levels: list[int],
     locale: str | None = "en",
+    query_context: str | None = None,
+    max_context_tokens: int | None = None,
 ) -> str:
     """Proyecta bloques del turno a prosa (N1–N4, sin N5)."""
     loc = locale or "en"
@@ -74,7 +76,23 @@ def render_turn_prose(
             source = dedup if dedup is not None else blocks
             factorized = factorize_context(source, locale=loc)
         structured = structure_context(factorized, locale=loc)
-        context_graph = build_context_graph(structured, source_blocks=blocks, locale=loc)
+        if max_context_tokens is not None:
+            from ..budget import build_context_graph_within_budget
+
+            _graph, prose, _truncated = build_context_graph_within_budget(
+                structured,
+                source_blocks=blocks,
+                query_context=query_context,
+                max_tokens=max_context_tokens,
+                locale=loc,
+            )
+            return prose
+        context_graph = build_context_graph(
+            structured,
+            source_blocks=blocks,
+            query_context=query_context,
+            locale=loc,
+        )
         return context_graph.render_prose(locale=loc)
 
     if run_n3:

@@ -23,6 +23,7 @@ from .models import (
 )
 from .renderer import render_raw_context
 from .renderer.assembly import assemble_gateway_output, render_turn_prose
+from .budget import apply_assembled_budget, truncate_text_to_tokens
 
 _SUPPORTED_LEVELS = frozenset({1, 2, 3, 4, 5})
 
@@ -39,6 +40,7 @@ class OptimizeOptions:
     section_delimiters: bool = True
     include_pending_turn: bool = False
     max_commits: int | None = None
+    max_context_tokens: int | None = None
 
 
 @dataclass
@@ -56,6 +58,8 @@ class OptimizationMetrics:
     latency_ms: float
     latency_ms_by_level: dict[str, float] = field(default_factory=dict)
     latency_budget_ok: bool = True
+    truncated: bool = False
+    pre_truncation_tokens: int | None = None
 
 
 @dataclass
@@ -83,12 +87,15 @@ class OptimizeResult:
                     k: round(v, 2) for k, v in self.metrics.latency_ms_by_level.items()
                 },
                 "latency_budget_ok": self.metrics.latency_budget_ok,
+                "truncated": self.metrics.truncated,
             },
             "trace": [
                 {"level": t.level, "latency_ms": round(t.latency_ms, 2), "detail": t.detail}
                 for t in self.trace
             ],
         }
+        if self.metrics.pre_truncation_tokens is not None:
+            data["metrics"]["pre_truncation_tokens"] = self.metrics.pre_truncation_tokens
         if self.deduplication is not None:
             data["deduplication"] = self.deduplication.to_dict()
         if self.factorization is not None:
@@ -114,6 +121,7 @@ def optimize_context(
     section_delimiters: bool | None = None,
     include_pending_turn: bool | None = None,
     max_commits: int | None = None,
+    max_context_tokens: int | None = None,
 ) -> OptimizeResult:
     """
     Ejecuta el pipeline COE sobre bloques o un ``ContextBundle``.
@@ -125,6 +133,7 @@ def optimize_context(
     bundle_section_delimiters = True
     bundle_include_pending_turn = False
     bundle_max_commits: int | None = None
+    bundle_max_context_tokens: int | None = None
     if isinstance(blocks, ContextBundle):
         bundle = blocks
         blocks_list = bundle.blocks
@@ -134,6 +143,7 @@ def optimize_context(
         bundle_section_delimiters = bundle.options.section_delimiters
         bundle_include_pending_turn = bundle.options.include_pending_turn
         bundle_max_commits = bundle.options.max_commits
+        bundle_max_context_tokens = bundle.options.max_context_tokens
     else:
         blocks_list = blocks
         locale = locale if locale is not None else "en"
@@ -163,6 +173,11 @@ def optimize_context(
         section_delimiters=resolved_section_delimiters,
         include_pending_turn=resolved_include_pending_turn,
         max_commits=max_commits if max_commits is not None else bundle_max_commits,
+        max_context_tokens=(
+            max_context_tokens
+            if max_context_tokens is not None
+            else bundle_max_context_tokens
+        ),
     )
     return _optimize(blocks_list, opts, ingest_notes=level_notes)
 
@@ -233,6 +248,8 @@ def _optimize(
     state_view: StateView | None = None
     commit_id: str | None = None
     text = original_text
+    n5_state_prose: str | None = None
+    n5_turn_prose: str | None = None
 
     run_n5 = 5 in opts.levels
     run_n1 = 1 in opts.levels and not run_n5
@@ -263,10 +280,14 @@ def _optimize(
                 blocks_work,
                 levels=opts.levels,
                 locale=opts.locale,
+                query_context=opts.query_context,
+                max_context_tokens=opts.max_context_tokens,
             )
+        n5_state_prose = state_view.render()
+        n5_turn_prose = turn_prose
         text = assemble_gateway_output(
-            state_prose=state_view.render(),
-            turn_prose=turn_prose,
+            state_prose=n5_state_prose,
+            turn_prose=n5_turn_prose,
             locale=opts.locale,
             section_delimiters=opts.section_delimiters,
         )
@@ -302,7 +323,10 @@ def _optimize(
                 factorized = factorize_context(source, locale=opts.locale)
             structured = structure_context(factorized, locale=opts.locale)
             context_graph = build_context_graph(
-                structured, source_blocks=blocks_work, locale=opts.locale
+                structured,
+                source_blocks=blocks_work,
+                query_context=opts.query_context,
+                locale=opts.locale,
             )
             elapsed = (time.perf_counter() - t0) * 1000.0
             latency_by_level["n4"] = elapsed
@@ -312,7 +336,28 @@ def _optimize(
             blocks_work,
             levels=opts.levels,
             locale=opts.locale,
+            query_context=opts.query_context,
+            max_context_tokens=opts.max_context_tokens if 4 in opts.levels else None,
         )
+
+    pre_truncation_tokens = estimate_tokens(text)
+    truncated = False
+    if opts.max_context_tokens is not None and pre_truncation_tokens > opts.max_context_tokens:
+        if run_n5:
+            text, truncated = apply_assembled_budget(
+                state_prose=n5_state_prose,
+                turn_prose=n5_turn_prose,
+                max_tokens=opts.max_context_tokens,
+                locale=opts.locale,
+                section_delimiters=opts.section_delimiters,
+            )
+        else:
+            text = truncate_text_to_tokens(
+                text,
+                opts.max_context_tokens,
+                keep_end=True,
+            )
+            truncated = True
 
     optimized_tokens = estimate_tokens(text)
     latency_ms = (time.perf_counter() - t_total) * 1000.0
@@ -327,6 +372,8 @@ def _optimize(
         compression_ratio=ratio,
         latency_ms=latency_ms,
         latency_ms_by_level=latency_by_level,
+        truncated=truncated,
+        pre_truncation_tokens=pre_truncation_tokens if truncated else None,
     )
 
     return OptimizeResult(

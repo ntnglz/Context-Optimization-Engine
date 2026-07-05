@@ -21,6 +21,7 @@ def _resolve_input(
     section_delimiters: bool | None = None,
     include_pending_turn: bool | None = None,
     max_commits: int | None = None,
+    max_context_tokens: int | None = None,
 ):
     if not blocks:
         raise ValueError("blocks must not be empty")
@@ -39,6 +40,8 @@ def _resolve_input(
         bundle.options.include_pending_turn = include_pending_turn
     if max_commits is not None:
         bundle.options.max_commits = max_commits
+    if max_context_tokens is not None:
+        bundle.options.max_context_tokens = max_context_tokens
     return bundle
 
 
@@ -55,6 +58,7 @@ def handle_optimize_context(
     section_delimiters: bool | None = None,
     include_pending_turn: bool | None = None,
     max_commits: int | None = None,
+    max_context_tokens: int | None = None,
 ) -> dict[str, Any]:
     """Ejecuta el pipeline COE y devuelve prosa optimizada + métricas."""
     bundle = _resolve_input(
@@ -67,6 +71,7 @@ def handle_optimize_context(
         section_delimiters=section_delimiters,
         include_pending_turn=include_pending_turn,
         max_commits=max_commits,
+        max_context_tokens=max_context_tokens,
     )
     result = optimize_context(
         bundle,
@@ -96,6 +101,7 @@ def handle_estimate_savings(
     section_delimiters: bool | None = None,
     include_pending_turn: bool | None = None,
     max_commits: int | None = None,
+    max_context_tokens: int | None = None,
 ) -> dict[str, Any]:
     """Estima tokens ahorrados sin devolver prosa ni invocar evaluador LLM."""
     bundle = _resolve_input(
@@ -108,6 +114,7 @@ def handle_estimate_savings(
         section_delimiters=section_delimiters,
         include_pending_turn=include_pending_turn,
         max_commits=max_commits,
+        max_context_tokens=max_context_tokens,
     )
     result = optimize_context(
         bundle,
@@ -119,7 +126,7 @@ def handle_estimate_savings(
     )
     original = result.metrics.original_tokens
     optimized = result.metrics.optimized_tokens
-    return {
+    payload = {
         "original_tokens": original,
         "optimized_tokens": optimized,
         "tokens_saved": max(0, original - optimized),
@@ -128,8 +135,12 @@ def handle_estimate_savings(
         "latency_ms_by_level": {
             k: round(v, 2) for k, v in result.metrics.latency_ms_by_level.items()
         },
+        "truncated": result.metrics.truncated,
         "levels": levels or [1],
     }
+    if result.metrics.pre_truncation_tokens is not None:
+        payload["pre_truncation_tokens"] = result.metrics.pre_truncation_tokens
+    return payload
 
 
 def blocks_from_context_block_models(blocks: list[ContextBlock]) -> list[dict[str, Any]]:
