@@ -94,7 +94,7 @@ Resumen; detalle de entregables en secciones siguientes (fases 6–18).
 | 11 | Integración PCM+COE | 594f63b |
 | 12 | HTTP API | b191a62 |
 | 13 | Model Adapter | 8b84bb5 |
-| 14 | N5 operaciones (TTL) | — |
+| 14 | N5 operaciones (TTL) | 76c3683 |
 
 ---
 
@@ -415,6 +415,7 @@ flowchart LR
 | 2026-07-05 | Cierre Fase 11 PCM+COE | 594f63b — optimize_with_pcm, perfil coe_pcm_n1_en |
 | 2026-07-05 | Cierre Fase 12 HTTP | b191a62 — FastAPI /optimize, /estimate, /health |
 | 2026-07-05 | Cierre Fase 13 Model Adapter | 8b84bb5 — target_model, adaptadores default/mistral/openai |
+| 2026-07-05 | Cierre Fase 14 N5 TTL/archivado | 76c3683 — session_ttl_hours, archive_session, store metrics |
 
 ---
 
