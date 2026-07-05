@@ -1,5 +1,7 @@
 # Diseño global de alto nivel — COE
 
+> **Integradores:** guía en inglés → [getting-started.md](getting-started.md). Este documento es referencia técnica (ES).
+
 > Documento de arquitectura de **este repositorio**. La motivación, los niveles de optimización y CIR como concepto están en el [documento fundacional](Context%20Optimization%20Engine%20(COE).md). Aquí se describe **cómo lo implementamos**: piezas, responsabilidades y relaciones.
 
 ## 1. Propósito

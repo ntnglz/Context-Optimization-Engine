@@ -1,73 +1,90 @@
-# Preguntas frecuentes (COE)
+# Frequently asked questions (COE)
 
-Respuestas cortas para integradores. Detalle técnico en [getting-started.md](getting-started.md) y specs en `docs/level*.md`.
+Short answers for integrators. Technical detail in [getting-started.md](getting-started.md) and specs in `docs/level*.md` *(ES)*.
 
-## ¿COE resume o elimina información?
+## Does COE summarize or drop information?
 
-**No.** Reorganiza y deduplica; los benchmarks exigen `factual_recall` alto. No es un resumidor generativo.
+**No.** It reorganizes and deduplicates; benchmarks require high `factual_recall`. COE is not a generative summarizer.
 
-## ¿COE reemplaza mi vector DB o RAG?
+## When should I **not** use COE?
 
-**No.** Optimiza el **texto** que ya recuperaste (chunks, historial, salidas de tools) antes de enviarlo al LLM.
+- Context is already tiny (<~200 tokens) with no repetition.
+- You need abstractive summarization, not deterministic compaction.
+- You want raw JSON/CSV/tables unchanged in the prompt.
+- You have not retrieved context yet — COE optimizes text you already have.
 
-## ¿Qué diferencia hay con PCM?
+## Does COE replace my vector DB or RAG retriever?
+
+**No.** It optimizes the **text** you already retrieved (chunks, history, tool outputs) before sending it to the LLM.
+
+## How is COE different from PCM?
 
 | | PCM | COE |
 |---|-----|-----|
-| Optimiza | Instrucciones / system prompt | Contexto (conocimiento) |
-| Repo | [Prompt-Compression-Middleware](https://github.com/ntnglz/Prompt-Compression-Middleware) | este repo |
+| Optimizes | Instructions / system prompt | Context (knowledge) |
+| Repo | [Prompt-Compression-Middleware](https://github.com/ntnglz/Prompt-Compression-Middleware) | this repo |
 
-Se pueden usar juntos: [getting-started.md § PCM+COE](getting-started.md#pcm--coe).
+Use together: [getting-started.md § PCM+COE](getting-started.md#pcm--coe).
 
-## ¿MCP o HTTP?
+## MCP or HTTP?
 
 | | MCP | HTTP |
 |---|-----|-----|
-| Uso típico | Cursor, Claude Desktop, agentes locales | Pipelines RAG, microservicios |
-| Arranque | `python scripts/mcp/run_server.py` | `python scripts/http/run_server.py` |
+| Typical use | Cursor, Claude Desktop, local agents | RAG pipelines, microservices |
+| Start | `python scripts/mcp/run_server.py` | `python scripts/http/run_server.py` |
 
-Mismo contrato JSON de bloques y opciones.
+Same JSON contract for blocks and options.
 
-## ¿Qué pongo en `levels`?
+## What should I put in `levels`?
 
-| `levels` | Efecto típico |
+| `levels` | Typical effect |
 |----------|----------------|
-| `[1]` | Dedup de líneas repetidas |
-| `[1, 2]` | + factorización por entidad (recomendado EN/ES/ZH) |
-| `[1, 2, 3, 4]` | + relaciones y grafo del turno |
-| incluye `5` | Estado de sesión persistente (`session_id` obligatorio) |
+| `[1]` | Deduplicate repeated lines |
+| `[1, 2]` | + group facts by entity (**recommended for narrative RAG**) |
+| `[1, 2, 3, 4]` | + relations and turn graph |
+| includes `5` | Persistent session state (`session_id` required) |
 
-Empieza con `[1, 2]` para RAG narrativo. La matriz `source_type` puede limitar niveles — ver [ingest.md](ingest.md).
+Start with `[1, 2]` for narrative RAG. The `source_type` matrix may limit levels — see [ingest.md](ingest.md) *(ES)*.
 
-## ¿Cuándo necesito `session_id`?
+## What savings should I expect?
 
-Cuando uses **N5**: conversaciones multi-turno donde el agente acumula estado en lugar de reenviar todo el historial crudo.
+Smoke benchmarks on narrative RAG often show **~15–40%** fewer context tokens. Actual savings depend on repetition and structure — run `estimate_savings` or check `out.metrics` on your data. Not a guarantee.
 
-## ¿Qué es `locale` vs `target_lang`?
+## Do I need MCP in `requirements.txt` for library-only use?
 
-- **`target_lang`** + **`l0=True`**: idioma del **contexto** hacia el LLM (traducción pre-N1).
-- **`locale`**: patrones N2/N3 y plantillas de prosa (EN, ES, ZH).
-- **`response_lang`**: idioma de respuesta al usuario (lo usa PCM/system; COE no traduce la respuesta).
+**No.** Use optional extras: `pip install -e ".[dev]"` for the library; add `[mcp]` or `[http]` only when you need those servers.
 
-Ver [i18n.md](i18n.md).
+## When do I need `session_id`?
 
-## ¿El LLM recibe grafos o CIR?
+When you enable **session memory** (level 5): multi-turn conversations where the agent accumulates state instead of resending raw history.
 
-**No en producción.** COE proyecta a **prosa natural** vía Renderer. CIR/grafo es interno y para N5 store.
+## What is `locale` vs `target_lang`?
 
-## ¿Qué limitaciones tiene v1?
+- **`target_lang`** + **`l0=True`**: language of **context** toward the LLM (pre-processing translation).
+- **`locale`**: prose patterns for entity grouping and relations (EN, ES, ZH).
+- **`response_lang`**: user-facing reply language (PCM/system; COE does not translate the response).
 
-- N2/N3: heurísticas + locale packs (no parser semántico universal).
-- L0 en CI: stub ES→EN / EN→ZH; producción puede inyectar `DeepTranslatorBackend`.
-- Store: filesystem o SQLite local (no Redis/cloud en v1).
-- Idiomas N2 completos: EN, ES, ZH.
+See [i18n.md](i18n.md) *(ES)*.
 
-## ¿Cómo sé que no rompí nada?
+## Does the LLM receive graphs or CIR?
+
+**Not in production.** COE projects to **natural prose** via the Renderer. CIR/graph is internal and used for session store.
+
+## What are v1 limitations?
+
+- Entity grouping / relations: heuristics + locale packs (not a universal semantic parser).
+- L0 in CI: stub ES→EN / EN→ZH; production can inject `DeepTranslatorBackend`.
+- Store: local filesystem or SQLite (no Redis/cloud in v1).
+- Full locale packs: EN, ES, ZH.
+
+## How do I verify nothing broke?
 
 ```bash
 python run.py --ci
 ```
 
-## ¿Dónde está el diseño interno?
+CI runs locally (GitHub Actions disabled). See [.github/workflows/README.md](../.github/workflows/README.md).
 
-[architecture.md](architecture.md), [levels.md](levels.md), [execution-plan.md](execution-plan.md).
+## Where is the internal design?
+
+[architecture.md](architecture.md), [levels.md](levels.md), [execution-plan.md](execution-plan.md) *(ES)*.

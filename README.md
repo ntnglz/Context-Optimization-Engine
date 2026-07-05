@@ -1,29 +1,36 @@
 # Context Optimization Engine (COE)
 
-Motor de optimización de **contexto** para LLM: RAG, historial, tools, código. Complementa a [PCM](https://github.com/ntnglz/Prompt-Compression-Middleware) (instrucciones).
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![Tests](https://img.shields.io/badge/tests-238-green.svg)](#try-it-now)
+[![Version](https://img.shields.io/badge/version-1.0.2-blue.svg)](CHANGELOG.md)
+
+**Compact LLM context without losing facts.** COE reorganizes and deduplicates RAG chunks, chat history, tools, and code before they reach the model. It complements [PCM](https://github.com/ntnglz/Prompt-Compression-Middleware) (instructions).
 
 ```
-Bloques crudos  →  COE  →  Prosa compacta  →  LLM
+Raw blocks  →  COE  →  compact prose  →  LLM
 ```
 
-COE **no resume**: reorganiza y deduplica sin perder hechos medibles en benchmarks.
+COE **does not summarize**. It removes redundancy and groups facts — measurable in benchmarks.
 
-## Probar ahora
+## Try it now
 
 ```bash
 git clone https://github.com/ntnglz/Context-Optimization-Engine.git
 cd Context-Optimization-Engine
 python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-export PYTHONPATH=src
+pip install -e ".[dev]"
 
-python run.py --demo          # dedup ACME (N1)
-python run.py --test          # 234 tests
+python run.py --demo          # canonical EN RAG example
+python run.py --quickstart    # demo + copy-paste Python snippet
+python run.py --test          # pytest suite
 ```
 
-## Ejemplo (antes → después)
+No editable install? Use `pip install -r requirements.txt` and `export PYTHONPATH=src` instead.
 
-**Entrada** — tres chunks RAG con repetición:
+## Example (before → after)
+
+**Input** — three RAG chunks with repetition:
 
 ```
 [A] Company: ACME / Juan works at ACME.
@@ -31,11 +38,10 @@ python run.py --test          # 234 tests
 [C] Company: ACME / Pedro works at ACME.
 ```
 
-**Salida** (`levels=[1, 2]`, `locale="en"`) — una línea por entidad, hechos compartidos fusionados:
+**Output** (`levels=[1, 2]`, `locale="en"`) — one line per entity, shared facts merged:
 
 ```
 Company: ACME
-Client: Globex
 Juan works at ACME and approved the budget.
 Budget: 50k
 Pedro works at ACME.
@@ -55,29 +61,35 @@ out = optimize_context(
     locale="en",
 )
 print(out.text)
-# ~44 → ~29 tokens típico en smoke benchmark
+# ~33 → ~22 tokens in smoke benchmarks
 ```
 
-## Tres formas de integrar
+## Three ways to integrate
 
-| Camino | Cuándo | Arranque |
-|--------|--------|----------|
+| Path | When | Quick start |
+|------|------|-------------|
 | **Python** | Pipelines, notebooks | `from coe import optimize_context` |
 | **MCP** | Cursor, Claude Desktop | `python scripts/mcp/run_server.py` |
-| **HTTP** | RAG / microservicios | `python scripts/http/run_server.py` → `:8080` |
+| **HTTP** | RAG / microservices | `python scripts/http/run_server.py` → `:8080` |
 
-Guía paso a paso: **[docs/getting-started.md](docs/getting-started.md)**  
-Preguntas frecuentes: **[docs/FAQ.md](docs/FAQ.md)**  
-Ejemplos JSON: **[data/examples/](data/examples/)**
+Step-by-step guide: **[docs/getting-started.md](docs/getting-started.md)**  
+FAQ: **[docs/FAQ.md](docs/FAQ.md)**  
+JSON examples: **[data/examples/](data/examples/)**
 
-### MCP en Cursor
+### MCP in Cursor
+
+```bash
+python scripts/mcp/print_cursor_config.py   # prints JSON with absolute paths
+```
+
+Or manually in `.cursor/mcp.json`:
 
 ```json
 {
   "mcpServers": {
     "coe": {
-      "command": "/ruta/.venv/bin/python",
-      "args": ["/ruta/Context-Optimization-Engine/scripts/mcp/run_server.py"]
+      "command": "/path/to/.venv/bin/python",
+      "args": ["/path/to/Context-Optimization-Engine/scripts/mcp/run_server.py"]
     }
   }
 }
@@ -91,47 +103,63 @@ curl -s -X POST http://127.0.0.1:8080/optimize \
   -d @data/examples/http_optimize_rag.json
 ```
 
-## Opciones habituales
+## Choosing options (plain language)
 
-| Parámetro | Uso |
+| `levels` | What it does | When |
+|----------|--------------|------|
+| `[1]` | Line deduplication | Repeated lines across chunks |
+| `[1, 2]` | Dedup + entity grouping | **Default for narrative RAG** |
+| `[1, 2, 3, 4]` | + relations & graph slice | Complex multi-entity context |
+| includes `5` + `session_id` | Session memory | Multi-turn agents |
+
+| Parameter | Use |
 |-----------|-----|
-| `levels=[1, 2]` | RAG narrativo (dedup + factorización) |
-| `levels` con `5` + `session_id` | Chat multi-turno con memoria |
-| `locale` | `"en"`, `"es"`, `"zh"` |
-| `l0=True` + `target_lang` | Unificar idioma del contexto |
+| `locale` | `"en"`, `"es"`, `"zh"` — prose patterns |
+| `l0=True` + `target_lang` | Unify context language before processing |
 | `source_type` | `rag`, `code`, `structured`, `glossary`, … |
 
-## Documentación
+Technical reference (ES): [docs/levels.md](docs/levels.md) · [docs/ingest.md](docs/ingest.md)
 
-| Para… | Documento |
-|-------|-----------|
-| **Integrar sin leer el pipeline** | [getting-started.md](docs/getting-started.md) |
+## When not to use COE
+
+- Context is already under ~200 tokens with no repetition.
+- You need a **generative summary** (COE is deterministic, not abstractive).
+- Payload is purely tabular and you want raw JSON/CSV unchanged.
+- You have not retrieved context yet — COE optimizes text you already have.
+
+## Documentation
+
+| For… | Document |
+|------|----------|
+| **Integrate without reading the pipeline** | [getting-started.md](docs/getting-started.md) |
 | FAQ | [FAQ.md](docs/FAQ.md) |
-| Visión y comparativa v1 | [vision.md](docs/vision.md) |
-| Diseño (N1–N5, CIR) | [architecture.md](docs/architecture.md) |
-| **Maintainers** (estado, fases) | [STATUS.md](docs/STATUS.md) · [execution-plan.md](docs/execution-plan.md) |
+| Vision & v1 comparison | [vision.md](docs/vision.md) |
+| Design (pipeline internals) | [architecture.md](docs/architecture.md) *(ES)* |
+| **Maintainers** | [STATUS.md](docs/STATUS.md) · [execution-plan.md](docs/execution-plan.md) *(ES)* |
+
+Spanish user docs (archive): [docs/es/](docs/es/)
 
 ## PCM + COE
 
 ```
-Usuario → PCM (instrucción) → COE (contexto) → Model Adapter → LLM
+User → PCM (instruction) → COE (context) → Model Adapter → LLM
 ```
 
-| Proyecto | Optimiza |
-|----------|----------|
-| [PCM](https://github.com/ntnglz/Prompt-Compression-Middleware) | Instrucciones |
-| **COE** (este repo) | Conocimiento / contexto |
+| Project | Optimizes |
+|---------|-----------|
+| [PCM](https://github.com/ntnglz/Prompt-Compression-Middleware) | Instructions |
+| **COE** (this repo) | Knowledge / context |
 
-## Estructura del repo
+## Repository layout
 
 ```
-src/coe/          # gateway, ingest, level1–5, mcp, http
+src/coe/          # gateway, ingest, levels, mcp, http
 docs/             # specs + getting-started
-data/examples/    # payloads demo
+data/examples/    # demo payloads
 tests/            # pytest
 scripts/          # mcp, http, benchmark, ci
 ```
 
-## Licencia
+## License
 
-MIT — ver [LICENSE](LICENSE). Cambios: [CHANGELOG.md](CHANGELOG.md).
+MIT — see [LICENSE](LICENSE). Changes: [CHANGELOG.md](CHANGELOG.md).

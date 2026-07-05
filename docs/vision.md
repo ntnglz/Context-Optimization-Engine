@@ -1,5 +1,7 @@
 # Visión de COE
 
+> **Integradores:** guía en inglés → [getting-started.md](getting-started.md) · [FAQ.md](FAQ.md)
+
 ## Documento fundacional
 
 → **[Context Optimization Engine (COE).md](Context%20Optimization%20Engine%20(COE).md)**

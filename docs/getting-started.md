@@ -1,39 +1,56 @@
-# Guía de inicio — integrar COE sin conocer el pipeline
+# Getting started — integrate COE without reading the pipeline
 
-Esta guía es para **usar** COE (RAG, agentes, HTTP). No necesitas saber qué es N3 o CIR.
+This guide is for **using** COE (RAG, agents, HTTP). You do not need to know pipeline internals.
 
 - FAQ: [FAQ.md](FAQ.md)
-- Estado del proyecto (maintainers): [STATUS.md](STATUS.md)
-- Diseño profundo: [architecture.md](architecture.md)
+- Maintainer status (ES): [STATUS.md](STATUS.md)
+- Deep design (ES): [architecture.md](architecture.md)
 
-## Instalación
+## Installation
+
+| I want… | Install |
+|---------|---------|
+| Try demo / Python library | `pip install -e ".[dev]"` |
+| MCP server | `pip install -e ".[mcp]"` |
+| HTTP API | `pip install -e ".[http]"` |
+| Everything locally | `pip install -e ".[dev,mcp,http]"` |
 
 ```bash
 git clone https://github.com/ntnglz/Context-Optimization-Engine.git
 cd Context-Optimization-Engine
 python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
+pip install -e ".[dev]"
 ```
 
-Añade el código al path de Python (desde la raíz del repo):
+**Without editable install:** `pip install -r requirements.txt` and `export PYTHONPATH=src` from the repo root.
 
-```bash
-export PYTHONPATH=src
-```
-
-## Probar en 30 segundos
+## Try in 30 seconds
 
 ```bash
 python run.py --demo
+python run.py --quickstart   # adds copy-paste Python snippet
 ```
 
-Verás deduplicación N1 sobre el ejemplo ACME (documentos A, B, C).
+You will see deduplication + entity grouping on the canonical ACME example (blocks A, B, C).
+
+## Decision guide
+
+```mermaid
+flowchart TD
+    A[What are you optimizing?] --> B{Narrative RAG chunks?}
+    B -->|yes, one-shot| C["levels=[1, 2]"]
+    B -->|multi-turn chat| D["levels with 5 + session_id"]
+    A --> E{Mixed languages?}
+    E -->|yes| F["l0=True + target_lang"]
+    A --> G{Code / JSON / glossary?}
+    G -->|yes| H["source_type + see ingest.md (ES)"]
+```
 
 ---
 
-## Librería Python
+## Python library
 
-### RAG one-shot (recomendado: N1 + N2)
+### RAG one-shot (recommended: dedup + entity grouping)
 
 ```python
 from coe import optimize_context
@@ -50,11 +67,11 @@ print(out.text)
 print(out.metrics.compression_ratio, out.metrics.original_tokens, out.metrics.optimized_tokens)
 ```
 
-Ejemplo JSON de bloques: [../data/examples/http_optimize_rag.json](../data/examples/http_optimize_rag.json)
+JSON example: [../data/examples/acme_rag_en.json](../data/examples/acme_rag_en.json)
 
-### Sesión multi-turno (N5)
+### Multi-turn session (session memory)
 
-Turno 1 y turno 2 comparten `session_id`; COE acumula estado en store (filesystem por defecto).
+Turn 1 and turn 2 share `session_id`; COE accumulates state in a store (filesystem by default).
 
 ```python
 from coe import optimize_context
@@ -62,7 +79,7 @@ from coe.models import ContextBlock
 
 session = "my-agent-session"
 
-# Turno 1
+# Turn 1
 optimize_context(
     [ContextBlock(id="t1-A", content="Company: ACME\nJuan works at ACME.", source_type="rag")],
     levels=[1, 4, 5],
@@ -70,7 +87,7 @@ optimize_context(
     session_id=session,
 )
 
-# Turno 2 — el estado previo se fusiona
+# Turn 2 — previous state is merged
 out = optimize_context(
     [ContextBlock(id="t2-A", content="Company: ACME\nJuan approved the budget.", source_type="rag")],
     levels=[1, 4, 5],
@@ -80,7 +97,7 @@ out = optimize_context(
 print(out.text)
 ```
 
-Store SQLite (opcional):
+Optional SQLite store:
 
 ```python
 optimize_context(
@@ -92,7 +109,7 @@ optimize_context(
 )
 ```
 
-### L0 — contexto en otro idioma (ES → EN)
+### L0 — context in another language (ES → EN)
 
 ```python
 out = optimize_context(
@@ -107,9 +124,9 @@ out = optimize_context(
 )
 ```
 
-### Bloques `structured`, `code`, `glossary`
+### `structured`, `code`, `glossary` blocks
 
-Use `ingest_context` o pasa bloques con `source_type`:
+Use `ingest_context` or pass blocks with `source_type`:
 
 ```python
 from coe import ingest_context, optimize_context
@@ -120,65 +137,59 @@ ingested = ingest_context([
 out = optimize_context(ingested.bundle, levels=[1])
 ```
 
-Ejemplos: [../data/examples/structured_block.json](../data/examples/structured_block.json), [code_blocks.json](../data/examples/code_blocks.json), [glossary_block.json](../data/examples/glossary_block.json).
+Examples: [../data/examples/structured_block.json](../data/examples/structured_block.json), [code_blocks.json](../data/examples/code_blocks.json), [glossary_block.json](../data/examples/glossary_block.json).
 
 ---
 
 ## MCP (Cursor, Claude Desktop)
 
-### Arranque
+### Start server
 
 ```bash
-pip install -r requirements-mcp.txt
+pip install -e ".[mcp]"
 python scripts/mcp/run_server.py
 ```
 
-### Configuración Cursor
+### Cursor configuration
 
-Ajustes → MCP → añadir servidor, o `.cursor/mcp.json`:
+Generate config with absolute paths:
 
-```json
-{
-  "mcpServers": {
-    "coe": {
-      "command": "/ruta/a/.venv/bin/python",
-      "args": ["/ruta/absoluta/Context-Optimization-Engine/scripts/mcp/run_server.py"],
-      "env": {}
-    }
-  }
-}
+```bash
+python scripts/mcp/print_cursor_config.py
+# paste into Settings → MCP, or:
+python scripts/mcp/print_cursor_config.py > .cursor/mcp.json
 ```
 
-### Herramientas
+### Tools
 
-| Tool | Devuelve |
-|------|----------|
-| `optimize_context` | `text` (prosa) + `metrics` |
-| `estimate_savings` | solo `metrics` (sin prosa) |
+| Tool | Returns |
+|------|---------|
+| `optimize_context` | `text` (prose) + `metrics` |
+| `estimate_savings` | `metrics` only (no prose) |
 
-Payload de ejemplo: [../data/examples/mcp_optimize_rag.json](../data/examples/mcp_optimize_rag.json)
+Example payload: [../data/examples/mcp_optimize_rag.json](../data/examples/mcp_optimize_rag.json)
 
 ---
 
 ## HTTP API
 
-### Arranque
+### Start server
 
 ```bash
-pip install -r requirements-http.txt
+pip install -e ".[http]"
 python scripts/http/run_server.py
 # http://127.0.0.1:8080
 ```
 
 ### Endpoints
 
-| Método | Ruta | Descripción |
-|--------|------|-------------|
-| GET | `/health` | Estado del servicio |
-| POST | `/optimize` | Contexto optimizado + métricas |
-| POST | `/estimate` | Solo métricas |
+| Method | Route | Description |
+|--------|-------|-------------|
+| GET | `/health` | Service status |
+| POST | `/optimize` | Optimized context + metrics |
+| POST | `/estimate` | Metrics only |
 
-### Ejemplo curl
+### curl example
 
 ```bash
 curl -s http://127.0.0.1:8080/health
@@ -188,7 +199,7 @@ curl -s -X POST http://127.0.0.1:8080/optimize \
   -d @data/examples/http_optimize_rag.json
 ```
 
-Cuerpo mínimo:
+Minimal body:
 
 ```json
 {
@@ -201,13 +212,13 @@ Cuerpo mínimo:
 }
 ```
 
-Detalle en [architecture.md §7.3](architecture.md).
+Full API schema: [architecture.md §7.3](architecture.md) *(ES)*.
 
 ---
 
 ## PCM + COE
 
-COE optimiza el **contexto**; PCM la **instrucción**. Composición en un solo flujo:
+COE optimizes **context**; PCM optimizes **instructions**. Compose in one flow:
 
 ```python
 from coe import optimize_with_pcm
@@ -222,40 +233,40 @@ result = optimize_with_pcm(
 # result.context_text, result.instruction_text, result.metrics
 ```
 
-Requiere PCM instalado/configurado según [Fase 11](execution-plan.md) del plan.
+Requires PCM installed per the [PCM repository](https://github.com/ntnglz/Prompt-Compression-Middleware).
 
 ---
 
-## Opciones que más importan
+## Options that matter most
 
-| Parámetro | Cuándo usarlo |
-|-----------|----------------|
-| `levels` | `[1,2]` RAG; añade `5` + `session_id` para chat |
-| `locale` | `"en"`, `"es"`, `"zh"` — patrones N2+ |
-| `l0` + `target_lang` | Unificar idioma del contexto antes de N1 |
-| `session_id` | Obligatorio con nivel 5 |
-| `max_context_tokens` | Truncar salida si supera tope |
-| `target_model` | Ajuste post-renderer (mistral, openai, …) |
-| `query_context` | Slice N4/N5 hacia la pregunta actual |
-| `source_type` | `rag`, `code`, `structured`, `glossary`, … — ver [ingest.md](ingest.md) |
+| Parameter | When to use |
+|-----------|-------------|
+| `levels` | `[1,2]` RAG; add `5` + `session_id` for chat |
+| `locale` | `"en"`, `"es"`, `"zh"` — prose patterns |
+| `l0` + `target_lang` | Unify context language before processing |
+| `session_id` | Required when level 5 is enabled |
+| `max_context_tokens` | Truncate output if over limit |
+| `target_model` | Post-renderer tuning (mistral, openai, …) |
+| `query_context` | Slice graph/session toward current question |
+| `source_type` | `rag`, `code`, `structured`, `glossary`, … — see [ingest.md](ingest.md) *(ES)* |
 
-### Métricas (`out.metrics`)
+### Metrics (`out.metrics`)
 
-| Campo | Significado |
-|-------|-------------|
-| `original_tokens` | Entrada estimada |
-| `optimized_tokens` | Salida prosa |
-| `compression_ratio` | Ahorro relativo |
-| `latency_ms` | Tiempo total |
-| `truncated` | Se aplicó tope de tokens |
+| Field | Meaning |
+|-------|---------|
+| `original_tokens` | Estimated input |
+| `optimized_tokens` | Prose output |
+| `compression_ratio` | Relative savings |
+| `latency_ms` | Total time |
+| `truncated` | Token cap was applied |
 
 ---
 
-## Siguiente lectura
+## Further reading
 
-| Si quieres… | Lee |
-|-------------|-----|
-| Decidir niveles e ingest | [ingest.md](ingest.md), [levels.md](levels.md) |
-| Multilingüe | [i18n.md](i18n.md), [l0-ingest.md](l0-ingest.md) |
-| Benchmarks / calidad | [benchmarks.md](benchmarks.md) |
-| Contribuir / roadmap | [execution-plan.md](execution-plan.md) |
+| If you want… | Read |
+|--------------|------|
+| Level & ingest details | [ingest.md](ingest.md), [levels.md](levels.md) *(ES)* |
+| Multilingual | [i18n.md](i18n.md), [l0-ingest.md](l0-ingest.md) *(ES)* |
+| Benchmarks / quality | [benchmarks.md](benchmarks.md) *(ES)* |
+| Contribute / roadmap | [execution-plan.md](execution-plan.md) *(ES)* |

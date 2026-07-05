@@ -356,6 +356,31 @@ Resumen; detalle de entregables en secciones siguientes (fases 6–18).
 
 ---
 
+### Fase 21 — Visitor adoption mitigation (EN) ✅
+
+**Objetivo:** Cerrar fricciones de adopción post-revisión visitante (2026-07-05): ejemplo canónico coherente, `pip install -e .`, docs de usuario en inglés, DX helpers.
+
+| Entregable | Criterio de hecho |
+|------------|-------------------|
+| **`acme_rag_en.json`** + demo | `run.py --demo` usa `optimize_context([1,2])` EN; README alineado |
+| **`pyproject.toml`** | `pip install -e ".[dev]"` sin `PYTHONPATH` |
+| **`--quickstart`** | Snippet Python copy-paste |
+| **`print_cursor_config.py`** | JSON MCP con rutas absolutas |
+| **Docs EN** | README, getting-started, FAQ, examples README |
+| **`docs/es/`** | Archivo español pre-migración |
+| **FAQ ampliado** | When not to use, savings, MCP optional deps |
+| **CHANGELOG 1.0.2** | Entrada release |
+
+**Fuera de alcance:** PyPI publish, Docker, GitHub Actions, cambios pipeline.
+
+**Gate:** `python run.py --ci` PASS — **238 tests, 10 smokes PASS** (2026-07-05).
+
+**Plan:** [plans/2026-07-05-visitor-adoption-mitigation.md](plans/2026-07-05-visitor-adoption-mitigation.md)
+
+**Requiere:** Fase 20 ✅.
+
+---
+
 ## Pista I — Investigación (sin fase obligatoria)
 
 Temas de [Context Optimization Engine (COE).md](Context%20Optimization%20Engine%20(COE).md) § visión largo plazo **no** son deuda de producto v1:

@@ -1,13 +1,14 @@
-# Ejemplos COE
+# COE examples
 
-| Archivo | Uso |
-|---------|-----|
-| [level1_acme.json](level1_acme.json) | `python run.py --demo` — dedup N1 |
-| [mcp_optimize_rag.json](mcp_optimize_rag.json) | Payload MCP `optimize_context` |
+| File | Use |
+|------|-----|
+| [acme_rag_en.json](acme_rag_en.json) | **Canonical** — `python run.py --demo`, curl, MCP |
+| [level1_acme.json](level1_acme.json) | Legacy N1-only demo (ES) — use `acme_rag_en.json` instead |
+| [mcp_optimize_rag.json](mcp_optimize_rag.json) | MCP `optimize_context` payload |
 | [http_optimize_rag.json](http_optimize_rag.json) | `curl -d @... POST /optimize` |
-| [n5_session_turn2.json](n5_session_turn2.json) | Segundo turno con `session_id` |
-| [structured_block.json](structured_block.json) | JSON → líneas N1-friendly |
-| [code_blocks.json](code_blocks.json) | Dedup código por firma |
-| [glossary_block.json](glossary_block.json) | Glosario + N5 |
+| [n5_session_turn2.json](n5_session_turn2.json) | Second turn with `session_id` |
+| [structured_block.json](structured_block.json) | JSON → N1-friendly lines |
+| [code_blocks.json](code_blocks.json) | Code dedup by signature |
+| [glossary_block.json](glossary_block.json) | Glossary + session memory |
 
-Guía: [../docs/getting-started.md](../docs/getting-started.md)
+Guide: [../docs/getting-started.md](../docs/getting-started.md)

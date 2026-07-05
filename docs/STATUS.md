@@ -1,6 +1,6 @@
 # Estado del proyecto (maintainers)
 
-> Para visitantes e integradores: [getting-started.md](getting-started.md) · [FAQ.md](FAQ.md)  
+> **Maintainers (ES).** For visitors and integrators: [getting-started.md](getting-started.md) (EN) · [FAQ.md](FAQ.md) (EN)  
 > Plan de trabajo: [execution-plan.md](execution-plan.md)
 
 **Producto v1:** fases 0–18 ✅ · **Fase 20** docs visitante ✅ · **Fase 19:** omitida
