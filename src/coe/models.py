@@ -61,15 +61,24 @@ class DeduplicationResult:
         return self.original_tokens - self.optimized_tokens
 
     def render(self) -> str:
+        """Alias legacy de ``render_compact()``."""
+        return self.render_compact()
+
+    def render_compact(self) -> str:
         from .level1.render import render_deduplication
 
         if not self.shared_facts and not any(b.content.strip() for b in self.unique_blocks):
             return ""
         if not self.shared_facts:
-            return "\n\n".join(
-                f"[{block.id}]\n{block.content}" for block in self.unique_blocks if block.content.strip()
-            ) + "\n"
+            from .renderer import render_raw_context
+
+            return render_raw_context(self.unique_blocks)
         return render_deduplication(self)
+
+    def render_prose(self, *, locale: str | None = "en") -> str:
+        from .renderer import render_n1_prose
+
+        return render_n1_prose(self, locale=locale)
 
     def to_dict(self) -> dict[str, Any]:
         return {

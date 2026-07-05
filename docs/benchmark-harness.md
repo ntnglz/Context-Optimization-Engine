@@ -428,8 +428,8 @@ Sin dependencias LLM en capa 1 — CI funciona offline.
 | Fase | Entregable | Desbloquea |
 |------|------------|------------|
 | **H1** | `schema`, `dataset`, `profile`, scorers deterministas, mock evaluator, CLI smoke | ✅ Implementado (N1 pipeline) |
-| **H2** | `arms` + integración `optimize_context` (N1 `render_prose`) | Siguiente |
-| **H3** | `factual`, embedding similarity, `report`, compare | Gate N2 |
+| **H2** | `gateway.optimize_context`, `arms`, N1 `render_prose`, harness vía Gateway | ✅ Implementado |
+| **H3** | `factual`, embedding similarity, `report`, compare | Siguiente |
 | **H4** | Ollama evaluator, readability judge, casos core E2E | Pre-release |
 | **H5** | multi_turn N5, multilingual, nightly workflow | N5 |
 

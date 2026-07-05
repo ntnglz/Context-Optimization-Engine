@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+from coe.benchmark.arms import render_arm_a_context
 from coe.benchmark.dataset import load_case
 from coe.benchmark.profile import load_profile
 from coe.benchmark.report import compare_reports
@@ -24,10 +25,12 @@ class TestScorers:
 
 
 class TestHarnessSmoke:
-    def test_load_acme_case(self):
+    def test_arm_a_raw(self):
         case = load_case(BENCH / "cases" / "core" / "acme_budget_v1.json")
-        assert case.id == "acme_budget_v1"
-        assert "core" in case.tags
+        raw = render_arm_a_context(case)
+        assert "[A]" in raw
+        assert "ACME" in raw
+        assert "Empresa=ACME" not in raw
 
     def test_run_n1_smoke(self):
         report = run_suite_from_ids(
