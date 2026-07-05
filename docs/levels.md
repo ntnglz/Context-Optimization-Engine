@@ -26,7 +26,7 @@ COE aplica **transformaciones composables** sobre el contexto. **L0** (Ingest) p
 | **2** | Factorización | [level2.md](level2.md) | ✅ v1 (locale EN/ES) |
 | **3** | Representación estructurada | [level3.md](level3.md) | ✅ v1 (relaciones `knows`, proyección prosa) |
 | **4** | Grafo de conocimiento | [level4.md](level4.md) | ✅ v1 (ContextGraph, slice, proyección prosa) |
-| **5** | Estado semántico | [level5.md](level5.md) | v1 (`StateView`, store in-memory) |
+| **5** | Estado semántico | [level5.md](level5.md) | ✅ v2 (graph merge, StateView, store in-memory) |
 
 ## Pipeline
 

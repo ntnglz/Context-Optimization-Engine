@@ -66,7 +66,7 @@ def main() -> int:
     parser.add_argument(
         "--ci",
         action="store_true",
-        help="CI smoke local: pytest + 7 perfiles benchmark con compare baseline",
+        help="CI smoke local: pytest + 8 perfiles benchmark con compare baseline",
     )
     parser.add_argument(
         "--benchmark",

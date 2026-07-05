@@ -48,5 +48,8 @@ run_benchmark n1_n2_n3_en data/benchmarks/baselines/n1_n2_n3_en_smoke.json
 step "benchmark smoke n1_n2_n3_n4_en"
 run_benchmark n1_n2_n3_n4_en data/benchmarks/baselines/n1_n2_n3_n4_en_smoke.json
 
+step "benchmark smoke n5_graph_session (multi_turn)"
+run_benchmark n5_graph_session data/benchmarks/baselines/n5_graph_session_smoke.json --tags multi_turn
+
 echo ""
 echo "CI smoke: PASS"

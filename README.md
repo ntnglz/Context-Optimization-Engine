@@ -18,12 +18,12 @@ Contexto bruto (N bloques)  →  COE  →  Representación compacta  →  LLM
 | [Context Ingest](docs/ingest.md) | ✅ | Parcial (`ContextBlock` + L0) |
 | [Renderer](docs/renderer.md) | ✅ | N1/N2 `render_prose` |
 | [Benchmarks y KPIs](docs/benchmarks.md) | ✅ | — |
-| [Harness de benchmarks](docs/benchmark-harness.md) | ✅ | ✅ H1–H5 · CI local smoke (7 perfiles) |
+| [Harness de benchmarks](docs/benchmark-harness.md) | ✅ | ✅ H1–H5 · CI local smoke (8 perfiles) |
 | [Nivel 1](docs/level1.md) | ✅ | ✅ |
 | [Nivel 2](docs/level2.md) | ✅ | ✅ v1 (EN/ES) |
 | [Nivel 3](docs/level3.md) | ✅ | ✅ v1 (relaciones tipadas) |
 | [Nivel 4](docs/level4.md) | ✅ | ✅ v1 (ContextGraph efímero) |
-| [Nivel 5](docs/level5.md) | ✅ | v1 (`StateView`, store in-memory) |
+| [Nivel 5](docs/level5.md) | ✅ | ✅ v2 (graph merge, commits) |
 | **Gateway** (`optimize_context`) | — | L0 + N1 + N2 + N3 + N4 + N5 |
 
 ## Inicio rápido
@@ -41,7 +41,7 @@ python run.py --demo
 # Tests
 python run.py --test
 
-# CI local (pytest + 7 perfiles smoke, compare baseline — antes de push)
+# CI local (pytest + 8 perfiles smoke, compare baseline — antes de push)
 python run.py --ci
 # equivalente: bash scripts/ci/smoke.sh
 
@@ -140,7 +140,7 @@ Context-Optimization-Engine/
 ├── data/
 │   ├── examples/             # Demo N1 (ACME)
 │   └── benchmarks/           # Casos, perfiles, baselines, runs
-├── tests/                    # pytest (~99 tests)
+├── tests/                    # pytest (~102 tests)
 └── run.py
 ```
 

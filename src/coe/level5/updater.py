@@ -2,18 +2,11 @@
 
 from __future__ import annotations
 
-from ..level1 import deduplicate_context
-from ..level2 import factorize_context
-from ..level3 import structure_context
-from ..level4 import build_context_graph
-from ..models import ContextBlock
-from .state import SemanticState, StateView, UpdateResult
+from ..models import ContextBlock, estimate_tokens
+from .materialize import blocks_to_context_graph, render_state_view
+from .merge import merge_context_graphs, _clone_graph
+from .state import Commit, SemanticState, StateView, UpdateResult
 from .store import InMemoryStateStore, StateStore
-
-_VIEW_INTRO = {
-    "en": "Accumulated session state:",
-    "es": "Estado acumulado de la sesión:",
-}
 
 
 def update_semantic_state(
@@ -23,11 +16,12 @@ def update_semantic_state(
     store: StateStore | None = None,
     locale: str | None = "en",
     levels: list[int] | None = None,
+    query_context: str | None = None,
 ) -> UpdateResult:
     """
-    Integra bloques del turno en el store y materializa ``StateView``.
+    Integra el grafo del turno en el State Store y materializa ``StateView``.
 
-    v1: acumula bloques y proyecta vía N1/N2 (sin grafo N4).
+    v2: merge incremental de ``ContextGraph`` (N4) entre turnos.
     """
     if not blocks:
         raise ValueError("blocks must not be empty")
@@ -39,16 +33,40 @@ def update_semantic_state(
 
     state_store = store or InMemoryStateStore()
     state = state_store.load(session_id) or SemanticState(session_id=session_id)
+    previous_graph = _clone_graph(state.graph) if state.graph is not None else None
 
     _merge_blocks(state, blocks)
-    prose = _materialize_prose(state.blocks, locale=loc, levels=sub_levels)
+
+    turn_graph = blocks_to_context_graph(blocks, locale=loc, levels=sub_levels)
+    if query_context:
+        from ..level4.slice import apply_query_slice
+
+        turn_graph = apply_query_slice(
+            turn_graph,
+            query_context=query_context,
+            max_hops=turn_graph.max_hops,
+        )
+
+    state.graph = merge_context_graphs(state.graph, turn_graph)
+    if state.graph is not None:
+        prose_body = state.graph.render_prose(locale=loc)
+        state.graph.optimized_tokens = estimate_tokens(prose_body)
 
     state.commit_count += 1
     commit_id = f"{session_id}-c{state.commit_count}"
+
+    view = render_state_view(
+        state.graph,
+        previous=previous_graph,
+        locale=loc,
+    ) if state.graph is not None else StateView(prose="")
+
+    state.history.append(Commit(commit_id=commit_id, graph=_clone_graph(state.graph)))
+    state.head_commit_id = commit_id
     state_store.save(state)
 
     return UpdateResult(
-        view=StateView(prose=prose),
+        view=view,
         state=state,
         commit_id=commit_id,
     )
@@ -62,30 +80,3 @@ def _merge_blocks(state: SemanticState, new_blocks: list[ContextBlock]) -> None:
             block_id = f"c{state.commit_count + 1}-{block.id}"
         seen_ids.add(block_id)
         state.blocks.append(ContextBlock(id=block_id, content=block.content))
-
-
-def _materialize_prose(
-    blocks: list[ContextBlock],
-    *,
-    locale: str,
-    levels: list[int],
-) -> str:
-    dedup = deduplicate_context(blocks)
-    if 4 in levels:
-        factorized = factorize_context(dedup, locale=locale)
-        structured = structure_context(factorized, locale=locale)
-        graph = build_context_graph(structured, locale=locale)
-        body = graph.render_prose(locale=locale)
-    elif 3 in levels:
-        factorized = factorize_context(dedup, locale=locale)
-        structured = structure_context(factorized, locale=locale)
-        body = structured.render_prose(locale=locale)
-    elif 2 in levels:
-        factorized = factorize_context(dedup, locale=locale)
-        body = factorized.render_prose(locale=locale)
-    else:
-        body = dedup.render_prose(locale=locale)
-
-    intro_key = locale.split("-")[0].lower()
-    intro = _VIEW_INTRO.get(intro_key, _VIEW_INTRO["en"])
-    return f"{intro}\n\n{body.strip()}\n"

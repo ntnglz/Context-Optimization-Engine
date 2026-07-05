@@ -62,6 +62,47 @@ class TestN5StateView:
         assert "approved the budget" in prose
         assert result.commit_id == "bench-acme-session-1-c2"
         assert len(result.state.blocks) == 3
+        assert result.state.graph is not None
+        assert result.state.head_commit_id == "bench-acme-session-1-c2"
+        assert len(result.state.history) == 2
+
+    def test_graph_merge_across_turns(self):
+        store = InMemoryStateStore()
+        session_id = "graph-session-1"
+
+        turn1 = [
+            ContextBlock(id="A", content="Empresa: ACME\nJuan works at ACME."),
+            ContextBlock(id="B", content="Empresa: ACME\nPedro works at ACME."),
+        ]
+        turn2 = [
+            ContextBlock(
+                id="C",
+                content="Empresa: ACME\nPresupuesto: 50k\nJuan approved the budget.",
+            ),
+        ]
+
+        update_semantic_state(
+            turn1,
+            session_id=session_id,
+            store=store,
+            locale="en",
+            levels=[1, 2, 3, 4],
+        )
+        result = update_semantic_state(
+            turn2,
+            session_id=session_id,
+            store=store,
+            locale="en",
+            levels=[1, 2, 3, 4],
+        )
+
+        prose = result.view.render()
+        assert result.state.graph is not None
+        assert len(result.state.history) == 2
+        assert "Juan works at ACME" in prose
+        assert "Pedro works at ACME" in prose
+        assert "approved the budget" in prose
+        assert "node:" not in prose
 
     def test_gateway_n5_single_shot(self):
         blocks = [
