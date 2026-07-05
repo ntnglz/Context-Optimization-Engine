@@ -8,23 +8,28 @@ Contexto bruto (N bloques)  →  COE  →  Representación compacta  →  LLM
 
 ## Estado
 
+> Orden de trabajo: [execution-plan.md](docs/execution-plan.md) · **Fases 0–6 ✅** · activa: **Fase 8** (tras cierre doc Fase 7)
+
 | Componente | Spec | Implementación |
 |------------|------|----------------|
 | [Visión fundacional](docs/Context%20Optimization%20Engine%20(COE).md) | ✅ | — |
-| [Diseño global](docs/architecture.md) | ✅ | Parcial |
-| [Pipeline L0 → N1–N5](docs/levels.md) | ✅ | L0 v1 · N1 · N2 · N3 v1 · N4 v1 · N5 v1 |
-| [Multilingüe (i18n)](docs/i18n.md) | ✅ | Locale packs N2 EN/ES en código |
-| [L0 Ingest](docs/l0-ingest.md) | ✅ | v1 (heurística + ES→EN) |
-| [Context Ingest](docs/ingest.md) | ✅ | Parcial (`ContextBlock` + L0) |
-| [Renderer](docs/renderer.md) | ✅ | N1/N2 `render_prose` |
+| [Diseño global](docs/architecture.md) | ✅ | ✅ núcleo v1 (L0→N5, MCP, CIR) · integración v1 en curso (fases 8–18) |
+| [Plan de ejecución](docs/execution-plan.md) | ✅ | Fases 0–6 cerradas |
+| [Pipeline L0 → N1–N5](docs/levels.md) | ✅ | L0 v1 · N1 · N2 · N3 · N4 · N5 |
+| [Multilingüe (i18n)](docs/i18n.md) | ✅ | Locale packs N2 EN/ES |
+| [L0 Ingest](docs/l0-ingest.md) | ✅ | v1 (heurística ES→EN) · v2 planificado Fase 9 |
+| [Context Ingest](docs/ingest.md) | ✅ | ✅ `ingest_context`, `ContextBundle`, matriz `source_type` |
+| [Renderer](docs/renderer.md) | ✅ | ✅ prosa N1–N5 vía `renderer/assembly.py` |
+| [CIR v1.0](docs/cir-v1.md) | ✅ | ✅ grafo + envelope N5 (`src/coe/cir/`) |
 | [Benchmarks y KPIs](docs/benchmarks.md) | ✅ | — |
 | [Harness de benchmarks](docs/benchmark-harness.md) | ✅ | ✅ H1–H5 · CI local smoke (8 perfiles) |
 | [Nivel 1](docs/level1.md) | ✅ | ✅ |
-| [Nivel 2](docs/level2.md) | ✅ | ✅ v1 (EN/ES) |
-| [Nivel 3](docs/level3.md) | ✅ | ✅ v1 (relaciones tipadas) |
-| [Nivel 4](docs/level4.md) | ✅ | ✅ v1 (ContextGraph efímero) |
-| [Nivel 5](docs/level5.md) | ✅ | ✅ v2 (graph merge, commits) |
-| **Gateway** (`optimize_context`) | — | L0 + N1 + N2 + N3 + N4 + N5 |
+| [Nivel 2](docs/level2.md) | ✅ | ✅ (EN/ES) |
+| [Nivel 3](docs/level3.md) | ✅ | ✅ (relaciones tipadas) |
+| [Nivel 4](docs/level4.md) | ✅ | ✅ (`ContextGraph`, CIR materializado) |
+| [Nivel 5](docs/level5.md) | ✅ | ✅ (graph merge, commits, `FilesystemStateStore`) |
+| **Gateway** (`optimize_context`) | ✅ | ✅ L0 + N1–N5 + métricas |
+| **MCP** (agentes) | ✅ | ✅ `optimize_context`, `estimate_savings` (stdio) |
 
 ## Inicio rápido
 
@@ -120,22 +125,20 @@ Context-Optimization-Engine/
 │   ├── levels.md           # Índice pipeline L0 → N1–N5
 │   ├── i18n.md             # Multilingüe, target_lang, locale packs
 │   ├── l0-ingest.md        # Spec L0 (pre-N1)
-│   ├── benchmarks.md       # KPIs comprensión, redacción, latencia
-│   ├── spec-gaps.md        # Checklist cierre pre-implementación
+│   ├── execution-plan.md   # Orden de trabajo (fases 0–18)
+│   ├── cir-v1.md           # CIR v1.0 congelado
+│   ├── spec-gaps.md        # Checklist cierre + deuda → fase
 │   ├── ingest.md           # Context Ingest + Normalizer
 │   ├── renderer.md         # Prosa hacia LLM
 │   ├── level1.md … level5.md
 ├── src/coe/
-│   ├── gateway.py            # optimize_context — L0, N1, N2, N3, N4, N5
-│   ├── models.py             # ContextBlock, resultados por nivel
-│   ├── ingest/               # L0 normalize_language
-│   ├── level1/               # Deduplicación
-│   ├── level2/               # Factorización (locale EN/ES)
-│   ├── level3/               # Estructuración relacional
-│   ├── level4/               # Grafo de conocimiento efímero
-│   ├── level5/               # StateView, sesión multi-turno
-│   ├── mcp/                  # Servidor MCP (optimize_context, estimate_savings)
-│   ├── renderer/             # Plantillas prosa N1
+│   ├── gateway.py            # optimize_context — L0, N1–N5
+│   ├── models.py             # ContextBlock, ContextGraph, resultados por nivel
+│   ├── cir/                  # CIR v1.0 envelope (serialización N5)
+│   ├── ingest/               # ingest_context, L0, normalizer
+│   ├── level1/ … level5/
+│   ├── mcp/                  # Servidor MCP (stdio)
+│   ├── renderer/             # Ensamblaje prosa hacia LLM
 │   └── benchmark/            # Harness H1–H5
 ├── scripts/
 │   ├── benchmark/            # run.py, compare.py
@@ -144,7 +147,7 @@ Context-Optimization-Engine/
 ├── data/
 │   ├── examples/             # Demo N1 (ACME)
 │   └── benchmarks/           # Casos, perfiles, baselines, runs
-├── tests/                    # pytest (~102 tests)
+├── tests/                    # pytest (154 tests)
 └── run.py
 ```
 

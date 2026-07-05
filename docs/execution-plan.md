@@ -57,7 +57,7 @@ Orden de las fases 6–18 según **dependencias técnicas** y **cierre de deuda*
 | Locale `zh` | ✅ doc | ❌ | **17** |
 | Ingest `structured`/`code` | ✅ matriz | ⚠️ passthrough | **18** |
 | CIR v1.1 (stage N1–N3) | — | ❌ | **19** (opcional) |
-| Docs/README al día | — | ⚠️ | **7** |
+| Docs/README al día | — | ✅ | **7** |
 
 ---
 
@@ -108,7 +108,7 @@ Resumen; detalle histórico en commits de cierre.
 
 ---
 
-### Fase 7 — Sincronización documental
+### Fase 7 — Sincronización documental ✅
 
 **Objetivo:** Una sola narrativa veraz en índices y tablas; cero «parcial» falso donde el código ya cumple.
 
@@ -338,8 +338,8 @@ Temas de [Context Optimization Engine (COE).md](Context%20Optimization%20Engine%
 | 4 | Harness madurez + casos reales | ✅ cerrada | b8de213 |
 | 5 | MCP COE | ✅ cerrada | bf9ddf2 |
 | 6 | CIR formal | ✅ cerrada | dd51755 |
-| 7 | Sincronización documental | ⏳ **activa** | — |
-| 8 | Harness contrato + corpus | ⏳ pendiente | — |
+| 7 | Sincronización documental | ✅ cerrada | — |
+| 8 | Harness contrato + corpus | ⏳ **activa** | — |
 | 9 | L0 v2 | ⏳ pendiente | — |
 | 10 | Presupuesto tokens COE | ⏳ pendiente | — |
 | 11 | Integración PCM+COE | ⏳ pendiente | — |
@@ -398,6 +398,7 @@ flowchart LR
 | 2026-07-05 | CIR v1.0 diseño | Opción A: solo grafo serializado; N1–N3 en Python; `document`/`chunk`; `action` arista |
 | 2026-07-05 | Fases 6–18 + Pista I | Cierre de deuda sin presión de fechas; Fase 6 activa; 19 opcional |
 | 2026-07-05 | Fase 6 CIR v1.0 | Envelope, schema, action aristas, document/chunk RAG |
+| 2026-07-05 | Fase 7 docs sync | README, vision, architecture §3/§9 alineados con fases 0–6 |
 
 ---
 

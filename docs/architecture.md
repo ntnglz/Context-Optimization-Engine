@@ -101,10 +101,10 @@ flowchart TB
 | **Gateway** | Punto de entrada unificado (librería, CLI, MCP, HTTP futuro) | Petición del cliente | Contexto optimizado + métricas | ✅ `optimize_context` (L0, N1, N2, N3, N4, N5) |
 | **Context Ingest** | Normalizar fuentes heterogéneas a un modelo común; Normalizer; opcional **L0** | Texto, chunks RAG, tool output, etc. | `ContextBundle` / `ContextBlock[]` | v1 · `ingest_context` · `src/coe/ingest/` |
 | **L0 (Language norm.)** | Detectar idioma; traducir a `target_lang` **antes de N1** si hace falta | `ContextBlock[]` | `ContextBlock[]` en idioma base | v1 [l0-ingest.md](l0-ingest.md) · `src/coe/ingest/` |
-| **Normalizer** | Sub-etapa de Ingest: segmentación (líneas, oraciones `zh`), respeto fences | Bloques crudos | Unidades normalizadas | Parcial · `level1/normalize.py` |
-| **Optimization Pipeline** | Aplicar niveles de optimización en cadena configurable | Unidades + metadatos | Estructura optimizada | N1 ✅ · N2 ✅ · N3 v1 · N4 v1 · N5 v1 |
-| **CIR** | Representación intermedia estable, optimizable y serializable | Salida de parser / pipeline | Árbol o grafo de contexto | Diseño (sin implementar) |
-| **Renderer** | Proyección **prosa** hacia LLM; ensamblaje final | Resultado del pipeline | String / messages[] | v1 · `renderer/assembly.py` |
+| **Normalizer** | Sub-etapa de Ingest: segmentación (líneas, oraciones `zh`), respeto fences | Bloques crudos | Unidades normalizadas | ✅ v1 · `ingest/normalizer.py` |
+| **Optimization Pipeline** | Aplicar niveles de optimización en cadena configurable | Unidades + metadatos | Estructura optimizada | N1–N5 ✅ |
+| **CIR** | Representación intermedia estable del grafo N4+ | Salida N4 / N5 | Envelope `cir_version` + `graph` | ✅ v1.0 · [cir-v1.md](cir-v1.md) · `src/coe/cir/` |
+| **Renderer** | Proyección **prosa** hacia LLM; ensamblaje final | Resultado del pipeline | String / messages[] | ✅ · `renderer/assembly.py` |
 | **Metrics** | Tokens, ratio, latencia, integridad semántica | Antes / después del pipeline | Informe de métricas | Gateway + harness |
 | **State Store** | Mantener estado semántico entre turnos (Nivel 5) | Diffs de contexto | Vista materializada | v1 filesystem JSON + in-memory · `src/coe/level5/` |
 
@@ -119,7 +119,7 @@ flowchart TB
 3. **L0** (opcional) detecta idioma y traduce a `target_lang` sobre prosa natural — ver [l0-ingest.md](l0-ingest.md), [i18n.md](i18n.md).
 4. **Normalizer** prepara unidades atómicas (sub-etapa Ingest) — ver [ingest.md](ingest.md).
 5. **Optimization Pipeline** ejecuta niveles habilitados en orden creciente de complejidad.
-6. En fases avanzadas, el pipeline lee/escribe **CIR** como artefacto central (fase D).
+6. El pipeline materializa y persiste **CIR v1.0** (grafo N4+) — ver [cir-v1.md](cir-v1.md).
 7. **Renderer** materializa **prosa** para el LLM — ver [renderer.md](renderer.md).
 8. **Metrics** compara entrada y salida y adjunta el informe al Gateway.
 
@@ -141,7 +141,7 @@ Gateway
   └── Metrics (observa todo el flujo)
 ```
 
-- **CIR** será el contrato interno (Fase 6, **Opción A**): solo el grafo N4+ se versiona y persiste; N1–N3 permanecen lowering en Python — ver [cir-v1-draft.md](cir-v1-draft.md). Hoy: `DeduplicationResult` → … → `ContextGraph`.
+- **CIR v1.0** (Fase 6 ✅): solo el grafo N4+ se versiona y persiste; N1–N3 permanecen lowering en Python — [cir-v1.md](cir-v1.md). Pipeline: `DeduplicationResult` → … → `ContextGraph` → envelope N5.
 - **Renderer** consume la salida del último nivel activo y produce **prosa** — [renderer.md](renderer.md).
 - **Metrics** no modifica datos; es transversal (observabilidad + benchmarks).
 - **State Store** solo interviene en Nivel 5; los niveles 1–4 son stateless sobre el bundle de entrada.
@@ -314,7 +314,7 @@ Los benchmarks vivirán en `data/` + `tests/` + `scripts/comprehension_benchmark
 ## 9. Roadmap de implementación
 
 > **Fuente única de verdad del orden de trabajo:** [execution-plan.md](execution-plan.md)  
-> Las fases A–F de abajo son **histórico**; el plan vigente usa Fases 0–6 con gates estrictos.
+> Las fases A–F de abajo son **histórico**; el plan vigente usa Fases 0–18 — ver [execution-plan.md](execution-plan.md).
 
 ### Estado por bloques (foto 2026-07-05)
 
@@ -337,8 +337,8 @@ Ver [execution-plan.md](execution-plan.md) para entregables, criterios de hecho 
 |------|--------|--------|
 | 0–5 | Núcleo v1 (Ingest → MCP) | ✅ |
 | 6 | CIR formal | ✅ |
-| 7 | Sincronización documental | ⏳ activa |
-| 8 | Harness contrato + corpus | ⏳ |
+| 7 | Sincronización documental | ✅ |
+| 8 | Harness contrato + corpus | ⏳ activa |
 | 9 | L0 v2 | ⏳ |
 | 10 | Presupuesto tokens COE | ⏳ |
 | 11 | Integración PCM+COE | ⏳ |
@@ -359,8 +359,8 @@ Ver [execution-plan.md](execution-plan.md) para entregables, criterios de hecho 
 | **A** ✅ | Ingest mínimo + N1 + Renderer + Metrics básicas | Prototipo deduplicación |
 | **B** ✅ | Gateway unificado (`optimize_context`) + tests de integración | API estable |
 | **C** ✅ | N2 factorización + ampliación de `ContextBlock` | Pipeline N1+N2 |
-| **D** | Esbozo CIR + refactor pipeline sobre CIR | Contrato interno |
-| **E** | MCP + benchmark RAG | Integración agentes |
+| **D** ✅ | Esbozo CIR + refactor pipeline sobre CIR | Contrato interno CIR v1.0 |
+| **E** ✅ | MCP + benchmark RAG | Integración agentes |
 | **F** ✅ | N3–N5 + State Store | Pipeline completo v1 |
 
 ---

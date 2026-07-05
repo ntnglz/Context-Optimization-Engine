@@ -1,7 +1,7 @@
 # Lagunas de especificación — checklist de cierre
 
 > Revisión crítica previa a dar por cerradas las specs N1–N5.  
-> Última actualización: tras auditoría documental pre-implementación.
+> Última actualización: 2026-07-05 (Fase 7 — sincronización documental).
 
 **Objetivo:** resolver decisiones **bloqueantes** antes de codificar Gateway, N2+ y benchmarks E2E.
 
@@ -122,7 +122,7 @@ Excepción v1: flag `include_pending_turn=true` si merge difiere de commit (work
 | 5 | Casos `dev_agent` + tier release Ollama | 4 ✅ |
 | 6 | MCP `optimize_context` / `estimate_savings` | 5 ✅ |
 | 7 | CIR v1.0 grafo + schema + envelope N5 | 6 ✅ |
-| 8 | README + architecture §9 + vision al día | 7 |
+| 8 | README + architecture §9 + vision al día | 7 ✅ |
 | 9 | `case.schema.json` + ≥4 casos nuevos | 8 |
 | 10 | L0 v2 (detección, `TranslationBackend`) | 9 |
 | 11 | `max_context_tokens` en Gateway | 10 |
