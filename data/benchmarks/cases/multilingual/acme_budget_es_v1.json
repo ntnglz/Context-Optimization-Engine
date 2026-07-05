@@ -1,0 +1,35 @@
+{
+  "id": "acme_budget_es_v1",
+  "version": 1,
+  "tags": ["multilingual", "single_turn", "es"],
+  "description": "ACME presupuesto — pregunta en español",
+
+  "blocks": [
+    {
+      "id": "A",
+      "source_type": "rag",
+      "content": "Empresa: ACME\nCliente: Globex\nJuan trabaja en ACME."
+    },
+    {
+      "id": "B",
+      "source_type": "rag",
+      "content": "Empresa: ACME\nPresupuesto: 50k\nJuan aprobó el presupuesto."
+    },
+    {
+      "id": "C",
+      "source_type": "rag",
+      "content": "Empresa: ACME\nCliente: Globex\nPedro trabaja en ACME."
+    }
+  ],
+
+  "question": "¿Quién aprobó el presupuesto de ACME?",
+  "expected_facts": ["Juan", "aprobó", "presupuesto"],
+  "response_lang": "es",
+  "user_message_lang": "es",
+  "system_addendum": "Responde en español. Sé claro para un usuario no técnico.",
+
+  "mock": {
+    "arm_a_response": "Juan aprobó el presupuesto de ACME.",
+    "arm_b_response": "Juan aprobó el presupuesto de ACME."
+  }
+}

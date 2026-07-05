@@ -14,6 +14,19 @@ class CaseBlock:
 
 
 @dataclass
+class SessionTurn:
+    blocks: list[CaseBlock]
+    question: str
+    expected_facts: list[str]
+
+
+@dataclass
+class BenchmarkSession:
+    session_id: str
+    turns: list[SessionTurn]
+
+
+@dataclass
 class MockFixture:
     arm_a_response: str
     arm_b_response: str
@@ -32,6 +45,7 @@ class BenchmarkCase:
     user_message_lang: str = "en"
     system_addendum: str = ""
     mock: MockFixture | None = None
+    session: BenchmarkSession | None = None
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> BenchmarkCase:
@@ -44,27 +58,73 @@ class BenchmarkCase:
             if mock_data
             else None
         )
-        blocks = [
-            CaseBlock(
-                id=str(b["id"]),
-                content=str(b["content"]),
-                source_type=str(b.get("source_type", "prose")),
-            )
-            for b in data["blocks"]
-        ]
+        session = _parse_session(data.get("session"))
+        blocks = _parse_blocks(data.get("blocks") or [])
+        question = str(data.get("question", ""))
+        expected_facts = [str(x) for x in data.get("expected_facts", [])]
+        if session:
+            if not question:
+                question = session.turns[-1].question
+            if not expected_facts:
+                expected_facts = list(session.turns[-1].expected_facts)
+            if not blocks:
+                blocks = []
+                for turn_idx, turn in enumerate(session.turns, start=1):
+                    for block in turn.blocks:
+                        blocks.append(
+                            CaseBlock(
+                                id=f"T{turn_idx}-{block.id}",
+                                content=block.content,
+                                source_type=block.source_type,
+                            )
+                        )
+        if not question:
+            raise ValueError(f"Case {data.get('id')} missing question")
         return cls(
             id=str(data["id"]),
             version=int(data.get("version", 1)),
             tags=list(data.get("tags", [])),
             description=str(data.get("description", "")),
             blocks=blocks,
-            question=str(data["question"]),
-            expected_facts=[str(x) for x in data.get("expected_facts", [])],
+            question=question,
+            expected_facts=expected_facts,
             response_lang=str(data.get("response_lang", "en")),
             user_message_lang=str(data.get("user_message_lang", "en")),
             system_addendum=str(data.get("system_addendum", "")),
             mock=mock,
+            session=session,
         )
+
+
+def _parse_blocks(raw: list[Any]) -> list[CaseBlock]:
+    return [
+        CaseBlock(
+            id=str(b["id"]),
+            content=str(b["content"]),
+            source_type=str(b.get("source_type", "prose")),
+        )
+        for b in raw
+    ]
+
+
+def _parse_session(raw: Any) -> BenchmarkSession | None:
+    if not raw:
+        return None
+    if not isinstance(raw, dict):
+        raise ValueError("session must be an object")
+    turns_raw = raw.get("turns") or []
+    if not turns_raw:
+        raise ValueError("session.turns must not be empty")
+    turns: list[SessionTurn] = []
+    for item in turns_raw:
+        turns.append(
+            SessionTurn(
+                blocks=_parse_blocks(item.get("blocks") or []),
+                question=str(item["question"]),
+                expected_facts=[str(x) for x in item.get("expected_facts", [])],
+            )
+        )
+    return BenchmarkSession(session_id=str(raw.get("session_id", "")), turns=turns)
 
 
 @dataclass

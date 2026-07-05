@@ -1,0 +1,48 @@
+{
+  "id": "acme_session_budget_v1",
+  "version": 1,
+  "tags": ["multi_turn", "n5"],
+  "description": "ACME session — budget follow-up across turns",
+
+  "response_lang": "en",
+  "user_message_lang": "en",
+  "system_addendum": "Answer in English. Be clear for a non-technical user.",
+
+  "session": {
+    "session_id": "bench-acme-session-1",
+    "turns": [
+      {
+        "blocks": [
+          {
+            "id": "A",
+            "source_type": "rag",
+            "content": "Empresa: ACME\nJuan works at ACME."
+          },
+          {
+            "id": "B",
+            "source_type": "rag",
+            "content": "Empresa: ACME\nPedro works at ACME."
+          }
+        ],
+        "question": "Who works at ACME?",
+        "expected_facts": ["Juan", "Pedro"]
+      },
+      {
+        "blocks": [
+          {
+            "id": "C",
+            "source_type": "rag",
+            "content": "Empresa: ACME\nPresupuesto: 50k\nJuan approved the budget."
+          }
+        ],
+        "question": "What is the ACME budget now?",
+        "expected_facts": ["50k", "budget"]
+      }
+    ]
+  },
+
+  "mock": {
+    "arm_a_response": "The ACME budget is 50k; Juan approved it.",
+    "arm_b_response": "The ACME budget is 50k; Juan approved it."
+  }
+}

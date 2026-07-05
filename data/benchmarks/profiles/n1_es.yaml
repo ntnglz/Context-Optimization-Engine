@@ -1,0 +1,18 @@
+id: n1_es
+description: N1 deduplication — Spanish locale pack
+levels: [1]
+target_lang: null
+locale: es
+l0: false
+options:
+  cite_sources: false
+gate:
+  t_coe_p95_ms: 80
+  comprehension_similarity: 0.90
+  comprehension_delta_min: -0.10
+  factual_recall: 0.95
+  user_language_match: 0.95
+  artifact_leak_rate_max: 0.02
+tier:
+  ci: false
+  release: true

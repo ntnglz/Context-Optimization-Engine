@@ -11,7 +11,8 @@ from .evaluators.base import default_evaluator_for_tier
 from .evaluators.factory import create_evaluator
 from .pipeline_runner import run_pipeline_on_case
 from .profile import load_profile_by_id
-from .report import build_report_metadata, evaluate_gate
+from .report import aggregate_reports, build_report_metadata, evaluate_gate
+from .tier_config import default_tags_for_tier
 from .schema import BenchmarkCase, BenchmarkReport, CaseMetrics, CaseResult, PipelineProfile
 from .scorers.artifacts import detect_artifact_leak
 from .scorers.embedding import DEFAULT_BACKEND, EmbeddingBackend, resolve_backend
@@ -224,18 +225,25 @@ def run_suite_from_ids(
     embedding_backend: EmbeddingBackend | None = None,
     evaluator: str | None = None,
     fail_fast: bool = False,
+    runs: int = 1,
 ) -> BenchmarkReport:
     root = benchmark_root or default_benchmark_root()
     profile = load_profile_by_id(root / "profiles", profile_id)
-    tag_filter = tags
-    if tier == "smoke" and tags is None:
-        tag_filter = {"core"}
-    return run_suite(
-        profile=profile,
-        cases_dir=root / "cases",
-        tier=tier,
-        tags=tag_filter,
-        evaluator=evaluator,
-        embedding_backend=embedding_backend or DEFAULT_BACKEND,
-        fail_fast=fail_fast,
-    )
+    tag_filter = tags if tags is not None else default_tags_for_tier(tier)
+    if runs < 1:
+        raise ValueError("runs must be >= 1")
+
+    reports: list[BenchmarkReport] = []
+    for _ in range(runs):
+        reports.append(
+            run_suite(
+                profile=profile,
+                cases_dir=root / "cases",
+                tier=tier,
+                tags=tag_filter,
+                evaluator=evaluator,
+                embedding_backend=embedding_backend or DEFAULT_BACKEND,
+                fail_fast=fail_fast,
+            )
+        )
+    return aggregate_reports(reports)

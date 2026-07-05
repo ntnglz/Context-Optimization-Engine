@@ -60,6 +60,12 @@ def main() -> int:
         action="store_true",
         help="Skip capa 2 LLM if capa 1 fails (latency/artifacts)",
     )
+    parser.add_argument(
+        "--runs",
+        type=int,
+        default=1,
+        help="Repeat suite N times and average summary (release tier)",
+    )
     args = parser.parse_args()
 
     root = args.benchmark_root or default_benchmark_root()
@@ -75,6 +81,7 @@ def main() -> int:
             embedding_backend=args.embedding_backend,
             evaluator=evaluator,
             fail_fast=args.fail_fast,
+            runs=args.runs,
         )
     except (ValueError, FileNotFoundError, ConnectionError) as exc:
         print(f"Error: {exc}", file=sys.stderr)

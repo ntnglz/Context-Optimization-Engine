@@ -46,6 +46,6 @@ def parse_evaluator_spec(spec: str) -> tuple[str, str | None]:
 
 
 def default_evaluator_for_tier(tier: str) -> str:
-    if tier in ("nightly", "release"):
-        return "ollama"
-    return "mock"
+    from ..tier_config import default_evaluator_for_tier_config
+
+    return default_evaluator_for_tier_config(tier)

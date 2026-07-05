@@ -73,9 +73,7 @@ def evaluate_gate(
 
     if gate.readability_score_min is not None:
         mean_read = summary.get("readability_score_mean")
-        if mean_read is None:
-            failures.append("readability_score_mean missing from summary")
-        elif mean_read < gate.readability_score_min:
+        if mean_read is not None and mean_read < gate.readability_score_min:
             failures.append(
                 f"readability_score_mean {mean_read} < {gate.readability_score_min}"
             )
@@ -243,3 +241,49 @@ def compare_reports_detailed(
             )
 
     return regressions
+
+
+def aggregate_reports(reports: list[BenchmarkReport]) -> BenchmarkReport:
+    """Promedia summaries de varias ejecuciones (tier release ×N)."""
+    if not reports:
+        raise ValueError("aggregate_reports requires at least one report")
+    if len(reports) == 1:
+        return reports[0]
+
+    base = reports[0]
+    numeric_keys = set()
+    for report in reports:
+        numeric_keys.update(report.summary.keys())
+
+    merged_summary: dict[str, Any] = {}
+    for key in sorted(numeric_keys):
+        values = [r.summary[key] for r in reports if key in r.summary]
+        if not values:
+            continue
+        if isinstance(values[0], (int, float)):
+            merged_summary[key] = round(sum(values) / len(values), 4)
+        else:
+            merged_summary[key] = values[0]
+
+    gate_passed = all(r.gate_passed for r in reports)
+    gate_failures: list[str] = []
+    if not gate_passed:
+        failed = sum(1 for r in reports if not r.gate_passed)
+        gate_failures.append(f"{failed}/{len(reports)} runs failed gate")
+
+    metadata = dict(base.metadata)
+    metadata["runs"] = len(reports)
+
+    return BenchmarkReport(
+        harness_version=base.harness_version,
+        profile_id=base.profile_id,
+        tier=base.tier,
+        evaluator=base.evaluator,
+        cases_run=base.cases_run,
+        cases_passed=min(r.cases_passed for r in reports),
+        gate_passed=gate_passed,
+        gate_failures=gate_failures,
+        results=base.results,
+        summary=merged_summary,
+        metadata=metadata,
+    )

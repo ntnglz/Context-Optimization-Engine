@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from .case_utils import effective_expected_facts, effective_question
 from .evaluators.base import LLMEvaluator
 from .evaluators.mock import mock_responses
 from .scorers.artifacts import detect_artifact_leak
@@ -53,8 +54,8 @@ def run_e2e_arms(
         arm_a = evaluator.complete(messages_a, temperature=0.0).text
         arm_b = evaluator.complete(messages_b, temperature=0.0).text
 
-    recall = factual_recall(arm_b, case.expected_facts)
-    f1 = factual_f1(arm_b, case.expected_facts)
+    recall = factual_recall(arm_b, effective_expected_facts(case))
+    f1 = factual_f1(arm_b, effective_expected_facts(case))
     if profile.gate.factual_recall is not None and recall < profile.gate.factual_recall:
         failures.append(f"factual_recall {recall:.2f} < {profile.gate.factual_recall}")
 

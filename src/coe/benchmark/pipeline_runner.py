@@ -8,7 +8,7 @@ from coe.gateway import OptimizeResult, optimize_context
 from coe.models import estimate_tokens
 from coe.renderer import render_raw_context
 
-from .arms import blocks_from_case
+from .case_utils import context_blocks
 from .schema import BenchmarkCase, PipelineProfile
 
 
@@ -21,26 +21,35 @@ class PipelineRunResult:
     optimize_result: OptimizeResult | None = None
 
 
+def _resolve_levels(profile: PipelineProfile) -> list[int]:
+    """N5 aún no implementado — perfiles con nivel 5 usan N1 sobre bloques aplanados."""
+    levels = list(profile.levels)
+    if not levels:
+        return [1]
+    if all(n == 1 for n in levels):
+        return [1]
+    if set(levels) <= {1, 5}:
+        return [1]
+    unsupported = [n for n in levels if n > 1]
+    raise NotImplementedError(
+        f"Benchmark profile levels {unsupported} not implemented (max ready: N1, N5 passthrough)"
+    )
+
+
 def run_pipeline_on_case(
     case: BenchmarkCase,
     profile: PipelineProfile,
 ) -> PipelineRunResult:
-    blocks = blocks_from_case(case)
+    blocks = context_blocks(case)
     original_text = render_raw_context(blocks)
     original_tokens = estimate_tokens(original_text)
 
     if profile.l0:
         raise NotImplementedError("L0 not implemented in benchmark pipeline yet")
 
-    unsupported = [n for n in profile.levels if n > 1]
-    if unsupported:
-        raise NotImplementedError(
-            f"Benchmark profile levels {unsupported} not implemented (max ready: N1)"
-        )
-
     result = optimize_context(
         blocks,
-        levels=profile.levels,
+        levels=_resolve_levels(profile),
         locale=profile.locale or "en",
         target_lang=profile.target_lang,
         l0=profile.l0,
