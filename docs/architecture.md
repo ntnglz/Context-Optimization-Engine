@@ -98,15 +98,15 @@ flowchart TB
 
 | Pieza | Responsabilidad | Entrada | Salida | Estado |
 |-------|-----------------|---------|--------|--------|
-| **Gateway** | Punto de entrada unificado (librería, CLI, MCP, HTTP futuro) | Petición del cliente | Contexto optimizado + métricas | Parcial (`run.py`) |
-| **Context Ingest** | Normalizar fuentes heterogéneas a un modelo común; Normalizer; opcional **L0** | Texto, chunks RAG, tool output, etc. | `ContextBundle` / `ContextBlock[]` | Spec ✅ [ingest.md](ingest.md) |
-| **L0 (Language norm.)** | Detectar idioma; traducir a `target_lang` **antes de N1** si hace falta | `ContextBlock[]` | `ContextBlock[]` en idioma base | Spec: [l0-ingest.md](l0-ingest.md) |
-| **Normalizer** | Sub-etapa de Ingest: segmentación (líneas, oraciones `zh`), respeto fences | Bloques crudos | Unidades normalizadas | Spec ✅ [ingest.md](ingest.md) |
-| **Optimization Pipeline** | Aplicar niveles de optimización en cadena configurable | Unidades + metadatos | Estructura optimizada | N1 ✅, N2–N5 planificado |
+| **Gateway** | Punto de entrada unificado (librería, CLI, MCP, HTTP futuro) | Petición del cliente | Contexto optimizado + métricas | ✅ `optimize_context` (L0, N1, N2, N5) |
+| **Context Ingest** | Normalizar fuentes heterogéneas a un modelo común; Normalizer; opcional **L0** | Texto, chunks RAG, tool output, etc. | `ContextBundle` / `ContextBlock[]` | Parcial · spec [ingest.md](ingest.md) |
+| **L0 (Language norm.)** | Detectar idioma; traducir a `target_lang` **antes de N1** si hace falta | `ContextBlock[]` | `ContextBlock[]` en idioma base | v1 [l0-ingest.md](l0-ingest.md) · `src/coe/ingest/` |
+| **Normalizer** | Sub-etapa de Ingest: segmentación (líneas, oraciones `zh`), respeto fences | Bloques crudos | Unidades normalizadas | Parcial · `level1/normalize.py` |
+| **Optimization Pipeline** | Aplicar niveles de optimización en cadena configurable | Unidades + metadatos | Estructura optimizada | N1 ✅ · N2 ✅ · N3–N4 pend. · N5 v1 |
 | **CIR** | Representación intermedia estable, optimizable y serializable | Salida de parser / pipeline | Árbol o grafo de contexto | Diseño (sin implementar) |
-| **Renderer** | Proyección **prosa** hacia LLM; ensamblaje final | Resultado del pipeline | String / messages[] | Spec ✅ [renderer.md](renderer.md) · parcial N1 |
-| **Metrics** | Tokens, ratio, latencia, integridad semántica | Antes / después del pipeline | Informe de métricas | Parcial (estimación tokens) |
-| **State Store** | Mantener estado semántico entre turnos (Nivel 5) | Diffs de contexto | Vista materializada | Futuro |
+| **Renderer** | Proyección **prosa** hacia LLM; ensamblaje final | Resultado del pipeline | String / messages[] | N1/N2 `render_prose` · spec [renderer.md](renderer.md) |
+| **Metrics** | Tokens, ratio, latencia, integridad semántica | Antes / después del pipeline | Informe de métricas | Gateway + harness |
+| **State Store** | Mantener estado semántico entre turnos (Nivel 5) | Diffs de contexto | Vista materializada | v1 in-memory · `src/coe/level5/` |
 
 ---
 
@@ -177,10 +177,10 @@ flowchart LR
 | Nivel | Transformación | Tipo | Implementación COE |
 |-------|------------------|------|-------------------|
 | **1** | Extraer duplicados exactos inter-bloque | Determinista | `src/coe/level1/` ✅ |
-| **2** | Agrupar hechos bajo entidades (`Juan → acciones`) | Heurística + locale pack | Spec ✅ [level2.md](level2.md) |
-| **3** | Natural → estructura compacta + `render_prose()` | Parser / plantillas + proyección LN | Spec ✅ [level3.md](level3.md) |
-| **4** | Grafo del bundle + `render_prose()` | Topológico; cero pérdida vs N3 | Spec ✅ [level4.md](level4.md) |
-| **5** | Estado semántico + diff (modelo Git) | Store persistente | Spec ✅ [level5.md](level5.md) |
+| **2** | Agrupar hechos bajo entidades (`Juan → acciones`) | Heurística + locale pack | `src/coe/level2/` ✅ v1 |
+| **3** | Natural → estructura compacta + `render_prose()` | Parser / plantillas + proyección LN | Pendiente · [level3.md](level3.md) |
+| **4** | Grafo del bundle + `render_prose()` | Topológico; cero pérdida vs N3 | Pendiente · [level4.md](level4.md) |
+| **5** | Estado semántico + diff (modelo Git) | Store persistente | `src/coe/level5/` v1 · [level5.md](level5.md) |
 
 **Regla de composición:** cada nivel asume que el anterior ya eliminó la redundancia obvia de su capa. Se pueden activar subconjuntos (p. ej. solo N1, o N1+N2).
 

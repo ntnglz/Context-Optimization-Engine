@@ -3,7 +3,7 @@
 > Harness previsto: `scripts/comprehension_benchmark.py` · datos: `data/comprehension_cases.json`  
 > Índice pipeline: [levels.md](levels.md) · métricas transversales: [architecture.md](architecture.md) §8
 
-**Estado:** ✅ Spec aprobada · harness sin implementar
+**Estado:** ✅ Spec aprobada · **harness implementado** (`scripts/benchmark/`, `src/coe/benchmark/`)
 
 COE debe demostrar dos cosas distintas antes de producción:
 

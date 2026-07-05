@@ -24,10 +24,16 @@ jobs:
         run: |
           python scripts/benchmark/run.py --tier nightly --profile n1 --evaluator mock
 
-      - name: Multilingual subset smoke
+      - name: Multilingual subset (n1_es)
         run: |
           python scripts/benchmark/run.py --tier nightly --profile n1_es \
             --tags multilingual --evaluator mock
+
+      - name: Multi-turn N5 session (mock)
+        run: |
+          python scripts/benchmark/run.py --tier smoke --profile n5_session \
+            --tags multi_turn --evaluator mock \
+            --compare-baseline data/benchmarks/baselines/n5_session_smoke.json
 
   nightly-ollama:
     runs-on: ubuntu-latest

@@ -3,7 +3,7 @@
 > KPIs y umbrales: [benchmarks.md](benchmarks.md) · Pipeline COE: [levels.md](levels.md) · Render: [renderer.md](renderer.md)  
 > Hermano conceptual: PCM `e2e_benchmark` (instrucción); COE mide **contexto**.
 
-**Estado:** H1–H4 implementados · H5 (multi-turn, multilingual, nightly workflow) implementado
+**Estado:** H1–H5 implementados · CI smoke en 5 perfiles (mock, compare baseline)
 
 El harness no es un script auxiliar: es el **sistema de calidad** que validará cada nivel (N2→N5), cada cambio de locale pack y cada perfil de despliegue. Debe ser **rápido en CI**, **reproducible**, **barato** en volumen y **estricto** en pre-release.
 
@@ -362,6 +362,9 @@ Baselines canónicos en `data/benchmarks/baselines/` — se actualizan **solo** 
 data/benchmarks/baselines/
 ├── n1_smoke.json
 ├── n1_n2_en_smoke.json
+├── n1_n2_es_smoke.json
+├── l0_n1_en_smoke.json
+├── n5_session_smoke.json
 └── README.md              # cuándo y cómo refrescar
 ```
 
@@ -371,19 +374,29 @@ data/benchmarks/baselines/
 
 | Tier | Capas | Casos | Evaluador | Cuándo |
 |------|-------|-------|-----------|--------|
-| **`smoke`** | 0 + 1 + 2 mock | `tags=core` (~5) | **mock** | PR |
-| **`ci`** | 0 + 1 + 2 mock | `tags=core` (~12) | **mock** | push a `main` |
+| **`smoke`** | 0 + 1 + 2 mock | `core` + perfiles con `--tags` | **mock** | PR / `main` |
+| **`ci`** | 0 + 1 + 2 mock | `tags=core` (~12) | **mock** | alias de smoke ampliado |
 | **`nightly`** | 1 + 2 | all `single_turn` | **ollama** | cron |
 | **`release`** | 1 + 2 ×3 runs | all + multilingual + multi_turn | **ollama** | tag / manual |
 
 **Decisión CI:** PR y `main` **no** llaman a Ollama en capa 2 — solo fixtures `mock`. La validación semántica **real** (respuestas LLM + juez redacción) ocurre en **nightly** y **release**.
 
 ```bash
-# PR — sin LLM real, segundos
-python scripts/benchmark/run.py --tier smoke --profile n1_n2_en
+# PR — pytest + 5 perfiles smoke con compare (sin Ollama)
+python -m pytest tests/ -q
+python scripts/benchmark/run.py --tier smoke --profile n1 \
+  --compare-baseline data/benchmarks/baselines/n1_smoke.json
+python scripts/benchmark/run.py --tier smoke --profile n1_n2_en \
+  --compare-baseline data/benchmarks/baselines/n1_n2_en_smoke.json
+python scripts/benchmark/run.py --tier smoke --profile n1_n2_es --tags multilingual \
+  --compare-baseline data/benchmarks/baselines/n1_n2_es_smoke.json
+python scripts/benchmark/run.py --tier smoke --profile l0_n1_en --tags multilingual \
+  --compare-baseline data/benchmarks/baselines/l0_n1_en_smoke.json
+python scripts/benchmark/run.py --tier smoke --profile n5_session --tags multi_turn \
+  --compare-baseline data/benchmarks/baselines/n5_session_smoke.json
 
-# Pre-release — coste real
-python scripts/benchmark/run.py --tier release --profile l0_n1_n4_en \
+# Pre-release — coste real (Ollama)
+python scripts/benchmark/run.py --tier release --profile n1 \
   --evaluator ollama:qwen3:8b --runs 3
 ```
 

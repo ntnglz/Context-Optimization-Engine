@@ -8,25 +8,23 @@ Contexto bruto (N bloques)  →  COE  →  Representación compacta  →  LLM
 
 ## Estado
 
-| Componente | Estado |
-|------------|--------|
-| [Visión fundacional](docs/Context%20Optimization%20Engine%20(COE).md) | ✅ |
-| [Índice docs](docs/vision.md) | ✅ |
-| [Diseño global](docs/architecture.md) | ✅ |
-| [Pipeline N1–N5](docs/levels.md) | ✅ Specs aprobadas · implementación pendiente |
-| [Multilingüe (i18n)](docs/i18n.md) | ✅ Aprobado |
-| [L0 Ingest](docs/l0-ingest.md) | ✅ Aprobado · sin implementar |
-| [Context Ingest](docs/ingest.md) | ✅ Spec cerrada |
-| [Renderer](docs/renderer.md) | ✅ Spec cerrada |
-| [Benchmarks y KPIs](docs/benchmarks.md) | ✅ Aprobado |
-| [Harness de benchmarks](docs/benchmark-harness.md) | ✅ Diseño |
-| [Cierre spec](docs/spec-gaps.md) | ✅ Checklist |
-| [Nivel 1 — spec](docs/level1.md) | ✅ Aprobado |
-| [Nivel 2 — spec](docs/level2.md) | ✅ Aprobado |
-| Nivel 1 — implementación | ✅ Prototipo |
-| [Nivel 3 — spec](docs/level3.md) | ✅ Aprobado |
-| [Nivel 4 — spec](docs/level4.md) | ✅ Aprobado |
-| [Nivel 5 — spec](docs/level5.md) | ✅ Aprobado |
+| Componente | Spec | Implementación |
+|------------|------|----------------|
+| [Visión fundacional](docs/Context%20Optimization%20Engine%20(COE).md) | ✅ | — |
+| [Diseño global](docs/architecture.md) | ✅ | Parcial |
+| [Pipeline L0 → N1–N5](docs/levels.md) | ✅ | L0 v1 · N1 · N2 · N5 v1 · N3/N4 pendientes |
+| [Multilingüe (i18n)](docs/i18n.md) | ✅ | Locale packs N2 EN/ES en código |
+| [L0 Ingest](docs/l0-ingest.md) | ✅ | v1 (heurística + ES→EN) |
+| [Context Ingest](docs/ingest.md) | ✅ | Parcial (`ContextBlock` + L0) |
+| [Renderer](docs/renderer.md) | ✅ | N1/N2 `render_prose` |
+| [Benchmarks y KPIs](docs/benchmarks.md) | ✅ | — |
+| [Harness de benchmarks](docs/benchmark-harness.md) | ✅ | ✅ H1–H5 · CI smoke (5 perfiles) |
+| [Nivel 1](docs/level1.md) | ✅ | ✅ |
+| [Nivel 2](docs/level2.md) | ✅ | ✅ v1 (EN/ES) |
+| [Nivel 3](docs/level3.md) | ✅ | Pendiente |
+| [Nivel 4](docs/level4.md) | ✅ | Pendiente |
+| [Nivel 5](docs/level5.md) | ✅ | v1 (`StateView`, store in-memory) |
+| **Gateway** (`optimize_context`) | — | L0 + N1 + N2 + N5 |
 
 ## Inicio rápido
 
@@ -42,6 +40,35 @@ python run.py --demo
 
 # Tests
 python run.py --test
+
+# Benchmark smoke (mock, compare baselines)
+python scripts/benchmark/run.py --tier smoke --profile n1_n2_en \
+  --compare-baseline data/benchmarks/baselines/n1_n2_en_smoke.json
+```
+
+## Gateway (pipeline composable)
+
+```python
+from coe import optimize_context
+from coe.models import ContextBlock
+
+blocks = [
+    ContextBlock(id="A", content="Juan works at ACME."),
+    ContextBlock(id="B", content="Juan approved the budget."),
+]
+
+# N1 + N2 factorización (EN)
+out = optimize_context(blocks, levels=[1, 2], locale="en")
+print(out.text)
+
+# L0 ES→EN + N1
+out = optimize_context(
+    blocks,
+    levels=[1],
+    locale="en",
+    target_lang="en",
+    l0=True,
+)
 ```
 
 ## Nivel 1 — Deduplicación
@@ -93,15 +120,19 @@ Context-Optimization-Engine/
 │   ├── renderer.md         # Prosa hacia LLM
 │   ├── level1.md … level5.md
 ├── src/coe/
-│   ├── models.py             # ContextBlock, DeduplicationResult
-│   └── level1/
-│       ├── deduplicator.py   # Nivel 1: eliminación de redundancias
-│       └── render.py         # Serialización legible para LLM
+│   ├── gateway.py            # optimize_context — L0, N1, N2, N5
+│   ├── models.py             # ContextBlock, resultados por nivel
+│   ├── ingest/               # L0 normalize_language
+│   ├── level1/               # Deduplicación
+│   ├── level2/               # Factorización (locale EN/ES)
+│   ├── level5/               # StateView, sesión multi-turno
+│   ├── renderer/             # Plantillas prosa N1
+│   └── benchmark/            # Harness H1–H5
+├── scripts/benchmark/        # run.py, compare.py
 ├── data/
-│   ├── examples/           # Demo N1 (ACME)
-│   └── benchmarks/         # Casos, perfiles, runs (ver README ahí)
-├── tests/
-│   └── test_level1.py
+│   ├── examples/             # Demo N1 (ACME)
+│   └── benchmarks/           # Casos, perfiles, baselines, runs
+├── tests/                    # pytest (~82 tests)
 └── run.py
 ```
 

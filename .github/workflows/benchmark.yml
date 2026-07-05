@@ -33,3 +33,21 @@ jobs:
         run: |
           python scripts/benchmark/run.py --tier smoke --profile n1_n2_en \
             --compare-baseline data/benchmarks/baselines/n1_n2_en_smoke.json
+
+      - name: Benchmark smoke n1_n2_es (multilingual) + baseline compare
+        run: |
+          python scripts/benchmark/run.py --tier smoke --profile n1_n2_es \
+            --tags multilingual \
+            --compare-baseline data/benchmarks/baselines/n1_n2_es_smoke.json
+
+      - name: Benchmark smoke l0_n1_en (multilingual) + baseline compare
+        run: |
+          python scripts/benchmark/run.py --tier smoke --profile l0_n1_en \
+            --tags multilingual \
+            --compare-baseline data/benchmarks/baselines/l0_n1_en_smoke.json
+
+      - name: Benchmark smoke n5_session (multi_turn) + baseline compare
+        run: |
+          python scripts/benchmark/run.py --tier smoke --profile n5_session \
+            --tags multi_turn \
+            --compare-baseline data/benchmarks/baselines/n5_session_smoke.json

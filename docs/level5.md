@@ -3,7 +3,7 @@
 > Definición conceptual: [documento fundacional](Context%20Optimization%20Engine%20(COE).md#nivel-5--estado-semántico).  
 > Nivel anterior: [level4.md](level4.md) · Índice: [levels.md](levels.md)
 
-**Estado:** ✅ Spec aprobada · sin implementar
+**Estado:** ✅ Spec aprobada · **v1 implementado** (`src/coe/level5/` · sin grafo N4)
 
 ## Alineación con la visión fundacional
 

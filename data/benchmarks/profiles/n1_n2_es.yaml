@@ -16,5 +16,5 @@ gate:
   artifact_leak_rate_max: 0.02
   user_language_match: 0.95
 tier:
-  ci: false
+  ci: true
   release: true

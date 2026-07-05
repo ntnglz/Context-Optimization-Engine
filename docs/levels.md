@@ -11,22 +11,22 @@ COE aplica **transformaciones composables** sobre el contexto. **L0** (Ingest) p
 | Documento | Contenido | Estado |
 |-----------|-----------|--------|
 | [i18n.md](i18n.md) | Principios multilingües, locale packs | ✅ Aprobado |
-| [l0-ingest.md](l0-ingest.md) | Normalización de idioma (Ingest) | ✅ Aprobado · sin implementar |
-| [benchmarks.md](benchmarks.md) | KPIs comprensión, redacción, latencia COE | ✅ Aprobado · harness pendiente |
-| [benchmark-harness.md](benchmark-harness.md) | Diseño harness (capas, CI, schema) | ✅ Diseño cerrado |
+| [l0-ingest.md](l0-ingest.md) | Normalización de idioma (Ingest) | ✅ Aprobado · **v1 implementado** |
+| [benchmarks.md](benchmarks.md) | KPIs comprensión, redacción, latencia COE | ✅ Aprobado · **harness implementado** |
+| [benchmark-harness.md](benchmark-harness.md) | Diseño harness (capas, CI, schema) | ✅ Implementado (H1–H5) |
 | [spec-gaps.md](spec-gaps.md) | Checklist cierre pre-implementación | ✅ Cerrado |
 | [ingest.md](ingest.md) | Context Ingest + Normalizer | ✅ Cerrado |
 | [renderer.md](renderer.md) | Prosa obligatoria hacia LLM | ✅ Cerrado |
 
 ## Specs operativas N1–N5
 
-| Nivel | Nombre | Spec | Estado |
-|-------|--------|------|--------|
-| **1** | Eliminación de redundancias | [level1.md](level1.md) | ✅ Aprobado · implementado |
-| **2** | Factorización | [level2.md](level2.md) | ✅ Aprobado · sin implementar |
-| **3** | Representación estructurada | [level3.md](level3.md) | ✅ Aprobado · sin implementar |
-| **4** | Grafo de conocimiento | [level4.md](level4.md) | ✅ Aprobado · sin implementar |
-| **5** | Estado semántico | [level5.md](level5.md) | ✅ Aprobado · sin implementar |
+| Nivel | Nombre | Spec | Implementación |
+|-------|--------|------|----------------|
+| **1** | Eliminación de redundancias | [level1.md](level1.md) | ✅ Completo |
+| **2** | Factorización | [level2.md](level2.md) | ✅ v1 (locale EN/ES) |
+| **3** | Representación estructurada | [level3.md](level3.md) | Pendiente |
+| **4** | Grafo de conocimiento | [level4.md](level4.md) | Pendiente |
+| **5** | Estado semántico | [level5.md](level5.md) | v1 (`StateView`, store in-memory) |
 
 ## Pipeline
 

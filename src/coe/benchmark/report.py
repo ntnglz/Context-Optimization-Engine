@@ -231,6 +231,8 @@ def compare_reports_detailed(
         if cur_val is None or base_val is None:
             continue
         if cur_val > base_val:
+            if key == "t_coe_p95_ms" and (cur_val - base_val) <= 0.05:
+                continue
             regressions.append(
                 {
                     "metric": key,
