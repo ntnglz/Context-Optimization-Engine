@@ -356,7 +356,7 @@ Temas de [Context Optimization Engine (COE).md](Context%20Optimization%20Engine%
 | 11 | Integración PCM+COE | ✅ cerrada | 594f63b |
 | 12 | HTTP API | ✅ cerrada | b191a62 |
 | 13 | Model Adapter | ✅ cerrada | 8b84bb5 |
-| 14 | N5 operaciones (TTL) | ✅ cerrada | — |
+| 14 | N5 operaciones (TTL) | ✅ cerrada | 76c3683 |
 | 15 | Entity linking fuzzy | ⏳ **activa** | — |
 | 16 | Store distribuido | ⏳ pendiente | — |
 | 17 | Locale `zh` | ⏳ pendiente | — |
