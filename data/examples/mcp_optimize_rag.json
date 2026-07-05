@@ -1,0 +1,10 @@
+{
+  "description": "MCP optimize_context — RAG ACME, levels 1+2",
+  "blocks": [
+    {"id": "A", "source_type": "rag", "content": "Company: ACME\nJuan works at ACME."},
+    {"id": "B", "source_type": "rag", "content": "Company: ACME\nBudget: 50k\nJuan approved the budget."},
+    {"id": "C", "source_type": "rag", "content": "Company: ACME\nPedro works at ACME."}
+  ],
+  "levels": [1, 2],
+  "locale": "en"
+}

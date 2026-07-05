@@ -1,0 +1,8 @@
+{
+  "description": "source_type code — dedup por firma de línea, L0 desactivado",
+  "blocks": [
+    {"id": "A", "source_type": "code", "content": "x = 1\ny = 2"},
+    {"id": "B", "source_type": "code", "content": "x=1  # duplicate\nz = 3"}
+  ],
+  "levels": [1]
+}

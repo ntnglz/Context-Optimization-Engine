@@ -12,7 +12,7 @@ En [Prompt-Compression-Middleware](https://github.com/ntnglz/Prompt-Compression-
 
 ## Producto v1 — cerrado (2026-07-05)
 
-**Plan de ejecución:** [execution-plan.md](execution-plan.md) · **Fases 0–18 ✅** · **Fase 19 🚫 omitida**
+**Plan de ejecución:** [execution-plan.md](execution-plan.md) · **Fases 0–18 ✅** · **Fase 20 ✅** · **Fase 19 🚫 omitida**
 
 | Área | Estado | Notas |
 |------|--------|-------|
@@ -28,6 +28,7 @@ En [Prompt-Compression-Middleware](https://github.com/ntnglz/Prompt-Compression-
 | Integración PCM+COE | ✅ | Presupuesto ventana conjunto |
 | Model Adapter | ✅ | `target_model`: default / mistral / openai |
 | Harness smoke + tier release | ✅ | 234 tests · 10 perfiles CI |
+| Docs visitante e integrador | ✅ | Fase 20 — README, getting-started, FAQ, STATUS |
 | CIR v1.1 (stages N1–N3) | 🚫 | Sin demanda concreta — ver Fase 19 |
 
 **Gate habitual:** `python run.py --ci`
@@ -66,10 +67,9 @@ PCM y COE son complementarios (repos independientes). Integración runtime: [exe
 
 | Vía | Contenido |
 |-----|-----------|
-| **Fase 20** | README, getting-started, FAQ, STATUS, ejemplos — [execution-plan.md](execution-plan.md) |
-| **Pista I** | ML, CIR→LLM, parser semántico — solo con benchmark A/B favorable ([execution-plan.md](execution-plan.md)) |
-| **Enmienda al plan** | Nuevo trabajo producto requiere fila en execution-plan + aprobación |
-| **Despliegue / adopción** | HTTP, MCP, stores SQLite en producción |
+| **[getting-started.md](getting-started.md)** | Integrar COE (Python, MCP, HTTP) |
+| **Pista I** | ML, CIR→LLM — benchmark A/B favorable |
+| **Enmienda al plan** | Nuevo trabajo producto |
 
 ---
 
@@ -79,7 +79,10 @@ PCM y COE son complementarios (repos independientes). Integración runtime: [exe
 |-----------|-----------|
 | [Context Optimization Engine (COE).md](Context%20Optimization%20Engine%20(COE).md) | Visión fundacional (canónica) |
 | [architecture.md](architecture.md) | Diseño global: piezas, relaciones, roadmap §9 |
-| [execution-plan.md](execution-plan.md) | Plan de ejecución (fases 0–18 cerradas) |
+| [execution-plan.md](execution-plan.md) | Plan de ejecución (fases 0–20 cerradas) |
+| [getting-started.md](getting-started.md) | Guía integrador (visitante) |
+| [FAQ.md](FAQ.md) | Preguntas frecuentes adopción |
+| [STATUS.md](STATUS.md) | Tabla spec/implementación (maintainers) |
 | [cir-v1.md](cir-v1.md) | CIR v1.0 congelado — grafo N4+, envelope N5 |
 | [i18n.md](i18n.md) | Multilingüe: `target_lang`, locale packs |
 | [l0-ingest.md](l0-ingest.md) | Spec L0 — normalización de idioma |

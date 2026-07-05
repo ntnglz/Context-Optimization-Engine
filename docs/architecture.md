@@ -225,57 +225,51 @@ Specs operativas: [levels.md](levels.md) · [level1.md](level1.md) ✅ · [level
 
 ---
 
-## 6. Modelo de datos (visión)
+## 6. Modelo de datos
 
-Evolución prevista del modelo interno:
+Implementado en `src/coe/models.py`, `ingest/types.py` y resultados del Gateway:
 
 ```
-ContextBundle
-├── blocks: ContextBlock[]
-│     ├── id: str
-│     ├── source_type: rag | history | tool | code | memory
-│     ├── content: str
-│     ├── detected_lang: str | None    # post-L0
-│     └── metadata: dict
-├── target_lang: str | None            # L0: en, zh, …
-├── locale: str | None                 # locale pack N2+ (en, zh, …)
-├── query_context: str | None
-└── options: OptimizeOptions
+ContextBundle / ContextBlock[]
+├── id, content, source_type
+├── detected_lang, metadata (preserve_lang, source_uri, …)
+├── target_lang, locale, query_context, session_id
+└── options: IngestOptions (max_context_tokens, cite_sources, …)
 
 OptimizeResult
-├── optimized_text: str
-├── cir: CIR | None                # cuando exista
-├── shared_facts: SharedFact[]     # N1
-├── metrics: OptimizationMetrics
-└── trace: LevelTrace[]            # depuración por nivel
+├── text                    # prosa hacia el LLM
+├── metrics                 # tokens, latencia, truncated, …
+├── trace                   # LevelTrace[] por nivel
+├── deduplication, factorization, structured, graph  # según levels
+└── ingest_trace            # si L0 activo
 ```
 
-Hoy solo existen `ContextBlock`, `SharedFact` y `DeduplicationResult` (`src/coe/models.py`). El resto se introducirá al integrar Gateway + CIR.
+CIR v1.0: grafo serializado en N5 (`SemanticState.graph` + envelope). Detalle: [cir-v1.md](cir-v1.md).
+
+Guía de integración sin entrar en niveles: [getting-started.md](getting-started.md).
 
 ---
 
 ## 7. Interfaces previstas
 
-### 7.1 Librería (actual y objetivo)
+### 7.1 Librería
 
 ```python
-# Hoy
-from coe.level1 import deduplicate_context
-
-# Objetivo
-from coe import optimize_context
+from coe import optimize_context, ingest_context
+from coe.models import ContextBlock
 
 result = optimize_context(
-    blocks=[...],
-    target_lang="en",      # L0: normalizar idioma antes de N1
-    locale="en",           # patrones N2+ (locale pack)
+    blocks=[ContextBlock(id="A", content="...", source_type="rag")],
+    target_lang="en",
+    locale="en",
     levels=[1, 2],
     target_model="mistral-large",
 )
-result.text          # para el LLM
-result.metrics       # ahorro, latencia
-result.to_json()     # pipelines / logs
+result.text       # prosa para el LLM
+result.metrics    # tokens, latencia
 ```
+
+Tutorial: [getting-started.md](getting-started.md). Configuración MCP/HTTP en §7.2–7.3 (enlaces, no duplicar aquí).
 
 ### 7.2 Servicios (MCP)
 
@@ -286,6 +280,8 @@ result.to_json()     # pipelines / logs
 | **HTTP** | `POST /optimize`, `POST /estimate`, `GET /health` | ✅ `scripts/http/run_server.py` |
 
 #### MCP COE (stdio)
+
+Ver [getting-started.md § MCP](getting-started.md#mcp-cursor-claude-desktop) para configuración Cursor y payload de ejemplo.
 
 Servidor en `src/coe/mcp/`; arranque:
 
@@ -327,6 +323,8 @@ Configuración Cursor (`.cursor/mcp.json` o ajustes MCP):
 Dependencia: `pip install -r requirements-mcp.txt` (incluye `mcp`).
 
 ### 7.3 HTTP API
+
+Ver [getting-started.md § HTTP](getting-started.md#http-api) para `curl` y ejemplos en `data/examples/`.
 
 Servidor en `src/coe/http/`; arranque:
 
@@ -424,7 +422,7 @@ Ver [execution-plan.md](execution-plan.md) para entregables, criterios de hecho 
 | 17 | Locale `zh` | ✅ |
 | 18 | Ingest structured/code | ✅ |
 | 19 | CIR v1.1 Opción B | 🚫 omitida |
-| 20 | Docs visitante e integrador | ⏳ **activa** |
+| 20 | Docs visitante e integrador | ✅ |
 | I | Investigación (ML, CIR→LLM) | sin fase |
 
 ### Histórico (fases A–F originales)

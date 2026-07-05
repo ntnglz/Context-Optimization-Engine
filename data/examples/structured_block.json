@@ -1,0 +1,11 @@
+{
+  "description": "source_type structured — JSON aplanado en ingest",
+  "blocks": [
+    {
+      "id": "metrics",
+      "source_type": "structured",
+      "content": "{\"service\": \"api\", \"status\": \"ok\", \"latency_ms\": 42}"
+    }
+  ],
+  "levels": [1]
+}

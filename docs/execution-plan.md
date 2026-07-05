@@ -26,7 +26,7 @@ Orden de las fases 6–18 según **dependencias técnicas** y **cierre de deuda*
 6. **Investigación explícita** — hipótesis no validadas (ML, CIR hacia LLM) fuera del producto v1; pista I al final.
 7. **Adopción tras v1** — documentación de visitante/integrador (Fase 20) antes de nuevas features o Pista I.
 
-**Producto v1 cerrado (fases 0–18 ✅).** CIR v1.1 (Fase 19) **omitida**. **Fase activa:** **20 — Docs visitante e integrador**.
+**Producto v1 cerrado (fases 0–18 ✅).** Documentación visitante (Fase 20) ✅. Fase 19 omitida.
 
 **Deuda cerrada (fases 0–18):** núcleo L0→N5, CIR v1.0, harness, MCP, HTTP, PCM+COE, Model Adapter, N5 operaciones, fuzzy linking, SQLite store, locale `zh`, ingest structured/code/glossary.
 
@@ -58,14 +58,14 @@ Orden de las fases 6–18 según **dependencias técnicas** y **cierre de deuda*
 | Locale `zh` | ✅ | ✅ | **17** |
 | Ingest structured/code/glossary | ✅ | ✅ | **18** |
 | CIR v1.1 (stage N1–N3) | — | 🚫 omitida | **19** |
-| Docs visitante / integrador | ⏳ | ⏳ | **20** ⏳ **activa** |
+| Docs visitante / integrador | ✅ | ✅ | **20** |
 | Docs/README al día (specs) | ✅ | ✅ | **7** |
 
 ---
 
 ## Reglas de ejecución estricta
 
-1. **Fase activa: 20 (docs visitante).** Producto v1 (fases 0–18) cerrado. Nuevo trabajo producto o Pista I → enmienda + fila en progreso.
+1. **Plan producto v1 + docs visitante cerrados.** Nuevo trabajo → enmienda + fila en progreso o Pista I.
 2. **Sin saltos** (durante el plan 0–18; histórico).
 3. **Cierre de fase** = todos los entregables ✅ + CI PASS + fila actualizada a `✅` + commit con `CI: PASS antes de push`.
 4. **Enmiendas.** Si hace falta desviarse, primero se edita este archivo (sección «Enmiendas») y el usuario aprueba.
@@ -324,7 +324,7 @@ Resumen; detalle de entregables en secciones siguientes (fases 6–18).
 
 ---
 
-### Fase 20 — Documentación visitante e integrador ⏳ **activa**
+### Fase 20 — Documentación visitante e integrador ✅
 
 **Objetivo:** Reorganizar la documentación del repo para que un visitante de GitHub (sin conocer N1–N5) pueda **entender, probar e integrar** COE en minutos. Separar **producto/adopción** (README, guías) de **diseño/mantenimiento** (specs, execution-plan).
 
@@ -395,7 +395,7 @@ Temas de [Context Optimization Engine (COE).md](Context%20Optimization%20Engine%
 | 17 | Locale `zh` | ✅ cerrada | 6ec6435 |
 | 18 | Ingest structured/code | ✅ cerrada | 2c91a7e |
 | 19 | CIR v1.1 Opción B | 🚫 omitida | — |
-| 20 | Docs visitante e integrador | ⏳ **activa** | — |
+| 20 | Docs visitante e integrador | ✅ cerrada | — |
 
 **Leyenda:** ⏳ pendiente · 🔄 en curso · ✅ cerrada · 📝 diferido · 🚫 omitida
 

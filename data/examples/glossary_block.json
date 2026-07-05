@@ -1,0 +1,13 @@
+{
+  "description": "source_type glossary — preserve_lang + merge términos N5",
+  "session_id": "example-glossary-session",
+  "blocks": [
+    {
+      "id": "g1",
+      "source_type": "glossary",
+      "content": "ACME: ACME Corporation\nBudget: approved spending limit"
+    }
+  ],
+  "levels": [1, 5],
+  "locale": "en"
+}
