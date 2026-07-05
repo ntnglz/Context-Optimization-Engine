@@ -8,7 +8,7 @@ Contexto bruto (N bloques)  →  COE  →  Representación compacta  →  LLM
 
 ## Estado
 
-> Orden de trabajo: [execution-plan.md](docs/execution-plan.md) · **Fases 0–17 ✅** · activa: **Fase 18**
+> Orden de trabajo: [execution-plan.md](docs/execution-plan.md) · **Fases 0–18 ✅** · opcional: **Fase 19**
 
 | Componente | Spec | Implementación |
 |------------|------|----------------|
