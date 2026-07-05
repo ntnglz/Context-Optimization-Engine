@@ -56,12 +56,30 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Context Optimization Engine (COE)")
     parser.add_argument("--demo", action="store_true", help="Demo Nivel 1 deduplicación")
     parser.add_argument("--test", action="store_true", help="Ejecutar tests")
+    parser.add_argument(
+        "--benchmark",
+        action="store_true",
+        help="Ejecutar harness smoke (equiv. scripts/benchmark/run.py --tier smoke --profile n1)",
+    )
+    parser.add_argument("--profile", default="n1", help="Perfil benchmark con --benchmark")
     args = parser.parse_args()
 
     if args.demo:
         return run_demo()
     if args.test:
         return run_tests()
+    if args.benchmark:
+        import subprocess
+
+        cmd = [
+            sys.executable,
+            str(ROOT / "scripts" / "benchmark" / "run.py"),
+            "--tier",
+            "smoke",
+            "--profile",
+            args.profile,
+        ]
+        return subprocess.call(cmd, cwd=ROOT)
 
     parser.print_help()
     return 0
