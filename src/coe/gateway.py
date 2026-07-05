@@ -9,17 +9,19 @@ from typing import Any
 from .ingest import IngestTrace, normalize_language
 from .level1 import deduplicate_context
 from .level2 import factorize_context
+from .level3 import structure_context
 from .level5 import InMemoryStateStore, StateView, update_semantic_state
 from .level5.store import StateStore
 from .models import (
     ContextBlock,
     DeduplicationResult,
     FactorizationResult,
+    StructuredContext,
     estimate_tokens,
 )
 from .renderer import render_raw_context
 
-_SUPPORTED_LEVELS = frozenset({1, 2, 5})
+_SUPPORTED_LEVELS = frozenset({1, 2, 3, 5})
 
 
 @dataclass
@@ -55,6 +57,7 @@ class OptimizeResult:
     metrics: OptimizationMetrics
     deduplication: DeduplicationResult | None = None
     factorization: FactorizationResult | None = None
+    structured: StructuredContext | None = None
     state_view: StateView | None = None
     commit_id: str | None = None
     ingest_trace: IngestTrace | None = None
@@ -82,6 +85,8 @@ class OptimizeResult:
             data["deduplication"] = self.deduplication.to_dict()
         if self.factorization is not None:
             data["factorization"] = self.factorization.to_dict()
+        if self.structured is not None:
+            data["structured"] = self.structured.to_dict()
         if self.commit_id is not None:
             data["commit_id"] = self.commit_id
         return data
@@ -100,7 +105,7 @@ def optimize_context(
     """
     Ejecuta el pipeline COE sobre un bundle de bloques.
 
-    Niveles soportados: **1** (dedup), **2** (factorización), **5** (estado).
+    Niveles soportados: **1** (dedup), **2** (factorización), **3** (estructura), **5** (estado).
     L0 opcional con ``l0=True`` y ``target_lang``.
     """
     opts = OptimizeOptions(
@@ -148,13 +153,15 @@ def _optimize(blocks: list[ContextBlock], opts: OptimizeOptions) -> OptimizeResu
 
     dedup: DeduplicationResult | None = None
     factorized: FactorizationResult | None = None
+    structured: StructuredContext | None = None
     state_view: StateView | None = None
     commit_id: str | None = None
     text = original_text
 
     run_n5 = 5 in opts.levels
     run_n1 = 1 in opts.levels and not run_n5
-    run_n2 = 2 in opts.levels and not run_n5
+    run_n2 = 2 in opts.levels or 3 in opts.levels
+    run_n3 = 3 in opts.levels and not run_n5
 
     if run_n5:
         sub_levels = [n for n in opts.levels if n != 5] or [1]
@@ -179,14 +186,26 @@ def _optimize(blocks: list[ContextBlock], opts: OptimizeOptions) -> OptimizeResu
         latency_by_level["n1"] = elapsed
         trace.append(LevelTrace(level=1, latency_ms=elapsed, detail="deduplicate"))
 
-    if run_n2:
+    if run_n2 and not run_n5:
         t0 = time.perf_counter()
         source = dedup if dedup is not None else blocks_work
         factorized = factorize_context(source, locale=opts.locale)
-        text = factorized.render_prose(locale=opts.locale)
         elapsed = (time.perf_counter() - t0) * 1000.0
         latency_by_level["n2"] = elapsed
-        trace.append(LevelTrace(level=2, latency_ms=elapsed, detail="factorize+prose"))
+        trace.append(LevelTrace(level=2, latency_ms=elapsed, detail="factorize"))
+
+    if run_n3:
+        t0 = time.perf_counter()
+        if factorized is None:
+            source = dedup if dedup is not None else blocks_work
+            factorized = factorize_context(source, locale=opts.locale)
+        structured = structure_context(factorized, locale=opts.locale)
+        text = structured.render_prose(locale=opts.locale)
+        elapsed = (time.perf_counter() - t0) * 1000.0
+        latency_by_level["n3"] = elapsed
+        trace.append(LevelTrace(level=3, latency_ms=elapsed, detail="structure+prose"))
+    elif run_n2 and factorized is not None:
+        text = factorized.render_prose(locale=opts.locale)
     elif run_n1 and dedup is not None:
         text = dedup.render_prose(locale=opts.locale)
 
@@ -210,6 +229,7 @@ def _optimize(blocks: list[ContextBlock], opts: OptimizeOptions) -> OptimizeResu
         metrics=metrics,
         deduplication=dedup,
         factorization=factorized,
+        structured=structured,
         state_view=state_view,
         commit_id=commit_id,
         ingest_trace=ingest_trace,

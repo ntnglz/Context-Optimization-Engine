@@ -99,11 +99,29 @@ class TestOptimizeContextN2:
         assert out.deduplication is None
         assert out.factorization is not None
 
-    def test_n3_not_implemented(self):
+    def test_n4_not_implemented(self):
         blocks = [ContextBlock(id="A", content="Juan works at ACME.")]
 
         with pytest.raises(NotImplementedError, match="Levels not implemented"):
-            optimize_context(blocks, levels=[3])
+            optimize_context(blocks, levels=[4])
+
+
+class TestOptimizeContextN3:
+    def test_n1_n2_n3_on_acme_budget(self):
+        blocks = [
+            ContextBlock(id="A", content="Empresa: ACME\nCliente: Globex\nJuan works at ACME."),
+            ContextBlock(
+                id="B",
+                content="Empresa: ACME\nPresupuesto: 50k\nJuan approved the budget.",
+            ),
+            ContextBlock(id="C", content="Empresa: ACME\nCliente: Globex\nPedro works at ACME."),
+        ]
+        out = optimize_context(blocks, levels=[1, 2, 3], locale="en")
+
+        assert out.structured is not None
+        assert "approved the budget" in out.text
+        assert "entity:" not in out.text
+        assert "node:" not in out.text
 
 
 class TestOptimizeContextN5:

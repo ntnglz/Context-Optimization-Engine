@@ -177,3 +177,28 @@ class TestHarnessL0:
             (BENCH / "baselines" / "l0_n1_en_smoke.json").read_text(encoding="utf-8")
         )
         assert compare_reports(report.to_dict(), baseline) == []
+
+
+class TestHarnessN3:
+    def test_run_n1_n2_n3_en_smoke(self):
+        report = run_suite_from_ids(
+            profile_id="n1_n2_n3_en",
+            tier="smoke",
+            benchmark_root=BENCH,
+        )
+        assert report.cases_run >= 2
+        assert report.gate_passed
+        assert "entity:" not in (report.results[0].optimized_context_preview or "")
+
+    def test_n1_n2_n3_en_baseline_compare(self):
+        import json
+
+        report = run_suite_from_ids(
+            profile_id="n1_n2_n3_en",
+            tier="smoke",
+            benchmark_root=BENCH,
+        )
+        baseline = json.loads(
+            (BENCH / "baselines" / "n1_n2_n3_en_smoke.json").read_text(encoding="utf-8")
+        )
+        assert compare_reports(report.to_dict(), baseline) == []

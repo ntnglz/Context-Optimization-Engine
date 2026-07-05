@@ -160,3 +160,85 @@ class FactorizationResult:
 
     def to_json(self, indent: int = 2) -> str:
         return json.dumps(self.to_dict(), indent=indent, ensure_ascii=False)
+
+
+@dataclass
+class StructuredRelation:
+    """Relación tipada entre entidades (N3)."""
+
+    type: str
+    value: str | None = None
+    target: str | None = None
+
+
+@dataclass
+class StructuredEntity:
+    """Entidad con relaciones en StructuredContext."""
+
+    id: str
+    name: str
+    relations: list[StructuredRelation] = field(default_factory=list)
+
+
+SCHEMA_VERSION = "0.1"
+
+
+@dataclass
+class StructuredContext:
+    """Resultado del optimizador Nivel 3."""
+
+    entities: list[StructuredEntity]
+    global_facts: list[SharedFact]
+    unparsed: list[str]
+    schema_version: str
+    original_tokens: int
+    optimized_tokens: int
+
+    @property
+    def compression_ratio(self) -> float:
+        if self.original_tokens == 0:
+            return 0.0
+        return 1.0 - (self.optimized_tokens / self.original_tokens)
+
+    def render_prose(self, *, locale: str | None = "en") -> str:
+        from .level3.render import render_structured_prose
+
+        return render_structured_prose(self, locale=locale)
+
+    def render_debug(self) -> str:
+        from .level3.render import render_structured_debug
+
+        return render_structured_debug(self)
+
+    def to_cir_draft(self) -> dict[str, Any]:
+        from .level3.render import structured_to_cir_draft
+
+        return structured_to_cir_draft(self)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "entities": [
+                {
+                    "id": entity.id,
+                    "name": entity.name,
+                    "relations": [
+                        {
+                            "type": rel.type,
+                            "value": rel.value,
+                            "target": rel.target,
+                        }
+                        for rel in entity.relations
+                    ],
+                }
+                for entity in self.entities
+            ],
+            "global_facts": [fact.to_compact() for fact in self.global_facts],
+            "unparsed": list(self.unparsed),
+            "original_tokens": self.original_tokens,
+            "optimized_tokens": self.optimized_tokens,
+            "compression_ratio": round(self.compression_ratio, 4),
+        }
+
+    def to_json(self, indent: int = 2) -> str:
+        return json.dumps(self.to_dict(), indent=indent, ensure_ascii=False)

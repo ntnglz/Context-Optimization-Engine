@@ -3,7 +3,7 @@
 > KPIs y umbrales: [benchmarks.md](benchmarks.md) · Pipeline COE: [levels.md](levels.md) · Render: [renderer.md](renderer.md)  
 > Hermano conceptual: PCM `e2e_benchmark` (instrucción); COE mide **contexto**.
 
-**Estado:** H1–H5 implementados · CI smoke en 5 perfiles (mock, compare baseline)
+**Estado:** H1–H5 implementados · CI smoke en 6 perfiles (mock, compare baseline)
 
 El harness no es un script auxiliar: es el **sistema de calidad** que validará cada nivel (N2→N5), cada cambio de locale pack y cada perfil de despliegue. Debe ser **rápido en CI**, **reproducible**, **barato** en volumen y **estricto** en pre-release.
 
@@ -139,6 +139,7 @@ data/benchmarks/
 ├── profiles/
 │   ├── n1.yaml
 │   ├── n1_n2_en.yaml
+│   ├── n1_n2_n3_en.yaml
 │   ├── l0_n1_n4_en.yaml
 │   └── n5_session.yaml
 ├── fixtures/           # mock evaluator: case_id → {arm_a, arm_b} text
@@ -258,6 +259,7 @@ tier:
 |--------|---------|-------------|
 | `n1` | [1] | structural + latencia 80ms |
 | `n1_n2_en` | [1,2] | + E2E core subset |
+| `n1_n2_n3_en` | [1,2,3] | + relaciones tipadas (`knows`) |
 | `l0_n1_n4_en` | L0+[1..4] | latencia 200ms |
 | `n5_session` | +5 | multi_turn + 350ms |
 
@@ -362,6 +364,7 @@ Baselines canónicos en `data/benchmarks/baselines/` — se actualizan **solo** 
 data/benchmarks/baselines/
 ├── n1_smoke.json
 ├── n1_n2_en_smoke.json
+├── n1_n2_n3_en_smoke.json
 ├── n1_n2_es_smoke.json
 ├── l0_n1_en_smoke.json
 ├── n5_session_smoke.json
@@ -382,12 +385,14 @@ data/benchmarks/baselines/
 **Decisión CI:** PR y `main` **no** llaman a Ollama en capa 2 — solo fixtures `mock`. La validación semántica **real** (respuestas LLM + juez redacción) ocurre en **nightly** y **release**.
 
 ```bash
-# PR — pytest + 5 perfiles smoke con compare (sin Ollama)
+# PR — pytest + 6 perfiles smoke con compare (sin Ollama)
 python -m pytest tests/ -q
 python scripts/benchmark/run.py --tier smoke --profile n1 \
   --compare-baseline data/benchmarks/baselines/n1_smoke.json
 python scripts/benchmark/run.py --tier smoke --profile n1_n2_en \
   --compare-baseline data/benchmarks/baselines/n1_n2_en_smoke.json
+python scripts/benchmark/run.py --tier smoke --profile n1_n2_n3_en \
+  --compare-baseline data/benchmarks/baselines/n1_n2_n3_en_smoke.json
 python scripts/benchmark/run.py --tier smoke --profile n1_n2_es --tags multilingual \
   --compare-baseline data/benchmarks/baselines/n1_n2_es_smoke.json
 python scripts/benchmark/run.py --tier smoke --profile l0_n1_en --tags multilingual \

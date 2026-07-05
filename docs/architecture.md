@@ -98,11 +98,11 @@ flowchart TB
 
 | Pieza | Responsabilidad | Entrada | Salida | Estado |
 |-------|-----------------|---------|--------|--------|
-| **Gateway** | Punto de entrada unificado (librería, CLI, MCP, HTTP futuro) | Petición del cliente | Contexto optimizado + métricas | ✅ `optimize_context` (L0, N1, N2, N5) |
+| **Gateway** | Punto de entrada unificado (librería, CLI, MCP, HTTP futuro) | Petición del cliente | Contexto optimizado + métricas | ✅ `optimize_context` (L0, N1, N2, N3, N5) |
 | **Context Ingest** | Normalizar fuentes heterogéneas a un modelo común; Normalizer; opcional **L0** | Texto, chunks RAG, tool output, etc. | `ContextBundle` / `ContextBlock[]` | Parcial · spec [ingest.md](ingest.md) |
 | **L0 (Language norm.)** | Detectar idioma; traducir a `target_lang` **antes de N1** si hace falta | `ContextBlock[]` | `ContextBlock[]` en idioma base | v1 [l0-ingest.md](l0-ingest.md) · `src/coe/ingest/` |
 | **Normalizer** | Sub-etapa de Ingest: segmentación (líneas, oraciones `zh`), respeto fences | Bloques crudos | Unidades normalizadas | Parcial · `level1/normalize.py` |
-| **Optimization Pipeline** | Aplicar niveles de optimización en cadena configurable | Unidades + metadatos | Estructura optimizada | N1 ✅ · N2 ✅ · N3–N4 pend. · N5 v1 |
+| **Optimization Pipeline** | Aplicar niveles de optimización en cadena configurable | Unidades + metadatos | Estructura optimizada | N1 ✅ · N2 ✅ · N3 v1 · N4 pend. · N5 v1 |
 | **CIR** | Representación intermedia estable, optimizable y serializable | Salida de parser / pipeline | Árbol o grafo de contexto | Diseño (sin implementar) |
 | **Renderer** | Proyección **prosa** hacia LLM; ensamblaje final | Resultado del pipeline | String / messages[] | N1/N2 `render_prose` · spec [renderer.md](renderer.md) |
 | **Metrics** | Tokens, ratio, latencia, integridad semántica | Antes / después del pipeline | Informe de métricas | Gateway + harness |
@@ -178,7 +178,7 @@ flowchart LR
 |-------|------------------|------|-------------------|
 | **1** | Extraer duplicados exactos inter-bloque | Determinista | `src/coe/level1/` ✅ |
 | **2** | Agrupar hechos bajo entidades (`Juan → acciones`) | Heurística + locale pack | `src/coe/level2/` ✅ v1 |
-| **3** | Natural → estructura compacta + `render_prose()` | Parser / plantillas + proyección LN | Pendiente · [level3.md](level3.md) |
+| **3** | Natural → estructura compacta + `render_prose()` | Parser / plantillas + proyección LN | `src/coe/level3/` v1 · [level3.md](level3.md) |
 | **4** | Grafo del bundle + `render_prose()` | Topológico; cero pérdida vs N3 | Pendiente · [level4.md](level4.md) |
 | **5** | Estado semántico + diff (modelo Git) | Store persistente | `src/coe/level5/` v1 · [level5.md](level5.md) |
 

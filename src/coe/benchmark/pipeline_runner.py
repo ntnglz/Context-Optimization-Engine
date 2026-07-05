@@ -13,7 +13,7 @@ from coe.renderer import render_raw_context
 from .case_utils import context_blocks, is_multi_turn
 from .schema import BenchmarkCase, PipelineProfile
 
-_GATEWAY_LEVELS = frozenset({1, 2, 5})
+_GATEWAY_LEVELS = frozenset({1, 2, 3, 5})
 
 
 @dataclass
@@ -34,7 +34,7 @@ def _resolve_levels(profile: PipelineProfile) -> list[int]:
         return sorted(level_set)
     unsupported = sorted(n for n in level_set if n not in _GATEWAY_LEVELS)
     raise NotImplementedError(
-        f"Benchmark profile levels {unsupported} not implemented (gateway: N1, N2, N5)"
+        f"Benchmark profile levels {unsupported} not implemented (gateway: N1, N2, N3, N5)"
     )
 
 

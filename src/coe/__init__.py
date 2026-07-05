@@ -3,7 +3,7 @@
 from .gateway import optimize_context, OptimizeResult, OptimizationMetrics
 from .ingest import IngestTrace, normalize_language
 from .level5 import StateView, update_semantic_state
-from .models import ContextBlock, DeduplicationResult, FactorizationResult, SharedFact
+from .models import ContextBlock, DeduplicationResult, FactorizationResult, SharedFact, StructuredContext
 
 __all__ = [
     "ContextBlock",
@@ -12,6 +12,7 @@ __all__ = [
     "IngestTrace",
     "SharedFact",
     "StateView",
+    "StructuredContext",
     "normalize_language",
     "optimize_context",
     "OptimizeResult",

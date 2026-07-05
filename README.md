@@ -21,10 +21,10 @@ Contexto bruto (N bloques)  →  COE  →  Representación compacta  →  LLM
 | [Harness de benchmarks](docs/benchmark-harness.md) | ✅ | ✅ H1–H5 · CI smoke (5 perfiles) |
 | [Nivel 1](docs/level1.md) | ✅ | ✅ |
 | [Nivel 2](docs/level2.md) | ✅ | ✅ v1 (EN/ES) |
-| [Nivel 3](docs/level3.md) | ✅ | Pendiente |
+| [Nivel 3](docs/level3.md) | ✅ | ✅ v1 (relaciones tipadas) |
 | [Nivel 4](docs/level4.md) | ✅ | Pendiente |
 | [Nivel 5](docs/level5.md) | ✅ | v1 (`StateView`, store in-memory) |
-| **Gateway** (`optimize_context`) | — | L0 + N1 + N2 + N5 |
+| **Gateway** (`optimize_context`) | — | L0 + N1 + N2 + N3 + N5 |
 
 ## Inicio rápido
 
@@ -125,6 +125,7 @@ Context-Optimization-Engine/
 │   ├── ingest/               # L0 normalize_language
 │   ├── level1/               # Deduplicación
 │   ├── level2/               # Factorización (locale EN/ES)
+│   ├── level3/               # Estructuración relacional
 │   ├── level5/               # StateView, sesión multi-turno
 │   ├── renderer/             # Plantillas prosa N1
 │   └── benchmark/            # Harness H1–H5

@@ -51,3 +51,8 @@ jobs:
           python scripts/benchmark/run.py --tier smoke --profile n5_session \
             --tags multi_turn \
             --compare-baseline data/benchmarks/baselines/n5_session_smoke.json
+
+      - name: Benchmark smoke n1_n2_n3_en + baseline compare
+        run: |
+          python scripts/benchmark/run.py --tier smoke --profile n1_n2_n3_en \
+            --compare-baseline data/benchmarks/baselines/n1_n2_n3_en_smoke.json

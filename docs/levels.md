@@ -24,7 +24,7 @@ COE aplica **transformaciones composables** sobre el contexto. **L0** (Ingest) p
 |-------|--------|------|----------------|
 | **1** | Eliminación de redundancias | [level1.md](level1.md) | ✅ Completo |
 | **2** | Factorización | [level2.md](level2.md) | ✅ v1 (locale EN/ES) |
-| **3** | Representación estructurada | [level3.md](level3.md) | Pendiente |
+| **3** | Representación estructurada | [level3.md](level3.md) | ✅ v1 (relaciones `knows`, proyección prosa) |
 | **4** | Grafo de conocimiento | [level4.md](level4.md) | Pendiente |
 | **5** | Estado semántico | [level5.md](level5.md) | v1 (`StateView`, store in-memory) |
 

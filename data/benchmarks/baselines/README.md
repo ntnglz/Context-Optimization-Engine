@@ -9,10 +9,11 @@ Informes de referencia para `compare.py` en PR. **No** gitignore — forman part
 | `n1_n2_es_smoke.json` | `n1_n2_es` | smoke · `multilingual` | Tras cambiar N2 ES o casos ES |
 | `l0_n1_en_smoke.json` | `l0_n1_en` | smoke · `multilingual` | Tras cambiar L0 o perfil L0→N1 |
 | `n5_session_smoke.json` | `n5_session` | smoke · `multi_turn` | Tras cambiar N5 o casos sesión |
+| `n1_n2_n3_en_smoke.json` | `n1_n2_n3_en` | smoke · `core` | Tras cambiar N3 o casos `core` |
 
 ## CI
 
-En PR y `main`, `.github/workflows/benchmark.yml` ejecuta **pytest** + los cinco perfiles anteriores con `--compare-baseline`. Evaluador **mock** (sin Ollama).
+En PR y `main`, `.github/workflows/benchmark.yml` ejecuta **pytest** + los seis perfiles anteriores con `--compare-baseline`. Evaluador **mock** (sin Ollama).
 
 ## Refrescar baseline (proceso)
 

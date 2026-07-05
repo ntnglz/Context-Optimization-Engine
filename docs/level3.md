@@ -3,7 +3,7 @@
 > Definición conceptual: [documento fundacional](Context%20Optimization%20Engine%20(COE).md#nivel-3--representación-estructurada).  
 > Nivel anterior: [level2.md](level2.md) · Índice: [levels.md](levels.md) · Locale: [i18n.md](i18n.md)
 
-**Estado:** ✅ Spec aprobada · sin implementar
+**Estado:** ✅ Spec aprobada · **v1 implementado** (`src/coe/level3/` · relaciones `knows` EN/ES)
 
 ## Alineación con la visión fundacional
 
