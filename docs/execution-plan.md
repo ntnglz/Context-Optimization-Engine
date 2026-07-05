@@ -49,7 +49,7 @@ Orden de las fases 6–18 según **dependencias técnicas** y **cierre de deuda*
 | Casos benchmark | — | 10 | **8** |
 | Presupuesto tokens COE | ✅ | ✅ | **10** |
 | PCM+COE runtime | ✅ | ✅ | **11** |
-| HTTP API | ✅ doc | ❌ | **12** |
+| HTTP API | ✅ doc | ✅ | **12** |
 | Model Adapter | ✅ acotado | ❌ | **13** |
 | N5 TTL / archivado | ✅ doc | ❌ | **14** |
 | Entity linking fuzzy | ✅ diferido | ❌ | **15** |
@@ -192,7 +192,7 @@ Resumen; detalle histórico en commits de cierre.
 
 ---
 
-### Fase 12 — HTTP API
+### Fase 12 — HTTP API ✅
 
 **Objetivo:** Misma superficie que MCP para pipelines RAG y despliegue.
 
@@ -201,7 +201,7 @@ Resumen; detalle histórico en commits de cierre.
 | Servidor HTTP | `scripts/http/run_server.py` (FastAPI o stdlib+ASGI acorde a deps) |
 | Endpoints | `POST /optimize`, `POST /estimate` — paridad con MCP |
 | Tests | Integración HTTP smoke (TestClient) |
-| Docs | `architecture.md` §7.2 + ejemplo curl |
+| Docs | `architecture.md` §7.3 + ejemplo curl |
 | CI | PASS |
 
 ---
@@ -343,8 +343,8 @@ Temas de [Context Optimization Engine (COE).md](Context%20Optimization%20Engine%
 | 9 | L0 v2 | ✅ cerrada | — |
 | 10 | Presupuesto tokens COE | ✅ cerrada | — |
 | 11 | Integración PCM+COE | ✅ cerrada | — |
-| 12 | HTTP API | ⏳ **activa** | — |
-| 13 | Model Adapter | ⏳ pendiente | — |
+| 12 | HTTP API | ✅ cerrada | — |
+| 13 | Model Adapter | ⏳ **activa** | — |
 | 14 | N5 operaciones (TTL) | ⏳ pendiente | — |
 | 15 | Entity linking fuzzy | ⏳ pendiente | — |
 | 16 | Store distribuido | ⏳ pendiente | — |

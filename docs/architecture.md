@@ -98,7 +98,7 @@ flowchart TB
 
 | Pieza | Responsabilidad | Entrada | Salida | Estado |
 |-------|-----------------|---------|--------|--------|
-| **Gateway** | Punto de entrada unificado (librería, CLI, MCP, HTTP futuro) | Petición del cliente | Contexto optimizado + métricas | ✅ `optimize_context` (L0, N1, N2, N3, N4, N5) |
+| **Gateway** | Punto de entrada unificado (librería, CLI, MCP, HTTP) | Petición del cliente | Contexto optimizado + métricas | ✅ `optimize_context` (L0, N1–N5) |
 | **Context Ingest** | Normalizar fuentes heterogéneas a un modelo común; Normalizer; opcional **L0** | Texto, chunks RAG, tool output, etc. | `ContextBundle` / `ContextBlock[]` | v1 · `ingest_context` · `src/coe/ingest/` |
 | **L0 (Language norm.)** | Detectar idioma; traducir a `target_lang` **antes de N1** si hace falta | `ContextBlock[]` | `ContextBlock[]` en idioma base | v1 [l0-ingest.md](l0-ingest.md) · `src/coe/ingest/` |
 | **Normalizer** | Sub-etapa de Ingest: segmentación (líneas, oraciones `zh`), respeto fences | Bloques crudos | Unidades normalizadas | ✅ v1 · `ingest/normalizer.py` |
@@ -278,7 +278,7 @@ result.to_json()     # pipelines / logs
 |----------|-----|
 | **CLI** | `run.py --demo`, benchmarks locales |
 | **MCP** | Herramientas `optimize_context`, `estimate_savings` para agentes |
-| **HTTP** | Middleware transparente en pipelines RAG (futuro) |
+| **HTTP** | `POST /optimize`, `POST /estimate`, `GET /health` | ✅ `scripts/http/run_server.py` |
 
 #### MCP COE (stdio)
 
@@ -321,7 +321,44 @@ Configuración Cursor (`.cursor/mcp.json` o ajustes MCP):
 
 Dependencia: `pip install -r requirements-mcp.txt` (incluye `mcp`).
 
-PCM ya expone MCP/HTTP para compresión; COE sigue el mismo patrón de integración stdio para agentes locales.
+### 7.3 HTTP API
+
+Servidor en `src/coe/http/`; arranque:
+
+```bash
+pip install -r requirements-http.txt
+python scripts/http/run_server.py
+# default http://127.0.0.1:8080
+```
+
+**`GET /health`** — liveness.
+
+**`POST /optimize`** — mismo cuerpo JSON que MCP `optimize_context`. Respuesta JSON con `text` + `metrics`.
+
+**`POST /estimate`** — paridad con MCP `estimate_savings` (métricas sin prosa).
+
+```bash
+curl -s http://127.0.0.1:8080/health
+
+curl -s -X POST http://127.0.0.1:8080/optimize \
+  -H "Content-Type: application/json" \
+  -d '{
+    "blocks": [
+      {"id": "A", "source_type": "rag", "content": "Empresa: ACME\nJuan works at ACME."},
+      {"id": "B", "source_type": "rag", "content": "Empresa: ACME\nPresupuesto: 50k"}
+    ],
+    "levels": [1, 2],
+    "locale": "en"
+  }'
+
+curl -s -X POST http://127.0.0.1:8080/estimate \
+  -H "Content-Type: application/json" \
+  -d '{"blocks": [{"id": "A", "content": "Empresa: ACME"}], "levels": [1]}'
+```
+
+Dependencia: `pip install -r requirements-http.txt` (`fastapi`, `uvicorn`).
+
+PCM ya expone MCP/HTTP para compresión; COE sigue el mismo patrón de integración stdio (MCP) y HTTP para despliegue RAG.
 
 ---
 
@@ -374,7 +411,7 @@ Ver [execution-plan.md](execution-plan.md) para entregables, criterios de hecho 
 | 9 | L0 v2 | ⏳ activa |
 | 10 | Presupuesto tokens COE | ⏳ |
 | 11 | Integración PCM+COE | ✅ |
-| 12 | HTTP API | ⏳ |
+| 12 | HTTP API | ✅ |
 | 13 | Model Adapter | ⏳ |
 | 14 | N5 operaciones (TTL) | ⏳ |
 | 15 | Entity linking fuzzy | ⏳ |

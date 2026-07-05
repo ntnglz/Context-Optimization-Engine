@@ -25,6 +25,7 @@ run_benchmark() {
 }
 
 step "pytest (capa 0)"
+"$PYTHON" -m pip install -q -r requirements-http.txt
 "$PYTHON" -m pytest tests/ -q
 
 step "benchmark smoke n1"

@@ -8,7 +8,7 @@ Contexto bruto (N bloques)  →  COE  →  Representación compacta  →  LLM
 
 ## Estado
 
-> Orden de trabajo: [execution-plan.md](docs/execution-plan.md) · **Fases 0–11 ✅** · activa: **Fase 12**
+> Orden de trabajo: [execution-plan.md](docs/execution-plan.md) · **Fases 0–12 ✅** · activa: **Fase 13**
 
 | Componente | Spec | Implementación |
 |------------|------|----------------|
@@ -31,6 +31,7 @@ Contexto bruto (N bloques)  →  COE  →  Representación compacta  →  LLM
 | [Nivel 5](docs/level5.md) | ✅ | ✅ (graph merge, commits, `FilesystemStateStore`) |
 | **Gateway** (`optimize_context`) | ✅ | ✅ L0 + N1–N5 + métricas |
 | **MCP** (agentes) | ✅ | ✅ `optimize_context`, `estimate_savings` (stdio) |
+| **HTTP API** (RAG / despliegue) | ✅ | ✅ `POST /optimize`, `POST /estimate`, `GET /health` |
 
 ## Inicio rápido
 
@@ -54,9 +55,14 @@ python run.py --ci
 # Servidor MCP para agentes (Cursor, Claude Desktop)
 pip install -r requirements-mcp.txt
 python scripts/mcp/run_server.py
+
+# Servidor HTTP (pipelines RAG, mismo contrato que MCP)
+pip install -r requirements-http.txt
+python scripts/http/run_server.py
+# http://127.0.0.1:8080 — ver architecture.md §7.3
 ```
 
-Ver configuración MCP en [architecture.md §7.2](docs/architecture.md).
+Ver configuración MCP en [architecture.md §7.2](docs/architecture.md) · HTTP en [§7.3](docs/architecture.md).
 
 ## Gateway (pipeline composable)
 
