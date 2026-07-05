@@ -107,7 +107,7 @@ Excepción v1: flag `include_pending_turn=true` si merge difiere de commit (work
 | Store distribuido | 16 ✅ |
 | Normalizer zh + locale pack | 17 ✅ |
 | Ingest `structured` / `code` | 18 ✅ |
-| CIR v1.1 Opción B (`stage` N1–N3) | 19 (opcional) |
+| CIR v1.1 Opción B (`stage` N1–N3) | 19 🚫 omitida |
 
 ---
 
@@ -139,8 +139,8 @@ Checklist spec:
 
 - [x] Usuario revisa N5, benchmarks, ingest, renderer, spec-gaps
 - [x] Plan fases 0–5 cerrado
-- [x] Plan fases 6–13 cerradas (commits en execution-plan.md)
-- [ ] Producto v1 completo (fases 14–18 ✅; 19 opcional)
+- [x] Plan fases 6–18 cerradas (commits en execution-plan.md)
+- [x] Producto v1 completo (fases 0–18 ✅; Fase 19 omitida)
 
 ---
 

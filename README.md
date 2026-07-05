@@ -8,24 +8,24 @@ Contexto bruto (N bloques)  →  COE  →  Representación compacta  →  LLM
 
 ## Estado
 
-> Orden de trabajo: [execution-plan.md](docs/execution-plan.md) · **Fases 0–18 ✅** · opcional: **Fase 19**
+> Orden de trabajo: [execution-plan.md](docs/execution-plan.md) · **Producto v1 cerrado (fases 0–18 ✅)** · Fase 19 omitida
 
 | Componente | Spec | Implementación |
 |------------|------|----------------|
 | [Visión fundacional](docs/Context%20Optimization%20Engine%20(COE).md) | ✅ | — |
-| [Diseño global](docs/architecture.md) | ✅ | ✅ núcleo v1 (L0→N5, MCP, CIR) · integración v1 en curso (fases 8–18) |
-| [Plan de ejecución](docs/execution-plan.md) | ✅ | Fases 0–6 cerradas |
-| [Pipeline L0 → N1–N5](docs/levels.md) | ✅ | L0 v1 · N1 · N2 · N3 · N4 · N5 |
-| [Multilingüe (i18n)](docs/i18n.md) | ✅ | Locale packs N2 EN/ES/**ZH** |
+| [Diseño global](docs/architecture.md) | ✅ | ✅ producto v1 (L0→N5, MCP, HTTP, CIR, PCM) |
+| [Plan de ejecución](docs/execution-plan.md) | ✅ | Fases 0–18 cerradas |
+| [Pipeline L0 → N1–N5](docs/levels.md) | ✅ | L0 v2 · N1 · N2 · N3 · N4 · N5 |
+| [Multilingüe (i18n)](docs/i18n.md) | ✅ | Locale packs N2 EN / ES / ZH |
 | [L0 Ingest](docs/l0-ingest.md) | ✅ | v2 (langdetect + TranslationBackend) |
-| [Context Ingest](docs/ingest.md) | ✅ | ✅ `ingest_context`, `ContextBundle`, matriz `source_type` |
-| [Renderer](docs/renderer.md) | ✅ | ✅ prosa N1–N5 vía `renderer/assembly.py` |
-| [CIR v1.0](docs/cir-v1.md) | ✅ | ✅ grafo + envelope N5 (`src/coe/cir/`) |
+| [Context Ingest](docs/ingest.md) | ✅ | `ingest_context`, matriz `source_type`, structured/code/glossary |
+| [Renderer](docs/renderer.md) | ✅ | prosa N1–N5 vía `renderer/assembly.py` |
+| [CIR v1.0](docs/cir-v1.md) | ✅ | grafo + envelope N5 (`src/coe/cir/`) |
 | [Benchmarks y KPIs](docs/benchmarks.md) | ✅ | — |
-| [Harness de benchmarks](docs/benchmark-harness.md) | ✅ | ✅ H1–H5 · CI smoke |
+| [Harness de benchmarks](docs/benchmark-harness.md) | ✅ | H1–H5 · CI smoke (10 perfiles) |
 | [Evaluadores Ollama](docs/benchmark-ollama.md) | ✅ | Granite/Gemma fast · Qwen release |
 | [Nivel 1](docs/level1.md) | ✅ | ✅ |
-| [Nivel 2](docs/level2.md) | ✅ | ✅ (EN/ES) |
+| [Nivel 2](docs/level2.md) | ✅ | ✅ (EN / ES / ZH) |
 | [Nivel 3](docs/level3.md) | ✅ | ✅ (relaciones tipadas) |
 | [Nivel 4](docs/level4.md) | ✅ | ✅ (`ContextGraph`, CIR materializado) |
 | [Nivel 5](docs/level5.md) | ✅ | ✅ (graph merge, commits, `FilesystemStateStore` / `SQLiteStateStore`) |
@@ -49,7 +49,7 @@ python run.py --demo
 # Tests
 python run.py --test
 
-# CI local (pytest + 8 perfiles smoke, compare baseline — antes de push)
+# CI local (pytest + 10 perfiles smoke, compare baseline — antes de push)
 python run.py --ci
 # equivalente: bash scripts/ci/smoke.sh
 

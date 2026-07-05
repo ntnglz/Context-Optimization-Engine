@@ -25,48 +25,46 @@ Orden de las fases 6–18 según **dependencias técnicas** y **cierre de deuda*
 5. **N5 escala tras CIR** — TTL, fuzzy linking y store remoto asumen envelope y merge probados.
 6. **Investigación explícita** — hipótesis no validadas (ML, CIR hacia LLM) fuera del producto v1; pista I al final.
 
-**Deuda cerrada (fases 0–15):** L0 v2, `case.schema.json`, presupuesto tokens COE, PCM+COE, HTTP API, Model Adapter, N5 TTL/archivado, entity linking fuzzy, CIR v1.0, harness, MCP, Gateway/N1–N5, README al día.
+**Producto v1 cerrado (fases 0–18 ✅).** CIR v1.1 (Fase 19) **omitida** — sin demanda de interoperabilidad por stage.
 
-**Deuda pendiente (fase 19):** CIR v1.1 opcional.
+**Deuda cerrada (fases 0–18):** núcleo L0→N5, CIR v1.0, harness, MCP, HTTP, PCM+COE, Model Adapter, N5 operaciones, fuzzy linking, SQLite store, locale `zh`, ingest structured/code/glossary.
 
-**Fuera de alcance producto v1:** optimización por ML, representación no-prosa hacia el LLM, parser semántico dedicado, «capa universal» como estándar de industria.
+**Fuera de alcance producto v1:** optimización por ML, representación no-prosa hacia el LLM, parser semántico dedicado, «capa universal» como estándar de industria, CIR v1.1 Opción B (ver Pista I / enmienda futura).
 
 ---
 
-## Estado real (foto 2026-07-05)
+## Estado real (foto 2026-07-05 — producto v1)
 
 | Pieza | Spec | Código | Fase cierre |
 |-------|------|--------|-------------|
 | N1–N4 | ✅ | ✅ | 0–5 |
 | N5 merge + commits | ✅ | ✅ | 3 |
-| State Store filesystem | ✅ | ✅ | 3 |
+| State Store filesystem + SQLite | ✅ | ✅ | 3, **16** |
 | Gateway `optimize_context` | ✅ | ✅ | 1–3 |
-| Context Ingest + matriz | ✅ | ✅ | 1 |
+| Context Ingest + matriz | ✅ | ✅ | 1, **18** |
 | Renderer unificado | ✅ | ✅ | 2 |
-| Harness smoke + release script | ✅ | ✅ | 4 |
+| Harness smoke + release script | ✅ | ✅ | 4, **8** |
 | MCP stdio | ✅ | ✅ | 5 |
-| L0 | ✅ | ✅ | **9** |
-| CIR formal | ✅ | ✅ | **6** |
-| `case.schema.json` | ✅ | ✅ | **8** |
-| Casos benchmark | — | 10 | **8** |
+| HTTP API | ✅ | ✅ | **12** |
+| L0 v2 | ✅ | ✅ | **9** |
+| CIR formal (v1.0) | ✅ | ✅ | **6** |
+| `case.schema.json` + casos | ✅ | ✅ | **8** |
 | Presupuesto tokens COE | ✅ | ✅ | **10** |
 | PCM+COE runtime | ✅ | ✅ | **11** |
-| HTTP API | ✅ doc | ✅ | **12** |
-| Model Adapter | ✅ acotado | ✅ | **13** |
-| N5 TTL / archivado | ✅ doc | ✅ | **14** |
-| Entity linking fuzzy | ✅ diferido | ✅ | **15** |
-| Store distribuido | ✅ doc | ❌ | **16** |
-| Locale `zh` | ✅ doc | ❌ | **17** |
-| Ingest `structured`/`code` | ✅ matriz | ✅ | **18** ✅ |
-| CIR v1.1 (stage N1–N3) | — | ❌ | **19** (opcional) |
-| Docs/README al día | — | ✅ | **7** |
+| Model Adapter | ✅ | ✅ | **13** |
+| N5 TTL / archivado | ✅ | ✅ | **14** |
+| Entity linking fuzzy | ✅ | ✅ | **15** |
+| Locale `zh` | ✅ | ✅ | **17** |
+| Ingest structured/code/glossary | ✅ | ✅ | **18** |
+| CIR v1.1 (stage N1–N3) | — | 🚫 omitida | **19** |
+| Docs/README al día | ✅ | ✅ | **7** |
 
 ---
 
 ## Reglas de ejecución estricta
 
-1. **Una fase activa.** La fase actual es la primera fila con estado `🔄` o `⏳` en la tabla de progreso.
-2. **Sin saltos.** No empezar tareas de fases posteriores aunque parezcan pequeñas.
+1. **Plan producto v1 cerrado.** Fases 0–18 ✅. Nuevo trabajo producto → enmienda + fila en progreso.
+2. **Sin saltos** (durante el plan 0–18; histórico).
 3. **Cierre de fase** = todos los entregables ✅ + CI PASS + fila actualizada a `✅` + commit con `CI: PASS antes de push`.
 4. **Enmiendas.** Si hace falta desviarse, primero se edita este archivo (sección «Enmiendas») y el usuario aprueba.
 5. **Specs > código.** Si código y spec discrepan, el trabajo de la fase alinea código a spec (no al revés), salvo enmienda documentada.
@@ -307,7 +305,7 @@ Resumen; detalle de entregables en secciones siguientes (fases 6–18).
 
 ---
 
-### Fase 19 — CIR v1.1 Opción B (opcional)
+### Fase 19 — CIR v1.1 Opción B 🚫 **omitida**
 
 **Objetivo:** Serializar etapas N1–N3 como `stage=fact|entity|tree` si hace falta interoperabilidad o auditoría fina.
 
@@ -318,7 +316,7 @@ Resumen; detalle de entregables en secciones siguientes (fases 6–18).
 | Builders | Lowering N1–N3 → CIR stages |
 | Tests | Roundtrip + prosa sin regresión |
 
-**Solo activar si Fase 6–18 ✅ y hay demanda concreta** (herramientas externas, compliance, debug avanzado). Si no, marcar `🚫 omitida` en progreso.
+**Decisión 2026-07-05:** omitida tras cierre Fase 18. CIR v1.0 (`stage=graph`) cubre persistencia N5 e integración actual. Reactivar solo vía enmienda + demanda concreta (herramientas externas, compliance, debug por etapa).
 
 **Requiere:** Fase 6 ✅.
 
@@ -362,7 +360,7 @@ Temas de [Context Optimization Engine (COE).md](Context%20Optimization%20Engine%
 | 16 | Store distribuido | ✅ cerrada | 8d23a72 |
 | 17 | Locale `zh` | ✅ cerrada | 6ec6435 |
 | 18 | Ingest structured/code | ✅ cerrada | 2c91a7e |
-| 19 | CIR v1.1 Opción B | ⏳ opcional | — |
+| 19 | CIR v1.1 Opción B | 🚫 omitida | — |
 
 **Leyenda:** ⏳ pendiente · 🔄 en curso · ✅ cerrada · 📝 diferido · 🚫 omitida
 
@@ -416,6 +414,7 @@ flowchart LR
 | 2026-07-05 | Cierre Fase 11 PCM+COE | 594f63b — optimize_with_pcm, perfil coe_pcm_n1_en |
 | 2026-07-05 | Cierre Fase 12 HTTP | b191a62 — FastAPI /optimize, /estimate, /health |
 | 2026-07-05 | Cierre Fase 13 Model Adapter | 8b84bb5 — target_model, adaptadores default/mistral/openai |
+| 2026-07-05 | Producto v1 cerrado; Fase 19 omitida | Fases 0–18 ✅; CIR v1.1 sin demanda; Pista I para investigación |
 | 2026-07-05 | Cierre Fase 18 ingest structured/code/glossary | 2c91a7e — flatten JSON/CSV/log, code dedup, N5 glossary |
 | 2026-07-05 | Cierre Fase 17 locale zh | 6ec6435 — pack zh, segmentación, L0 EN→ZH stub, benchmark n1_n2_zh |
 | 2026-07-05 | Cierre Fase 16 store SQLite | 8d23a72 — SQLiteStateStore, state_store_backend/path, WAL v1 |

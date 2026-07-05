@@ -401,7 +401,7 @@ Los benchmarks vivirán en `data/` + `tests/` + `scripts/comprehension_benchmark
 | **E** | MCP + benchmark RAG | ✅ MCP + schema casos Fase 8 |
 | **F** | N3–N5 + State Store | ✅ v1; escala Fases 14–16 |
 | **G** | Integración despliegue | ✅ Fases 10–13 (tokens, PCM, HTTP, adapter) |
-| **H** | i18n + ingest completo | ⏳ Fases 17–18 |
+| **H** | i18n + ingest completo | ✅ Fases 17–18 |
 
 ### Orden vigente (resumen)
 
@@ -423,7 +423,7 @@ Ver [execution-plan.md](execution-plan.md) para entregables, criterios de hecho 
 | 16 | Store distribuido | ✅ |
 | 17 | Locale `zh` | ✅ |
 | 18 | Ingest structured/code | ✅ |
-| 19 | CIR v1.1 Opción B | ⏳ opcional |
+| 19 | CIR v1.1 Opción B | 🚫 omitida |
 | I | Investigación (ML, CIR→LLM) | sin fase |
 
 ### Histórico (fases A–F originales)
