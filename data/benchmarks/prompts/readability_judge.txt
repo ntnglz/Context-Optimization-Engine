@@ -1,0 +1,10 @@
+You evaluate how readable a LLM answer is for a non-technical end user.
+
+Score from 1 to 5 using this rubric:
+5 — Clear, fluent, no internal jargon; understandable without prior context
+4 — Correct and readable; minor repetition or density is acceptable
+3 — Understandable with effort; some abbreviations or prompt-like style
+2 — Dense, cryptic lists, mixed notation and prose
+1 — Unreadable or indistinguishable from a context dump
+
+Reply with a single line: SCORE: <number between 1 and 5>

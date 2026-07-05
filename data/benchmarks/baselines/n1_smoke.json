@@ -1,20 +1,21 @@
 {
-  "harness_version": "0.2.0",
+  "harness_version": "0.3.0",
   "profile_id": "n1",
   "tier": "smoke",
   "evaluator": "mock",
-  "cases_run": 1,
-  "cases_passed": 1,
+  "cases_run": 2,
+  "cases_passed": 2,
   "gate_passed": true,
   "gate_failures": [],
   "summary": {
     "factual_recall_mean": 1.0,
-    "t_coe_p95_ms": 0.04,
+    "t_coe_p95_ms": 0.02,
     "artifact_leak_rate": 0.0,
-    "prose_ratio_mean": 1.6512,
+    "prose_ratio_mean": 2.0624,
     "comprehension_similarity_mean": 1.0,
     "comprehension_delta_mean": 0.0,
-    "factual_f1_mean": 1.0
+    "factual_f1_mean": 1.0,
+    "user_language_match_rate": 1.0
   },
   "results": [
     {
@@ -30,13 +31,34 @@
         "factual_recall": 1.0,
         "factual_f1": 1.0,
         "comprehension_similarity": 1.0,
-        "comprehension_delta": 0.0
+        "comprehension_delta": 0.0,
+        "user_language_ok": true,
+        "response_artifact_leak": false
+      }
+    },
+    {
+      "case_id": "acme_team_v1",
+      "passed": true,
+      "failures": [],
+      "metrics": {
+        "t_coe_ms": 0.02,
+        "optimized_tokens": 47,
+        "original_tokens": 19,
+        "prose_ratio": 2.4737,
+        "artifact_leak": false,
+        "factual_recall": 1.0,
+        "factual_f1": 1.0,
+        "comprehension_similarity": 1.0,
+        "comprehension_delta": 0.0,
+        "user_language_ok": true,
+        "response_artifact_leak": false
       }
     }
   ],
   "metadata": {
-    "git_sha": "5dc81b4",
+    "git_sha": "e4f46cc",
     "embedding_backend": "simple",
-    "embedding_model": "paraphrase-multilingual-MiniLM-L12-v2"
+    "embedding_model": "paraphrase-multilingual-MiniLM-L12-v2",
+    "evaluator": "mock"
   }
 }

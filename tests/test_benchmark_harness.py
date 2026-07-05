@@ -38,7 +38,7 @@ class TestHarnessSmoke:
             tier="smoke",
             benchmark_root=BENCH,
         )
-        assert report.cases_run >= 1
+        assert report.cases_run >= 2
         assert report.gate_passed
         assert report.summary["artifact_leak_rate"] == 0.0
 

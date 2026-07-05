@@ -6,18 +6,15 @@ from pathlib import Path
 
 from . import HARNESS_VERSION
 from .dataset import load_cases
-from .evaluators.mock import mock_responses
+from .e2e import run_e2e_arms
+from .evaluators.base import default_evaluator_for_tier
+from .evaluators.factory import create_evaluator
 from .pipeline_runner import run_pipeline_on_case
 from .profile import load_profile_by_id
 from .report import build_report_metadata, evaluate_gate
 from .schema import BenchmarkCase, BenchmarkReport, CaseMetrics, CaseResult, PipelineProfile
 from .scorers.artifacts import detect_artifact_leak
 from .scorers.embedding import DEFAULT_BACKEND, EmbeddingBackend, resolve_backend
-from .scorers.factual import (
-    comprehension_delta,
-    factual_f1,
-    factual_recall,
-)
 from .scorers.latency import latency_ok
 
 
@@ -27,14 +24,18 @@ def run_suite(
     cases_dir: Path,
     tier: str = "smoke",
     tags: set[str] | None = None,
-    evaluator: str = "mock",
+    evaluator: str | None = None,
     embedding_backend: EmbeddingBackend | None = None,
+    fail_fast: bool = False,
 ) -> BenchmarkReport:
     cases = load_cases(cases_dir, tags=tags)
     if not cases:
         raise ValueError(f"No cases found in {cases_dir} with tags={tags}")
 
+    evaluator_spec = evaluator or default_evaluator_for_tier(tier)
+    llm_evaluator, evaluator_id = create_evaluator(evaluator_spec)
     resolved_backend = resolve_backend(embedding_backend)
+
     results: list[CaseResult] = []
     for case in cases:
         results.append(
@@ -42,22 +43,29 @@ def run_suite(
                 case,
                 profile,
                 tier=tier,
-                evaluator=evaluator,
+                evaluator=llm_evaluator,
+                evaluator_id=evaluator_id,
                 embedding_backend=embedding_backend,
+                fail_fast=fail_fast,
             )
         )
+
+    metadata = build_report_metadata(embedding_backend=resolved_backend)
+    metadata["evaluator"] = evaluator_id
+    if evaluator_id.startswith("ollama:"):
+        metadata["ollama_model"] = evaluator_id.split(":", 1)[1]
 
     report = BenchmarkReport(
         harness_version=HARNESS_VERSION,
         profile_id=profile.id,
         tier=tier,
-        evaluator=evaluator,
+        evaluator=evaluator_id,
         cases_run=len(results),
         cases_passed=sum(1 for r in results if r.passed),
         gate_passed=False,
         gate_failures=[],
         results=results,
-        metadata=build_report_metadata(embedding_backend=resolved_backend),
+        metadata=metadata,
     )
     report.summary = _build_summary(results)
     report.gate_passed, report.gate_failures = evaluate_gate(report, profile)
@@ -69,8 +77,10 @@ def _run_case(
     profile: PipelineProfile,
     *,
     tier: str,
-    evaluator: str,
+    evaluator,
+    evaluator_id: str,
     embedding_backend: EmbeddingBackend | None,
+    fail_fast: bool,
 ) -> CaseResult:
     pipeline = run_pipeline_on_case(case, profile)
     prose_ratio = (
@@ -78,68 +88,73 @@ def _run_case(
         if pipeline.original_tokens
         else 1.0
     )
-    artifact = detect_artifact_leak(pipeline.optimized_text)
+    context_artifact = detect_artifact_leak(pipeline.optimized_text)
 
     failures: list[str] = []
     if not latency_ok(pipeline.t_coe_ms, profile.gate.t_coe_p95_ms):
         failures.append(
             f"t_coe {pipeline.t_coe_ms:.1f}ms > budget {profile.gate.t_coe_p95_ms}ms"
         )
-    if artifact:
+    if context_artifact:
         failures.append("artifact_leak in optimized context")
 
-    recall: float | None = None
-    f1: float | None = None
-    similarity: float | None = None
-    delta: float | None = None
+    layer1_failed = len(failures) > 0
+    skip_e2e = fail_fast and layer1_failed
+
+    recall = None
+    f1 = None
+    similarity = None
+    delta = None
+    readability_a = None
+    readability_b = None
+    lang_ok = None
+    response_artifact = False
     arm_a = ""
     arm_b = ""
-    if tier in ("smoke", "ci", "nightly", "release"):
-        if evaluator == "mock":
-            mock = mock_responses(case)
-            arm_a = mock.arm_a_response
-            arm_b = mock.arm_b_response
-            recall = factual_recall(arm_b, case.expected_facts)
-            f1 = factual_f1(arm_b, case.expected_facts)
-            if profile.gate.factual_recall is not None and recall < profile.gate.factual_recall:
-                failures.append(
-                    f"factual_recall {recall:.2f} < {profile.gate.factual_recall}"
-                )
 
-            from .scorers.embedding import comprehension_similarity
-
-            similarity = comprehension_similarity(
-                arm_a,
-                arm_b,
-                backend=embedding_backend,
-            )
-            delta = comprehension_delta(similarity)
-            if (
-                profile.gate.comprehension_similarity is not None
-                and similarity < profile.gate.comprehension_similarity
-            ):
-                failures.append(
-                    f"comprehension_similarity {similarity:.4f} < "
-                    f"{profile.gate.comprehension_similarity}"
-                )
-            delta_min = profile.gate.comprehension_delta_min
-            if delta_min is not None and delta < delta_min:
-                failures.append(
-                    f"comprehension_delta {delta:.4f} < {delta_min}"
-                )
-        elif evaluator != "mock":
-            failures.append(f"evaluator {evaluator!r} not implemented before H4")
+    if tier in ("smoke", "ci", "nightly", "release") and not skip_e2e:
+        judge_readability = evaluator_id != "mock" and (
+            tier in ("nightly", "release")
+            or profile.gate.readability_score_min is not None
+        )
+        e2e = run_e2e_arms(
+            case,
+            optimized_context=pipeline.optimized_text,
+            evaluator=evaluator,
+            evaluator_id=evaluator_id,
+            profile=profile,
+            embedding_backend=embedding_backend,
+            judge_readability_enabled=judge_readability,
+        )
+        arm_a = e2e.arm_a
+        arm_b = e2e.arm_b
+        recall = e2e.factual_recall
+        f1 = e2e.factual_f1
+        similarity = e2e.comprehension_similarity
+        delta = e2e.comprehension_delta
+        readability_a = e2e.readability_score_a
+        readability_b = e2e.readability_score_b
+        lang_ok = e2e.user_language_ok
+        response_artifact = e2e.response_artifact_leak
+        if e2e.failures:
+            failures.extend(e2e.failures)
+    elif skip_e2e:
+        failures.append("E2E skipped (--fail-fast after layer 1 failure)")
 
     metrics = CaseMetrics(
         t_coe_ms=pipeline.t_coe_ms,
         optimized_tokens=pipeline.optimized_tokens,
         original_tokens=pipeline.original_tokens,
         prose_ratio=prose_ratio,
-        artifact_leak=artifact,
+        artifact_leak=context_artifact or response_artifact,
         factual_recall=recall,
         factual_f1=f1,
         comprehension_similarity=similarity,
         comprehension_delta=delta,
+        readability_score=readability_b,
+        readability_score_a=readability_a,
+        user_language_ok=lang_ok,
+        response_artifact_leak=response_artifact,
     )
     return CaseResult(
         case_id=case.id,
@@ -179,12 +194,20 @@ def _build_summary(results: list[CaseResult]) -> dict:
     sim_mean = _mean([r.metrics.comprehension_similarity for r in results])
     delta_mean = _mean([r.metrics.comprehension_delta for r in results])
     f1_mean = _mean([r.metrics.factual_f1 for r in results])
+    readability_mean = _mean([r.metrics.readability_score for r in results])
+    lang_rate = _mean(
+        [1.0 if r.metrics.user_language_ok else 0.0 for r in results if r.metrics.user_language_ok is not None]
+    )
     if sim_mean is not None:
         summary["comprehension_similarity_mean"] = sim_mean
     if delta_mean is not None:
         summary["comprehension_delta_mean"] = delta_mean
     if f1_mean is not None:
         summary["factual_f1_mean"] = f1_mean
+    if readability_mean is not None:
+        summary["readability_score_mean"] = readability_mean
+    if lang_rate is not None:
+        summary["user_language_match_rate"] = lang_rate
     return summary
 
 
@@ -199,6 +222,8 @@ def run_suite_from_ids(
     tags: set[str] | None = None,
     benchmark_root: Path | None = None,
     embedding_backend: EmbeddingBackend | None = None,
+    evaluator: str | None = None,
+    fail_fast: bool = False,
 ) -> BenchmarkReport:
     root = benchmark_root or default_benchmark_root()
     profile = load_profile_by_id(root / "profiles", profile_id)
@@ -210,6 +235,7 @@ def run_suite_from_ids(
         cases_dir=root / "cases",
         tier=tier,
         tags=tag_filter,
-        evaluator="mock",
+        evaluator=evaluator,
         embedding_backend=embedding_backend or DEFAULT_BACKEND,
+        fail_fast=fail_fast,
     )

@@ -71,6 +71,24 @@ def evaluate_gate(
                 f"comprehension_delta_mean {mean_delta} < {delta_min}"
             )
 
+    if gate.readability_score_min is not None:
+        mean_read = summary.get("readability_score_mean")
+        if mean_read is None:
+            failures.append("readability_score_mean missing from summary")
+        elif mean_read < gate.readability_score_min:
+            failures.append(
+                f"readability_score_mean {mean_read} < {gate.readability_score_min}"
+            )
+
+    if gate.user_language_match is not None:
+        rate = summary.get("user_language_match_rate")
+        if rate is None:
+            failures.append("user_language_match_rate missing from summary")
+        elif rate < gate.user_language_match:
+            failures.append(
+                f"user_language_match_rate {rate} < {gate.user_language_match}"
+            )
+
     return len(failures) == 0, failures
 
 
@@ -107,6 +125,10 @@ def render_markdown_report(report: BenchmarkReport) -> str:
         if result.metrics.comprehension_similarity is not None:
             lines.append(
                 f"- comprehension_similarity: {result.metrics.comprehension_similarity:.4f}"
+            )
+        if result.metrics.readability_score is not None:
+            lines.append(
+                f"- readability_score: {result.metrics.readability_score:.2f}"
             )
         if result.failures:
             for f in result.failures:
@@ -164,6 +186,8 @@ _HIGHER_IS_BETTER = {
     "factual_recall_mean",
     "comprehension_similarity_mean",
     "comprehension_delta_mean",
+    "readability_score_mean",
+    "user_language_match_rate",
 }
 
 _LOWER_IS_BETTER = {

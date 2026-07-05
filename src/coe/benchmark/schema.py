@@ -130,6 +130,10 @@ class CaseMetrics:
     factual_f1: float | None = None
     comprehension_similarity: float | None = None
     comprehension_delta: float | None = None
+    readability_score: float | None = None
+    readability_score_a: float | None = None
+    user_language_ok: bool | None = None
+    response_artifact_leak: bool = False
 
 
 @dataclass
@@ -183,6 +187,10 @@ class BenchmarkReport:
                         "factual_f1": r.metrics.factual_f1,
                         "comprehension_similarity": r.metrics.comprehension_similarity,
                         "comprehension_delta": r.metrics.comprehension_delta,
+                        "readability_score": r.metrics.readability_score,
+                        "readability_score_a": r.metrics.readability_score_a,
+                        "user_language_ok": r.metrics.user_language_ok,
+                        "response_artifact_leak": r.metrics.response_artifact_leak,
                     },
                     "optimized_context_preview": r.optimized_context_preview[:500],
                 }

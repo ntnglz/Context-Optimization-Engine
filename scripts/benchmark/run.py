@@ -12,6 +12,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
 
+from coe.benchmark.evaluators.base import default_evaluator_for_tier  # noqa: E402
 from coe.benchmark.report import compare_reports, save_report  # noqa: E402
 from coe.benchmark.runner import default_benchmark_root, run_suite_from_ids  # noqa: E402
 
@@ -49,10 +50,21 @@ def main() -> int:
         choices=["auto", "simple", "sentence_transformers"],
         help="Backend for comprehension_similarity (default: simple / COE_EMBEDDING_BACKEND)",
     )
+    parser.add_argument(
+        "--evaluator",
+        default=None,
+        help="mock | ollama | ollama:model (default: mock for smoke/ci, ollama for nightly/release)",
+    )
+    parser.add_argument(
+        "--fail-fast",
+        action="store_true",
+        help="Skip capa 2 LLM if capa 1 fails (latency/artifacts)",
+    )
     args = parser.parse_args()
 
     root = args.benchmark_root or default_benchmark_root()
     tags = set(args.tags.split(",")) if args.tags else None
+    evaluator = args.evaluator or default_evaluator_for_tier(args.tier)
 
     try:
         report = run_suite_from_ids(
@@ -61,8 +73,10 @@ def main() -> int:
             tags=tags,
             benchmark_root=root,
             embedding_backend=args.embedding_backend,
+            evaluator=evaluator,
+            fail_fast=args.fail_fast,
         )
-    except (ValueError, FileNotFoundError) as exc:
+    except (ValueError, FileNotFoundError, ConnectionError) as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 2
 

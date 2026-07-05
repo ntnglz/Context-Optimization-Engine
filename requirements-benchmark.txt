@@ -1,2 +1,3 @@
-# Optional dependencies for full benchmark E2E (embedding gate)
+# Optional dependencies for full benchmark E2E (embedding gate + Ollama tiers)
 sentence-transformers>=3.0
+langdetect>=1.0.9
