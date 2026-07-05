@@ -31,6 +31,7 @@ Nightly mock opcional: `bash scripts/ci/nightly-mock.sh`.
    `python scripts/benchmark/run.py --tier smoke --profile n1_n2_en --compare-baseline data/benchmarks/baselines/n1_n2_en_smoke.json`
 2. Verificar que el gate mejora o se mantiene por razones documentadas.
 3. Si el reporte es la nueva referencia, copiar `report.json` a `data/benchmarks/baselines/{profile}_smoke.json`.
-4. PR dedicado: título `benchmark: refresh baseline n1_n2_en`.
+4. Regenerar docs visitante: `python scripts/benchmark/generate_savings_report.py`
+5. PR dedicado: título `benchmark: refresh baseline n1_n2_en`.
 
 Los baselines incluyen `harness_version`, `embedding_model`, `embedding_backend` y `git_sha` en `metadata` / `config.json`.

@@ -48,7 +48,7 @@ Start with `[1, 2]` for narrative RAG. The `source_type` matrix may limit levels
 
 ## What savings should I expect?
 
-Smoke benchmarks on narrative RAG often show **~15–40%** fewer context tokens. Actual savings depend on repetition and structure — run `estimate_savings` or check `out.metrics` on your data. Not a guarantee.
+Smoke benchmarks on narrative RAG (`levels=[1, 2]`) show **~32–46%** fewer context tokens — see [benchmark-results.md](benchmark-results.md) for reproducible tables. Actual savings depend on repetition and structure — run `estimate_savings` or check `out.metrics` on your data. Not a guarantee.
 
 ## Do I need MCP in `requirements.txt` for library-only use?
 

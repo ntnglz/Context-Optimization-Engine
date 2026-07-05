@@ -58,5 +58,8 @@ run_benchmark n5_graph_session data/benchmarks/baselines/n5_graph_session_smoke.
 step "benchmark smoke coe_pcm_n1_en (coe+pcm)"
 run_benchmark coe_pcm_n1_en data/benchmarks/baselines/coe_pcm_n1_en_smoke.json --tags coe_pcm
 
+step "savings docs in sync with baselines"
+"$PYTHON" scripts/benchmark/generate_savings_report.py --check
+
 echo ""
 echo "CI smoke: PASS"

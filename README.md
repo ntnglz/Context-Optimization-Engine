@@ -13,6 +13,26 @@ Raw blocks  →  COE  →  compact prose  →  LLM
 
 COE **does not summarize**. It removes redundancy and groups facts — measurable in benchmarks.
 
+<!-- coe-savings:start -->
+## Savings at a glance
+
+**Typical savings:** ~32–46% fewer context tokens on repetitive narrative RAG — **no extra LLM calls**, no summarization.
+Quality gate on smoke benchmarks: `factual_recall` ≥ 0.95, `comprehension_similarity` ≥ 0.90.
+
+**Illustrative cost** (10,000 requests/day, $2.50/M input tokens): ~**$11/month** saved on context input for the `acme_budget_v1` case (43 → 28 tokens). Run [`estimate_savings`](docs/benchmark-results.md#try-on-your-data) on your data — not a guarantee.
+
+| Profile | Case | Before | After | Saved |
+|---------|------|--------|-------|-------|
+| n1_n2_en | `acme_budget_v1` | 43 | 28 | **35%** |
+| n1_n2_en | `acme_team_v1` | 19 | 13 | **32%** |
+| n1_n2_es | `acme_budget_es_v1` | 44 | 29 | **34%** |
+| n1_n2_zh | `acme_budget_zh_v1` | 24 | 13 | **46%** |
+
+Full tables, methodology, and reproduce commands: **[docs/benchmark-results.md](docs/benchmark-results.md)**
+
+_Regenerate after baseline refresh: `python scripts/benchmark/generate_savings_report.py`_
+<!-- coe-savings:end -->
+
 ## Try it now
 
 ```bash
@@ -132,6 +152,7 @@ Technical reference (ES): [docs/levels.md](docs/levels.md) · [docs/ingest.md](d
 | For… | Document |
 |------|----------|
 | **Integrate without reading the pipeline** | [getting-started.md](docs/getting-started.md) |
+| **Token savings & benchmarks** | [benchmark-results.md](docs/benchmark-results.md) |
 | FAQ | [FAQ.md](docs/FAQ.md) |
 | Vision & v1 comparison | [vision.md](docs/vision.md) |
 | Design (pipeline internals) | [architecture.md](docs/architecture.md) *(ES)* |
@@ -163,3 +184,4 @@ scripts/          # mcp, http, benchmark, ci
 ## License
 
 MIT — see [LICENSE](LICENSE). Changes: [CHANGELOG.md](CHANGELOG.md).
+
