@@ -73,6 +73,11 @@ def main() -> int:
         action="store_true",
         help="Ejecutar harness smoke (equiv. scripts/benchmark/run.py --tier smoke --profile n1)",
     )
+    parser.add_argument(
+        "--release-dev-agent",
+        action="store_true",
+        help="Release tier dev_agent con Ollama (scripts/ci/release-dev-agent.sh)",
+    )
     parser.add_argument("--profile", default="n1", help="Perfil benchmark con --benchmark")
     args = parser.parse_args()
 
@@ -82,6 +87,11 @@ def main() -> int:
         return run_tests()
     if args.ci:
         return run_ci()
+    if args.release_dev_agent:
+        import subprocess
+
+        script = ROOT / "scripts" / "ci" / "release-dev-agent.sh"
+        return subprocess.call(["bash", str(script)], cwd=ROOT)
     if args.benchmark:
         import subprocess
 

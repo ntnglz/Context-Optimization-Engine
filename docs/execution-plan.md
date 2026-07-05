@@ -26,10 +26,10 @@ Este plan **reemplaza** `architecture.md` §9 como orden de trabajo. La arquitec
 | Context Ingest | ✅ | ✅ | `ingest_context`, `source_type`, matriz niveles |
 | Renderer unificado | ✅ | ✅ | Ensamblaje Gateway según `renderer.md` |
 | Harness capa 0–1 | ✅ | ✅ | 8 perfiles smoke mock |
-| Harness capa 2 (Ollama) | ✅ | ❌ | Sin tier `release` en CI local |
+| Harness capa 2 (Ollama) | ✅ | ✅ | `scripts/ci/release-dev-agent.sh`; fuera de `--ci` |
 | MCP | ✅ acotado | ❌ | Fase 5 |
 | CIR formal | 📝 diferido | ❌ | Fase 6 — no bloquea |
-| Casos benchmark | — | 5 | 2 core, 1 ES, 1 multi_turn, 1 dev_agent |
+| Casos benchmark | — | 6 | 2 core, 1 ES, 1 multi_turn, 2 dev_agent |
 
 ---
 
@@ -159,7 +159,7 @@ Este plan **reemplaza** `architecture.md` §9 como orden de trabajo. La arquitec
 | 1 | Context Ingest + ContextBundle | ✅ cerrada | — |
 | 2 | Renderer + ensamblaje Gateway | ✅ cerrada | — |
 | 3 | N5 producción | ✅ cerrada | d733bb7 |
-| 4 | Harness madurez + casos reales | ⏳ pendiente | — |
+| 4 | Harness madurez + casos reales | ✅ cerrada | (este commit) |
 | 5 | MCP COE | ⏳ pendiente | — |
 | 6 | CIR formal | 📝 diferido | — |
 

@@ -1,0 +1,64 @@
+{
+  "id": "dev_pytest_failure_session_v1",
+  "version": 1,
+  "tags": ["dev_agent", "n5", "python", "en"],
+  "description": "Session derived (anonymized) from CI pytest failure triage — 3 turns",
+
+  "response_lang": "en",
+  "user_message_lang": "en",
+  "system_addendum": "Answer in English. Be clear for a developer.",
+
+  "session": {
+    "session_id": "bench-dev-pytest-session-1",
+    "turns": [
+      {
+        "blocks": [
+          {
+            "id": "ci_log",
+            "source_type": "tool",
+            "content": "[pytest] ExampleService CI\nFAILED tests/test_auth.py::test_login_returns_token - AssertionError: expected 200, got 401\nFAILED tests/test_auth.py::test_refresh_rotates_token - KeyError: 'refresh_token'\nFAILED tests/test_billing.py::test_invoice_total - assert 49.99 == 50.00\n======================== 3 failed, 42 passed in 4.2s ========================"
+          },
+          {
+            "id": "triage",
+            "source_type": "prose",
+            "content": "CI triage for ExampleService: 3 failing tests.\nPriority 1 — Auth: login returns 401 (likely expired fixture token); refresh flow missing refresh_token key in response payload.\nPriority 2 — Billing: invoice total off by 0.01 (rounding in TaxCalculator.apply_discount).\nUser asked to fix auth first, then billing."
+          }
+        ],
+        "question": "How many tests failed in CI and what should be fixed first?",
+        "expected_facts": ["3", "auth", "401"]
+      },
+      {
+        "blocks": [
+          {
+            "id": "auth_fix",
+            "source_type": "prose",
+            "content": "Auth fixes applied:\n1. Renewed test fixture JWT in conftest.py (exp claim updated).\n2. AuthService.refresh() now returns refresh_token in JSON body.\nLogin and refresh tests pass locally."
+          }
+        ],
+        "question": "What was changed to fix the auth failures?",
+        "expected_facts": ["JWT", "refresh_token"]
+      },
+      {
+        "blocks": [
+          {
+            "id": "ci_rerun",
+            "source_type": "tool",
+            "content": "[pytest] ExampleService CI (rerun)\nFAILED tests/test_billing.py::test_invoice_total - assert 49.99 == 50.00\n======================== 1 failed, 44 passed in 3.8s ========================"
+          },
+          {
+            "id": "billing_note",
+            "source_type": "prose",
+            "content": "Auth suite green. One billing failure remains: TaxCalculator rounding uses banker's rounding; test expects half-up to 50.00."
+          }
+        ],
+        "question": "After rerunning CI, how many tests still fail and in which area?",
+        "expected_facts": ["1", "billing"]
+      }
+    ]
+  },
+
+  "mock": {
+    "arm_a_response": "After rerunning CI, 1 test still fails in billing (invoice total rounding).",
+    "arm_b_response": "After rerunning CI, 1 test still fails in billing (invoice total rounding)."
+  }
+}

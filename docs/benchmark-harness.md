@@ -399,10 +399,31 @@ python run.py --ci
 # Nightly mock (opcional)
 bash scripts/ci/nightly-mock.sh
 
-# Pre-release — coste real (Ollama local)
+# Pre-release dev_agent — Ollama local (requiere Ollama en marcha)
+bash scripts/ci/release-dev-agent.sh
+# equivalente:
+# OLLAMA_MODEL=qwen3:8b bash scripts/ci/release-dev-agent.sh
+# PROFILE=n5_graph_session RUNS=3 bash scripts/ci/release-dev-agent.sh
+
+# Pre-release general — coste real (Ollama local)
 python scripts/benchmark/run.py --tier release --profile n1 \
   --evaluator ollama:qwen3:8b --runs 3
 ```
+
+### Gate tier `release` (umbrales)
+
+Los KPIs se evalúan contra el bloque `gate:` del **perfil YAML** activo (p. ej. `n5_graph_session`). Para casos `dev_agent` con `--tags dev_agent`, usar perfil N5 graph:
+
+| KPI | Umbral (`n5_graph_session`) |
+|-----|-----------------------------|
+| `comprehension_similarity` | ≥ 0.90 |
+| `factual_recall` | ≥ 0.95 |
+| `readability_score` | ≥ 3.5; B ≥ A − 0.3 |
+| `artifact_leak_rate` | ≤ 2% |
+| `user_language_match` | ≥ 0.95 |
+| `t_coe_p95_ms` | ≤ 400 ms |
+
+Con `--runs 3`, el gate aplica sobre la **media** de las tres ejecuciones (tier `release`). **No** forma parte de `python run.py --ci` — solo smoke mock en pre-push.
 
 Exit code: `0` si gate pasa; `1` si falla KPI; `2` si error de config/dataset.
 

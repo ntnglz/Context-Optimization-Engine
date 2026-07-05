@@ -13,3 +13,5 @@ Diseño del harness: [docs/benchmark-harness.md](../docs/benchmark-harness.md).
 | `baselines/` | Referencia compare PR (versionado) |
 
 Casos etiquetados con `tags` — filtrar en CLI: `--tags core`.
+
+Release `dev_agent` (Ollama local, manual): `bash scripts/ci/release-dev-agent.sh` o `python run.py --release-dev-agent`.

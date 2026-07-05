@@ -296,7 +296,7 @@ Ver [execution-plan.md](execution-plan.md) para entregables, criterios de hecho 
 | 1 | Context Ingest + ContextBundle | ✅ |
 | 2 | Renderer + ensamblaje Gateway | ✅ |
 | 3 | N5 producción | ✅ |
-| 4 | Harness madurez + casos reales | ⏳ |
+| 4 | Harness madurez + casos reales | ✅ |
 | 5 | MCP COE | ⏳ |
 | 6 | CIR formal | 📝 diferido |
 

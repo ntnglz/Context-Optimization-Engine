@@ -57,9 +57,26 @@ class TestDevAgentCase:
             tags={"dev_agent"},
             benchmark_root=BENCH,
         )
-        assert report.cases_run == 1
+        assert report.cases_run == 2
         assert report.gate_passed
-        assert report.results[0].case_id == "dev_warnings_session_v1"
+        case_ids = {r.case_id for r in report.results}
+        assert case_ids == {"dev_warnings_session_v1", "dev_pytest_failure_session_v1"}
+
+    def test_load_dev_pytest_failure_session(self):
+        case = load_case(BENCH / "cases" / "dev_agent" / "dev_pytest_failure_session_v1.json")
+        assert is_multi_turn(case)
+        assert "dev_agent" in case.tags
+        assert "python" in case.tags
+        assert case.response_lang == "en"
+        assert effective_question(case) == (
+            "After rerunning CI, how many tests still fail and in which area?"
+        )
+        assert "billing" in effective_expected_facts(case)
+        assert len(context_blocks(case)) == 5
+
+    def test_dev_agent_case_count(self):
+        cases = load_cases(BENCH / "cases", tags={"dev_agent"})
+        assert len(cases) >= 2
 
 
 class TestMultilingualCase:
