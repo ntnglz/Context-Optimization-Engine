@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Arranca el servidor HTTP COE (FastAPI + uvicorn)."""
+"""Start the COE HTTP server (FastAPI + uvicorn)."""
 
 from __future__ import annotations
 

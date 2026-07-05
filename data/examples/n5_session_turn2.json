@@ -1,5 +1,5 @@
 {
-  "description": "N5 turno 2 — usar tras turno 1 con mismo session_id",
+  "description": "Session memory turn 2 — use after turn 1 with same session_id",
   "session_id": "example-agent-session",
   "blocks": [
     {"id": "t2-A", "source_type": "rag", "content": "Company: ACME\nJuan approved the budget."}

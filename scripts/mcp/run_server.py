@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Arranca el servidor MCP COE por stdio (Cursor, Claude Desktop, etc.)."""
+"""Start the COE MCP server over stdio (Cursor, Claude Desktop, etc.)."""
 
 from __future__ import annotations
 

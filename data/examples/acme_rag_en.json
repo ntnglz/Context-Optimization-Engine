@@ -1,5 +1,5 @@
 {
-  "description": "POST /optimize — same body as MCP optimize_context (canonical ACME EN example)",
+  "description": "Canonical EN RAG example — dedup + entity grouping (levels 1, 2)",
   "blocks": [
     {"id": "A", "source_type": "rag", "content": "Company: ACME\nJuan works at ACME."},
     {"id": "B", "source_type": "rag", "content": "Company: ACME\nBudget: 50k\nJuan approved the budget."},

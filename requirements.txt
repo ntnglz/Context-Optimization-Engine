@@ -1,5 +1,3 @@
+# Core library + dev tools (pytest). Optional: [mcp], [http] — see pyproject.toml
+-r requirements-core.txt
 pytest>=8.0
-pyyaml>=6.0
-mcp>=1.0
-jsonschema>=4.0
-langdetect>=1.0.9

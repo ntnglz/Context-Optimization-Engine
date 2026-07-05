@@ -1,5 +1,5 @@
 {
-  "description": "source_type structured — JSON aplanado en ingest",
+  "description": "source_type structured — JSON flattened at ingest",
   "blocks": [
     {
       "id": "metrics",

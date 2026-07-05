@@ -1,5 +1,5 @@
 {
-  "description": "Ejemplo Nivel 1 (caso ACME en docs/Context Optimization Engine (COE).md)",
+  "description": "Legacy N1-only ACME example (ES) — prefer acme_rag_en.json",
   "blocks": [
     {"id": "A", "content": "Empresa: ACME\nCliente: Globex"},
     {"id": "B", "content": "Empresa: ACME\nPresupuesto: 50k"},
