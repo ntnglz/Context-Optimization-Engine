@@ -8,7 +8,7 @@ from ..level3 import structure_context
 from ..level4 import build_context_graph
 from ..models import SCHEMA_VERSION, ContextBlock, ContextGraph, GraphEdge, StructuredContext
 from ..renderer.templates import get_templates
-from .state import StateView
+from .state import RetractRecord, StateView
 
 
 def blocks_to_context_graph(
@@ -35,20 +35,64 @@ def render_state_view(
     *,
     previous: ContextGraph | None,
     locale: str,
+    retract_log: list[RetractRecord] | None = None,
 ) -> StateView:
-    """Proyecta el head acumulado a prosa; añade diff reciente si hay cambios."""
+    """Proyecta el head acumulado a prosa; añade diff, conflictos y retracts."""
     tpl = get_templates(locale)
     intro = tpl["view_intro"]
     body = graph.render_prose(locale=locale).strip()
     sections = [intro, "", body]
+
+    conflict_prose = _conflicts_to_prose(graph, locale=locale)
+    if conflict_prose:
+        sections.extend(["", tpl["conflict_intro"], conflict_prose])
 
     if previous is not None:
         diff = _diff_to_prose(previous, graph, locale=locale)
         if diff:
             sections.extend(["", tpl["change_intro"], diff])
 
+    retract_prose = _retracts_to_prose(retract_log or [], locale=locale)
+    if retract_prose:
+        sections.extend(["", tpl["retract_intro"], retract_prose])
+
     prose = "\n".join(sections).rstrip() + "\n"
     return StateView(prose=prose)
+
+
+def _conflicts_to_prose(graph: ContextGraph, *, locale: str) -> str:
+    tpl = get_templates(locale)
+    lines: list[str] = []
+    for node in graph.nodes:
+        entries = node.properties.get("conflict_entries") or []
+        for entry in entries:
+            prev_sources = ", ".join(entry.get("previous_sources") or [])
+            new_sources = ", ".join(entry.get("incoming_sources") or [])
+            lines.append(
+                tpl["conflict_item"].format(
+                    property=entry.get("property", ""),
+                    previous=entry.get("previous", ""),
+                    incoming=entry.get("incoming", ""),
+                    prev_sources=prev_sources or "?",
+                    new_sources=new_sources or "?",
+                )
+            )
+    return "\n".join(lines)
+
+
+def _retracts_to_prose(retract_log: list[RetractRecord], *, locale: str) -> str:
+    tpl = get_templates(locale)
+    lines: list[str] = []
+    for record in retract_log:
+        lines.append(
+            tpl["retract_item"].format(
+                commit_id=record.commit_id,
+                previous=record.previous or "?",
+                corrected=record.corrects,
+                source_id=record.source_id,
+            )
+        )
+    return "\n".join(lines)
 
 
 def _dedup_to_structured(dedup) -> StructuredContext:

@@ -37,6 +37,7 @@ class TestSemanticStateSerialization:
         assert len(restored.blocks) == 2
         assert restored.graph is not None
         assert len(restored.history) == 2
+        assert restored.max_commits == 100
         assert len(restored.graph.nodes) == len(result.state.graph.nodes)
         assert restored.graph.render_prose(locale="en") == result.state.graph.render_prose(locale="en")
 

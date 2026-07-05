@@ -14,6 +14,11 @@ from ..level4.builder import _dedupe_edges
 from ..level4.render import serialize_graph_internal
 
 
+_SKIP_PROPERTY_KEYS = frozenset(
+    {"actions", "conflict", "conflict_entries", "retracts", "superseded_by"}
+)
+
+
 def merge_context_graphs(
     base: ContextGraph | None,
     incoming: ContextGraph,
@@ -58,15 +63,32 @@ def merge_context_graphs(
 
 
 def _merge_node_properties(existing: GraphNode, incoming: GraphNode) -> None:
+    conflicts = list(existing.properties.get("conflict_entries", []))
     for key, value in incoming.properties.items():
+        if key in _SKIP_PROPERTY_KEYS:
+            continue
         if key == "actions":
             actions = list(existing.properties.get("actions", []))
             for action in value:
                 if action not in actions:
                     actions.append(action)
             existing.properties["actions"] = actions
-        else:
-            existing.properties[key] = value
+            continue
+        if key in existing.properties and existing.properties[key] != value:
+            existing.properties["conflict"] = True
+            conflicts.append(
+                {
+                    "property": key,
+                    "previous": existing.properties[key],
+                    "incoming": value,
+                    "previous_sources": list(existing.source_refs),
+                    "incoming_sources": list(incoming.source_refs),
+                }
+            )
+        existing.properties[key] = value
+    if conflicts:
+        existing.properties["conflict_entries"] = conflicts
+        existing.properties["conflict"] = True
 
 
 def _clone_node(node: GraphNode) -> GraphNode:

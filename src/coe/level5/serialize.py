@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from ..models import ContextBlock, ContextGraph
-from .state import Commit, SemanticState
+from .state import Commit, RetractRecord, SemanticState
 
 STATE_SCHEMA_VERSION = "0.1"
 
@@ -50,6 +50,24 @@ def commit_from_dict(data: dict[str, Any]) -> Commit:
     )
 
 
+def retract_record_to_dict(record: RetractRecord) -> dict[str, Any]:
+    return {
+        "commit_id": record.commit_id,
+        "previous": record.previous,
+        "corrects": record.corrects,
+        "source_id": record.source_id,
+    }
+
+
+def retract_record_from_dict(data: dict[str, Any]) -> RetractRecord:
+    return RetractRecord(
+        commit_id=data["commit_id"],
+        previous=str(data.get("previous") or ""),
+        corrects=data["corrects"],
+        source_id=data["source_id"],
+    )
+
+
 def semantic_state_to_dict(state: SemanticState) -> dict[str, Any]:
     return {
         "schema_version": STATE_SCHEMA_VERSION,
@@ -59,6 +77,8 @@ def semantic_state_to_dict(state: SemanticState) -> dict[str, Any]:
         "head_commit_id": state.head_commit_id,
         "history": [commit_to_dict(commit) for commit in state.history],
         "commit_count": state.commit_count,
+        "max_commits": state.max_commits,
+        "retract_log": [retract_record_to_dict(record) for record in state.retract_log],
     }
 
 
@@ -71,4 +91,8 @@ def semantic_state_from_dict(data: dict[str, Any]) -> SemanticState:
         head_commit_id=data.get("head_commit_id"),
         history=[commit_from_dict(item) for item in data.get("history") or []],
         commit_count=int(data.get("commit_count") or 0),
+        max_commits=int(data.get("max_commits") or 100),
+        retract_log=[
+            retract_record_from_dict(item) for item in data.get("retract_log") or []
+        ],
     )

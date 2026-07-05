@@ -11,7 +11,7 @@ from .level1 import deduplicate_context
 from .level2 import factorize_context
 from .level3 import structure_context
 from .level4 import build_context_graph
-from .level5 import InMemoryStateStore, StateView, update_semantic_state
+from .level5 import StateView, update_semantic_state
 from .level5.store import StateStore
 from .models import (
     ContextBlock,
@@ -38,6 +38,7 @@ class OptimizeOptions:
     query_context: str | None = None
     section_delimiters: bool = True
     include_pending_turn: bool = False
+    max_commits: int | None = None
 
 
 @dataclass
@@ -112,6 +113,7 @@ def optimize_context(
     state_store: StateStore | None = None,
     section_delimiters: bool | None = None,
     include_pending_turn: bool | None = None,
+    max_commits: int | None = None,
 ) -> OptimizeResult:
     """
     Ejecuta el pipeline COE sobre bloques o un ``ContextBundle``.
@@ -122,6 +124,7 @@ def optimize_context(
     bundle: ContextBundle | None = None
     bundle_section_delimiters = True
     bundle_include_pending_turn = False
+    bundle_max_commits: int | None = None
     if isinstance(blocks, ContextBundle):
         bundle = blocks
         blocks_list = bundle.blocks
@@ -130,6 +133,7 @@ def optimize_context(
         session_id = session_id if session_id is not None else bundle.session_id
         bundle_section_delimiters = bundle.options.section_delimiters
         bundle_include_pending_turn = bundle.options.include_pending_turn
+        bundle_max_commits = bundle.options.max_commits
     else:
         blocks_list = blocks
         locale = locale if locale is not None else "en"
@@ -158,6 +162,7 @@ def optimize_context(
         query_context=bundle.query_context if bundle else None,
         section_delimiters=resolved_section_delimiters,
         include_pending_turn=resolved_include_pending_turn,
+        max_commits=max_commits if max_commits is not None else bundle_max_commits,
     )
     return _optimize(blocks_list, opts, ingest_notes=level_notes)
 
@@ -241,10 +246,11 @@ def _optimize(
         n5_result = update_semantic_state(
             blocks_work,
             session_id=opts.session_id or "_ephemeral",
-            store=opts.state_store or InMemoryStateStore(),
+            store=opts.state_store,
             locale=opts.locale,
             levels=sub_levels,
             query_context=opts.query_context,
+            max_commits=opts.max_commits,
         )
         elapsed = (time.perf_counter() - t0) * 1000.0
         latency_by_level["n5"] = elapsed

@@ -18,6 +18,10 @@ _TEMPLATES: dict[str, dict[str, str]] = {
         "edge_knows": "{source} knows {target}.",
         "edge_company": "{source} works at {target}.",
         "edge_generic": "{source} → {target} ({edge_type}).",
+        "conflict_intro": "Conflicting information in session state:",
+        "conflict_item": "Source {prev_sources} says {property} is {previous}; source {new_sources} says {incoming}.",
+        "retract_intro": "Corrections since earlier turns:",
+        "retract_item": "Previously ({commit_id}): {previous}; corrected to: {corrected} (source {source_id}).",
     },
     "es": {
         "shared_intro": "La siguiente información aparece en varias fuentes:",
@@ -32,6 +36,10 @@ _TEMPLATES: dict[str, dict[str, str]] = {
         "edge_knows": "{source} conoce a {target}.",
         "edge_company": "{source} trabaja en {target}.",
         "edge_generic": "{source} → {target} ({edge_type}).",
+        "conflict_intro": "Información contradictoria en el estado de sesión:",
+        "conflict_item": "La fuente {prev_sources} indica {property} = {previous}; la fuente {new_sources} indica {incoming}.",
+        "retract_intro": "Correcciones respecto a turnos anteriores:",
+        "retract_item": "Antes ({commit_id}): {previous}; corregido a: {corrected} (fuente {source_id}).",
     },
 }
 

@@ -14,6 +14,7 @@ class TestN5StateView:
         result = update_semantic_state(
             blocks,
             session_id="sess-1",
+            store=InMemoryStateStore(),
             locale="en",
             levels=[1],
         )
@@ -109,7 +110,13 @@ class TestN5StateView:
             ContextBlock(id="A", content="Empresa: ACME\nJuan works at ACME."),
             ContextBlock(id="B", content="Empresa: ACME\nPedro works at ACME."),
         ]
-        out = optimize_context(blocks, levels=[1, 5], locale="en", session_id="sess-x")
+        out = optimize_context(
+            blocks,
+            levels=[1, 5],
+            locale="en",
+            session_id="sess-x",
+            state_store=InMemoryStateStore(),
+        )
 
         assert out.state_view is not None
         assert out.commit_id == "sess-x-c1"

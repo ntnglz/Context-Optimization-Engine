@@ -12,6 +12,22 @@ from .serialize import semantic_state_from_dict, semantic_state_to_dict
 from .state import SemanticState
 
 _SAFE_SESSION_ID = re.compile(r"^[\w.-]+$")
+DEFAULT_SESSIONS_ROOT = Path("data/sessions")
+_EPHEMERAL_SESSION = "_ephemeral"
+
+
+def resolve_state_store(
+    session_id: str | None,
+    store: StateStore | None,
+    *,
+    root: str | Path | None = None,
+) -> StateStore:
+    """Elige store durable si hay ``session_id`` real y no se pasó uno explícito."""
+    if store is not None:
+        return store
+    if session_id and session_id != _EPHEMERAL_SESSION:
+        return FilesystemStateStore(root or DEFAULT_SESSIONS_ROOT)
+    return InMemoryStateStore()
 
 
 class StateStore(Protocol):

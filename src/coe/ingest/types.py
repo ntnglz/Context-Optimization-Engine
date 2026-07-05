@@ -19,6 +19,7 @@ class IngestOptions:
     cite_sources: bool = False
     section_delimiters: bool = True
     include_pending_turn: bool = False
+    max_commits: int | None = None
 
 
 @dataclass

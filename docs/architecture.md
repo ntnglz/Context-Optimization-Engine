@@ -284,7 +284,7 @@ Los benchmarks vivirán en `data/` + `tests/` + `scripts/comprehension_benchmark
 | **C** | N2 factorización | ✅ |
 | **D** | CIR + refactor pipeline | 📝 Fase 6 — diferido |
 | **E** | MCP + benchmark RAG | ⏳ Fase 5 |
-| **F** | N3–N5 + State Store | ✅ N3–N5 v1; Store parcial (Fase 3 cierra producción) |
+| **F** | N3–N5 + State Store | ✅ N3–N5 v1; Store producción (auto-store, retención, conflictos) |
 
 ### Orden vigente (resumen)
 
@@ -295,7 +295,7 @@ Ver [execution-plan.md](execution-plan.md) para entregables, criterios de hecho 
 | 0 | Sincronizar documentación | ✅ |
 | 1 | Context Ingest + ContextBundle | ✅ |
 | 2 | Renderer + ensamblaje Gateway | ✅ |
-| 3 | N5 producción | ⏳ |
+| 3 | N5 producción | ✅ |
 | 4 | Harness madurez + casos reales | ⏳ |
 | 5 | MCP COE | ⏳ |
 | 6 | CIR formal | 📝 diferido |

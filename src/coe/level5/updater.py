@@ -5,8 +5,9 @@ from __future__ import annotations
 from ..models import ContextBlock, estimate_tokens
 from .materialize import blocks_to_context_graph, render_state_view
 from .merge import merge_context_graphs, _clone_graph
-from .state import Commit, SemanticState, StateView, UpdateResult
-from .store import InMemoryStateStore, StateStore
+from .retention import DEFAULT_MAX_COMMITS, prune_history
+from .state import Commit, RetractRecord, SemanticState, StateView, UpdateResult
+from .store import StateStore, resolve_state_store
 
 
 def update_semantic_state(
@@ -17,6 +18,7 @@ def update_semantic_state(
     locale: str | None = "en",
     levels: list[int] | None = None,
     query_context: str | None = None,
+    max_commits: int | None = None,
 ) -> UpdateResult:
     """
     Integra el grafo del turno en el State Store y materializa ``StateView``.
@@ -31,11 +33,17 @@ def update_semantic_state(
     if 5 in sub_levels:
         sub_levels = [n for n in sub_levels if n != 5] or [1]
 
-    state_store = store or InMemoryStateStore()
+    state_store = resolve_state_store(session_id, store)
     state = state_store.load(session_id) or SemanticState(session_id=session_id)
+    if max_commits is not None:
+        state.max_commits = max_commits
+    elif state.max_commits <= 0:
+        state.max_commits = DEFAULT_MAX_COMMITS
+
     previous_graph = _clone_graph(state.graph) if state.graph is not None else None
 
     _merge_blocks(state, blocks)
+    _collect_retracts(state, blocks)
 
     turn_graph = blocks_to_context_graph(blocks, locale=loc, levels=sub_levels)
     if query_context:
@@ -59,10 +67,12 @@ def update_semantic_state(
         state.graph,
         previous=previous_graph,
         locale=loc,
+        retract_log=state.retract_log,
     ) if state.graph is not None else StateView(prose="")
 
     state.history.append(Commit(commit_id=commit_id, graph=_clone_graph(state.graph)))
     state.head_commit_id = commit_id
+    prune_history(state)
     state_store.save(state)
 
     return UpdateResult(
@@ -87,5 +97,20 @@ def _merge_blocks(state: SemanticState, new_blocks: list[ContextBlock]) -> None:
                 detected_lang=block.detected_lang,
                 token_estimate=block.token_estimate,
                 metadata=dict(block.metadata),
+            )
+        )
+
+
+def _collect_retracts(state: SemanticState, blocks: list[ContextBlock]) -> None:
+    for block in blocks:
+        retracts = block.metadata.get("retracts")
+        if not retracts:
+            continue
+        state.retract_log.append(
+            RetractRecord(
+                commit_id=str(retracts),
+                previous=str(block.metadata.get("previous") or ""),
+                corrects=str(block.metadata.get("corrects") or block.content.strip()),
+                source_id=block.id,
             )
         )

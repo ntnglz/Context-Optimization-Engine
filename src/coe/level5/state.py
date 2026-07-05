@@ -26,6 +26,16 @@ class Commit:
 
 
 @dataclass
+class RetractRecord:
+    """Corrección explícita referenciando un commit previo."""
+
+    commit_id: str
+    previous: str
+    corrects: str
+    source_id: str
+
+
+@dataclass
 class SemanticState:
     """Estado acumulado de sesión en el State Store."""
 
@@ -35,6 +45,8 @@ class SemanticState:
     head_commit_id: str | None = None
     history: list[Commit] = field(default_factory=list)
     commit_count: int = 0
+    max_commits: int = 100
+    retract_log: list[RetractRecord] = field(default_factory=list)
 
 
 @dataclass

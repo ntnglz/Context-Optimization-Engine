@@ -20,11 +20,11 @@ Este plan **reemplaza** `architecture.md` §9 como orden de trabajo. La arquitec
 |-------|------|--------|-------|
 | N1–N4 | ✅ | ✅ | Gates smoke en CI |
 | N5 merge + commits | ✅ | ✅ | `n5_session`, `n5_graph_session` |
-| State Store | ✅ | ⚠️ parcial | `InMemory` + `FilesystemStateStore`; sin retención ni auto-wire Gateway |
-| Gateway `optimize_context` | ✅ | ✅ | Acepta `list[ContextBlock]`; no `ContextBundle` |
-| L0 | ✅ | ⚠️ parcial | ES→EN heurístico; sin bundle |
-| Context Ingest | ✅ | ❌ | Sin `ingest_context`, sin `source_type`, sin matriz niveles |
-| Renderer unificado | ✅ | ⚠️ parcial | `render_n1_prose` existe; ensamblaje Gateway incompleto vs `renderer.md` |
+| State Store | ✅ | ✅ | `FilesystemStateStore` + auto-wire Gateway; retención `max_commits`; conflictos/retracts en prosa |
+| Gateway `optimize_context` | ✅ | ✅ | Acepta `ContextBundle` y `list[ContextBlock]` |
+| L0 | ✅ | ⚠️ parcial | ES→EN heurístico; con bundle |
+| Context Ingest | ✅ | ✅ | `ingest_context`, `source_type`, matriz niveles |
+| Renderer unificado | ✅ | ✅ | Ensamblaje Gateway según `renderer.md` |
 | Harness capa 0–1 | ✅ | ✅ | 8 perfiles smoke mock |
 | Harness capa 2 (Ollama) | ✅ | ❌ | Sin tier `release` en CI local |
 | MCP | ✅ acotado | ❌ | Fase 5 |
@@ -158,7 +158,7 @@ Este plan **reemplaza** `architecture.md` §9 como orden de trabajo. La arquitec
 | 0 | Sincronizar documentación | ✅ cerrada | — |
 | 1 | Context Ingest + ContextBundle | ✅ cerrada | — |
 | 2 | Renderer + ensamblaje Gateway | ✅ cerrada | — |
-| 3 | N5 producción | ⏳ pendiente | — |
+| 3 | N5 producción | ✅ cerrada | (este commit) |
 | 4 | Harness madurez + casos reales | ⏳ pendiente | — |
 | 5 | MCP COE | ⏳ pendiente | — |
 | 6 | CIR formal | 📝 diferido | — |
