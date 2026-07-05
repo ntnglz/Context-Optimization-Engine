@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 
-from coe.ingest.detect import detect_language, has_spanish_surface
+from coe.ingest.detect import detect_language, has_chinese_surface, has_spanish_surface
 
 
 def user_language_match(response: str, expected_lang: str) -> bool:
@@ -23,6 +23,9 @@ def user_language_match(response: str, expected_lang: str) -> bool:
         return True
 
     if expected == "es" and has_spanish_surface(text):
+        return True
+
+    if expected == "zh" and has_chinese_surface(text):
         return True
 
     if expected == "en" and detected == "unknown":

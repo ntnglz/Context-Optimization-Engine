@@ -14,6 +14,16 @@ class LocalePack:
     works_at_action_prefix: str
 
 
+@dataclass(frozen=True)
+class ParsedStatement:
+    entity: str
+    kind: str  # "attribute" | "action"
+    attribute_key: str | None = None
+    attribute_value: str | None = None
+    action_text: str | None = None
+    source_line: str = ""
+
+
 _LOCALE_PACKS: dict[str, LocalePack] = {
     "en": LocalePack(
         works_at_re=re.compile(
@@ -61,19 +71,11 @@ _LOCALE_PACKS: dict[str, LocalePack] = {
 }
 
 
-@dataclass(frozen=True)
-class ParsedStatement:
-    entity: str
-    kind: str  # "attribute" | "action"
-    attribute_key: str | None = None
-    attribute_value: str | None = None
-    action_text: str | None = None
-    source_line: str = ""
-
-
 def parse_line(line: str, *, locale: str = "en") -> ParsedStatement | None:
     """Parsea una línea con sujeto explícito repetido."""
     key = locale.split("-")[0].lower()
+    if key == "zh" and "zh" not in _LOCALE_PACKS:
+        _register_zh_pack()
     pack = _LOCALE_PACKS.get(key)
     if pack is None:
         raise NotImplementedError(f"Locale pack not implemented: {locale!r}")
@@ -81,6 +83,11 @@ def parse_line(line: str, *, locale: str = "en") -> ParsedStatement | None:
     text = line.strip()
     if not text:
         return None
+
+    if key == "zh":
+        from ..locales.zh.patterns import parse_line_zh
+
+        return parse_line_zh(text, pack)
 
     match = pack.works_at_re.match(text)
     if match:
@@ -125,3 +132,9 @@ def _normalize_entity(name: str) -> str:
     if not parts:
         return ""
     return " ".join(p[:1].upper() + p[1:] if p else p for p in parts)
+
+
+def _register_zh_pack() -> None:
+    from ..locales.zh.patterns import ZH_LOCALE_PACK
+
+    _LOCALE_PACKS["zh"] = ZH_LOCALE_PACK

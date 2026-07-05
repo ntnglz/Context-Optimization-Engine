@@ -37,6 +37,9 @@ run_benchmark n1_n2_en data/benchmarks/baselines/n1_n2_en_smoke.json
 step "benchmark smoke n1_n2_es (multilingual)"
 run_benchmark n1_n2_es data/benchmarks/baselines/n1_n2_es_smoke.json --tags multilingual
 
+step "benchmark smoke n1_n2_zh (multilingual)"
+run_benchmark n1_n2_zh data/benchmarks/baselines/n1_n2_zh_smoke.json --tags zh
+
 step "benchmark smoke l0_n1_en (multilingual)"
 run_benchmark l0_n1_en data/benchmarks/baselines/l0_n1_en_smoke.json --tags multilingual
 

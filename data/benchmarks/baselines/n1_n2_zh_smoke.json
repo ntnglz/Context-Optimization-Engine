@@ -1,0 +1,49 @@
+{
+  "harness_version": "0.4.0",
+  "profile_id": "n1_n2_zh",
+  "tier": "smoke",
+  "evaluator": "mock",
+  "cases_run": 1,
+  "cases_passed": 1,
+  "gate_passed": true,
+  "gate_failures": [],
+  "summary": {
+    "factual_recall_mean": 1.0,
+    "t_coe_p95_ms": 0.74,
+    "artifact_leak_rate": 0.0,
+    "prose_ratio_mean": 0.5417,
+    "comprehension_similarity_mean": 1.0,
+    "comprehension_delta_mean": 0.0,
+    "factual_f1_mean": 1.0,
+    "user_language_match_rate": 1.0
+  },
+  "results": [
+    {
+      "case_id": "acme_budget_zh_v1",
+      "passed": true,
+      "failures": [],
+      "metrics": {
+        "t_coe_ms": 0.74,
+        "optimized_tokens": 13,
+        "original_tokens": 24,
+        "prose_ratio": 0.5417,
+        "artifact_leak": false,
+        "factual_recall": 1.0,
+        "factual_f1": 1.0,
+        "comprehension_similarity": 1.0,
+        "comprehension_delta": 0.0,
+        "readability_score": null,
+        "readability_score_a": null,
+        "user_language_ok": true,
+        "response_artifact_leak": false
+      },
+      "optimized_context_preview": "公司：ACME\n客户：Globex\n张三在ACME工作，批准了预算。\n预算：80k\n李四在ACME工作。\n"
+    }
+  ],
+  "metadata": {
+    "git_sha": "1108a15",
+    "embedding_backend": "simple",
+    "embedding_model": "paraphrase-multilingual-MiniLM-L12-v2",
+    "evaluator": "mock"
+  }
+}

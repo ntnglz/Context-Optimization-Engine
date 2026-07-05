@@ -7,16 +7,19 @@ from ..models import SharedFact, StructuredContext, StructuredEntity, Structured
 _COMPANY_PHRASE = {
     "en": "works at {company}",
     "es": "trabaja en {company}",
+    "zh": "在{company}工作",
 }
 
 _KNOWS_PHRASE = {
     "en": "knows {target}",
     "es": "conoce a {target}",
+    "zh": "认识{target}",
 }
 
 _CONJUNCTION = {
     "en": {"pair": " and ", "list": ", "},
     "es": {"pair": " y ", "list": ", "},
+    "zh": {"pair": "，", "list": "，"},
 }
 
 

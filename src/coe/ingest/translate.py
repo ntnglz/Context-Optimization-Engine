@@ -15,6 +15,21 @@ _LINE_TRANSLATIONS: dict[str, str] = {
     "Juan trabaja en ACME.": "Juan works at ACME.",
     "Pedro trabaja en ACME.": "Pedro works at ACME.",
     "Juan aprobó el presupuesto.": "Juan approved the budget.",
+    "Company: ACME": "公司：ACME",
+    "Client: Globex": "客户：Globex",
+    "Budget: 50k": "预算：80k",
+    "Juan works at ACME.": "张三在ACME工作。",
+    "Pedro works at ACME.": "李四在ACME工作。",
+    "Juan approved the budget.": "张三批准了预算。",
+}
+
+_LINE_TRANSLATIONS_EN_ZH: dict[str, str] = {
+    "Company: ACME": "公司：ACME",
+    "Client: Globex": "客户：Globex",
+    "Budget: 50k": "预算：80k",
+    "Juan works at ACME.": "张三在ACME工作。",
+    "Pedro works at ACME.": "李四在ACME工作。",
+    "Juan approved the budget.": "张三批准了预算。",
 }
 
 _SUBSTRING_REPLACEMENTS: tuple[tuple[str, str], ...] = (
@@ -46,6 +61,8 @@ def translate_text(text: str, *, source_lang: str, target_lang: str) -> str:
     pair = (source_lang.split("-")[0].lower(), target_lang.split("-")[0].lower())
     if pair == ("es", "en"):
         return _translate_es_en(text)
+    if pair == ("en", "zh"):
+        return _translate_en_zh(text)
     raise NotImplementedError(f"Translation pair not supported: {pair!r}")
 
 
@@ -112,6 +129,32 @@ def _translate_es_en(text: str) -> str:
     lines = text.splitlines()
     translated = [_translate_line_es_en(line) for line in lines]
     return "\n".join(translated)
+
+
+def _translate_en_zh(text: str) -> str:
+    lines = text.splitlines()
+    translated = [_translate_line_en_zh(line) for line in lines]
+    return "\n".join(translated)
+
+
+def _translate_line_en_zh(line: str) -> str:
+    stripped = line.strip()
+    if not stripped:
+        return line
+    if stripped in _LINE_TRANSLATIONS_EN_ZH:
+        return _LINE_TRANSLATIONS_EN_ZH[stripped]
+    result = stripped
+    for src, dst in (
+        ("works at", "在"),
+        ("approved the budget", "批准了预算"),
+        ("Budget:", "预算："),
+        ("Company:", "公司："),
+        ("Client:", "客户："),
+    ):
+        result = result.replace(src, dst)
+    if result.endswith(".") and not result.endswith("。"):
+        result = result[:-1] + "。"
+    return result
 
 
 def _translate_line_es_en(line: str) -> str:

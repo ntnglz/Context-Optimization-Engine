@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 _ES_MARKERS = (
     "trabaja en",
     "aprobó",
@@ -40,6 +42,17 @@ _ES_SURFACE_MARKERS = (
     "prioridad",
     "según",
 )
+_ZH_MARKERS = (
+    "公司",
+    "预算",
+    "批准",
+    "工作",
+    "客户",
+    "中文",
+    "。",
+    "？",
+)
+_CJK_RE = re.compile(r"[\u4e00-\u9fff]")
 
 
 def _spanish_surface_score(text: str) -> int:
@@ -54,8 +67,24 @@ def has_spanish_surface(text: str) -> bool:
     )
 
 
+def has_chinese_surface(text: str) -> bool:
+    """Heurística para prosa zh con tokens latinos (nombres propios, IDs)."""
+    cjk = len(_CJK_RE.findall(text))
+    if cjk == 0:
+        return False
+    letters = re.findall(r"\S", text)
+    if not letters:
+        return False
+    if cjk / len(letters) >= 0.25:
+        return True
+    return sum(1 for marker in _ZH_MARKERS if marker in text) >= 1
+
+
 def _heuristic_detect(text: str) -> tuple[str, float]:
     """Fallback para textos cortos o cuando langdetect falla."""
+    if has_chinese_surface(text):
+        return "zh", 0.85
+
     lower = text.lower()
     es_score = sum(1 for marker in _ES_MARKERS if marker in lower)
     en_score = sum(1 for marker in _EN_MARKERS if marker in lower)

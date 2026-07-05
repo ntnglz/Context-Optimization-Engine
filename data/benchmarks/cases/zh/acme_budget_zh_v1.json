@@ -1,0 +1,35 @@
+{
+  "id": "acme_budget_zh_v1",
+  "version": 1,
+  "tags": ["zh", "single_turn"],
+  "description": "ACME 预算 — 中文问题",
+
+  "blocks": [
+    {
+      "id": "A",
+      "source_type": "rag",
+      "content": "公司：ACME\n客户：Globex\n张三在ACME工作。"
+    },
+    {
+      "id": "B",
+      "source_type": "rag",
+      "content": "公司：ACME\n预算：80k\n张三批准了预算。"
+    },
+    {
+      "id": "C",
+      "source_type": "rag",
+      "content": "公司：ACME\n客户：Globex\n李四在ACME工作。"
+    }
+  ],
+
+  "question": "谁批准了ACME的预算？",
+  "expected_facts": ["张三", "批准", "预算"],
+  "response_lang": "zh",
+  "user_message_lang": "zh",
+  "system_addendum": "请用中文回答，表述清晰。",
+
+  "mock": {
+    "arm_a_response": "张三批准了ACME的预算。",
+    "arm_b_response": "张三批准了ACME的预算。"
+  }
+}

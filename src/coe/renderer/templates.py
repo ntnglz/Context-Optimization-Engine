@@ -44,6 +44,16 @@ _TEMPLATES: dict[str, dict[str, str]] = {
 }
 
 
+def _ensure_zh_templates() -> None:
+    if "zh" in _TEMPLATES:
+        return
+    from ..locales.zh.templates import ZH_TEMPLATES
+
+    _TEMPLATES["zh"] = ZH_TEMPLATES
+
+
 def get_templates(locale: str | None) -> dict[str, str]:
     key = (locale or DEFAULT_LOCALE).split("-")[0].lower()
+    if key == "zh":
+        _ensure_zh_templates()
     return _TEMPLATES.get(key, _TEMPLATES[DEFAULT_LOCALE])

@@ -7,11 +7,13 @@ from ..models import FactorizationResult, SharedFact
 _COMPANY_PHRASE = {
     "en": "works at {company}",
     "es": "trabaja en {company}",
+    "zh": "在{company}工作",
 }
 
 _CONJUNCTION = {
     "en": {"pair": " and ", "list": ", "},
     "es": {"pair": " y ", "list": ", "},
+    "zh": {"pair": "，", "list": "，"},
 }
 
 
@@ -55,13 +57,19 @@ def _render_entity_prose(entity, *, locale: str) -> str:
         return f"{entity.name}."
 
     if len(parts) == 1:
+        if loc == "zh":
+            return f"{entity.name}{parts[0]}。"
         return f"{entity.name} {parts[0]}."
 
-    head = f"{entity.name} {parts[0]}"
+    head = f"{entity.name} {parts[0]}" if loc != "zh" else f"{entity.name}{parts[0]}"
     if len(parts) == 2:
+        if loc == "zh":
+            return f"{head}{conj['pair']}{parts[1]}。"
         return f"{head}{conj['pair']}{parts[1]}."
 
     middle = conj["list"].join(parts[1:-1])
+    if loc == "zh":
+        return f"{head}{conj['list']}{middle}{conj['pair']}{parts[-1]}。"
     return f"{head}{conj['list']}{middle}{conj['pair']}{parts[-1]}."
 
 

@@ -120,6 +120,34 @@ class TestHarnessMultilingualN2:
         assert compare_reports(report.to_dict(), baseline) == []
 
 
+class TestHarnessMultilingualN2Zh:
+    def test_run_n1_n2_zh_smoke(self):
+        report = run_suite_from_ids(
+            profile_id="n1_n2_zh",
+            tier="smoke",
+            tags={"zh"},
+            benchmark_root=BENCH,
+        )
+        assert report.cases_run == 1
+        assert report.gate_passed
+        assert report.summary["comprehension_similarity_mean"] >= 0.9
+        assert "entity:" not in (report.results[0].optimized_context_preview or "")
+
+    def test_n1_n2_zh_baseline_compare(self):
+        import json
+
+        report = run_suite_from_ids(
+            profile_id="n1_n2_zh",
+            tier="smoke",
+            tags={"zh"},
+            benchmark_root=BENCH,
+        )
+        baseline = json.loads(
+            (BENCH / "baselines" / "n1_n2_zh_smoke.json").read_text(encoding="utf-8")
+        )
+        assert compare_reports(report.to_dict(), baseline) == []
+
+
 class TestHarnessN5Session:
     def test_run_n5_session_smoke(self):
         report = run_suite_from_ids(

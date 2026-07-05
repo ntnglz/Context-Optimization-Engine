@@ -11,6 +11,13 @@ class RelationPattern:
     knows_re: re.Pattern[str]
 
 
+@dataclass(frozen=True)
+class ParsedKnows:
+    entity: str
+    target: str
+    source_line: str
+
+
 _RELATION_PACKS: dict[str, RelationPattern] = {
     "en": RelationPattern(
         knows_re=re.compile(
@@ -29,15 +36,10 @@ _RELATION_PACKS: dict[str, RelationPattern] = {
 }
 
 
-@dataclass(frozen=True)
-class ParsedKnows:
-    entity: str
-    target: str
-    source_line: str
-
-
 def parse_knows_line(line: str, *, locale: str = "en") -> ParsedKnows | None:
     key = locale.split("-")[0].lower()
+    if key == "zh" and "zh" not in _RELATION_PACKS:
+        _register_zh_relation_pack()
     pack = _RELATION_PACKS.get(key)
     if pack is None:
         raise NotImplementedError(f"Locale pack not implemented: {locale!r}")
@@ -45,6 +47,11 @@ def parse_knows_line(line: str, *, locale: str = "en") -> ParsedKnows | None:
     text = line.strip()
     if not text:
         return None
+
+    if key == "zh":
+        from ..locales.zh.patterns import parse_knows_line_zh
+
+        return parse_knows_line_zh(text, pack)
 
     match = pack.knows_re.match(text)
     if not match:
@@ -62,3 +69,9 @@ def _normalize_name(name: str) -> str:
     if not parts:
         return ""
     return " ".join(p[:1].upper() + p[1:] if p else p for p in parts)
+
+
+def _register_zh_relation_pack() -> None:
+    from ..locales.zh.patterns import ZH_RELATION_PATTERN
+
+    _RELATION_PACKS["zh"] = ZH_RELATION_PATTERN

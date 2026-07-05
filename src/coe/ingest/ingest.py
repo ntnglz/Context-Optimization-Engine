@@ -41,9 +41,9 @@ def ingest_context(
         except ValueError as exc:
             raise ValueError(f"invalid raw block at index {index}: {exc}") from exc
 
-    blocks = normalize_blocks(blocks)
-
     resolved_locale = locale or target_lang or "en"
+    blocks = normalize_blocks(blocks, locale=resolved_locale)
+
     bundle = ContextBundle(
         blocks=blocks,
         target_lang=target_lang,
