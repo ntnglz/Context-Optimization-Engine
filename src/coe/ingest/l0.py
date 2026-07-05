@@ -90,6 +90,9 @@ def normalize_language(
             ContextBlock(
                 id=block.id,
                 content=translated_content,
+                source_type=block.source_type,
+                detected_lang=target,
+                token_estimate=block.token_estimate,
                 metadata=dict(block.metadata),
             )
         )

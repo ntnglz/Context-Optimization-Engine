@@ -11,17 +11,26 @@ STATE_SCHEMA_VERSION = "0.1"
 
 
 def context_block_to_dict(block: ContextBlock) -> dict[str, Any]:
-    return {
+    data: dict[str, Any] = {
         "id": block.id,
         "content": block.content,
+        "source_type": block.source_type,
         "metadata": dict(block.metadata),
     }
+    if block.detected_lang is not None:
+        data["detected_lang"] = block.detected_lang
+    if block.token_estimate is not None:
+        data["token_estimate"] = block.token_estimate
+    return data
 
 
 def context_block_from_dict(data: dict[str, Any]) -> ContextBlock:
     return ContextBlock(
         id=data["id"],
         content=data["content"],
+        source_type=data.get("source_type", "prose"),
+        detected_lang=data.get("detected_lang"),
+        token_estimate=data.get("token_estimate"),
         metadata=dict(data.get("metadata") or {}),
     )
 

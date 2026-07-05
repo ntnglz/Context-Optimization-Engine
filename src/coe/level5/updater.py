@@ -79,4 +79,13 @@ def _merge_blocks(state: SemanticState, new_blocks: list[ContextBlock]) -> None:
         if block_id in seen_ids:
             block_id = f"c{state.commit_count + 1}-{block.id}"
         seen_ids.add(block_id)
-        state.blocks.append(ContextBlock(id=block_id, content=block.content))
+        state.blocks.append(
+            ContextBlock(
+                id=block_id,
+                content=block.content,
+                source_type=block.source_type,
+                detected_lang=block.detected_lang,
+                token_estimate=block.token_estimate,
+                metadata=dict(block.metadata),
+            )
+        )

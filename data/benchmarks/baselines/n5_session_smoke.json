@@ -9,7 +9,7 @@
   "gate_failures": [],
   "summary": {
     "factual_recall_mean": 1.0,
-    "t_coe_p95_ms": 0.15,
+    "t_coe_p95_ms": 0.18,
     "artifact_leak_rate": 0.0,
     "prose_ratio_mean": 1.8919,
     "comprehension_similarity_mean": 1.0,
@@ -23,7 +23,7 @@
       "passed": true,
       "failures": [],
       "metrics": {
-        "t_coe_ms": 0.15,
+        "t_coe_ms": 0.18,
         "optimized_tokens": 70,
         "original_tokens": 37,
         "prose_ratio": 1.8919,

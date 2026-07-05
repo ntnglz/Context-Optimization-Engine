@@ -2,7 +2,7 @@
 
 > L0 idioma: [l0-ingest.md](l0-ingest.md) · Normalizer · matriz niveles · [architecture.md](architecture.md) §3
 
-**Estado:** spec transversal ✅ cerrada · implementación parcial (`ContextBlock` mínimo)
+**Estado:** spec transversal ✅ cerrada · **v1 implementado** (`src/coe/ingest/` · `ingest_context`, `ContextBundle`)
 
 ## Objetivo
 

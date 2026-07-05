@@ -67,7 +67,16 @@ def deduplicate_context(
         for key, canonical in block_lines[block.id]:
             if key not in shared_keys:
                 remaining.append(canonical)
-        unique_blocks.append(ContextBlock(id=block.id, content="\n".join(remaining)))
+        unique_blocks.append(
+            ContextBlock(
+                id=block.id,
+                content="\n".join(remaining),
+                source_type=block.source_type,
+                detected_lang=block.detected_lang,
+                token_estimate=block.token_estimate,
+                metadata=dict(block.metadata),
+            )
+        )
 
     if shared_facts:
         optimized_text = render_deduplication(

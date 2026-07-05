@@ -99,7 +99,7 @@ flowchart TB
 | Pieza | Responsabilidad | Entrada | Salida | Estado |
 |-------|-----------------|---------|--------|--------|
 | **Gateway** | Punto de entrada unificado (librería, CLI, MCP, HTTP futuro) | Petición del cliente | Contexto optimizado + métricas | ✅ `optimize_context` (L0, N1, N2, N3, N4, N5) |
-| **Context Ingest** | Normalizar fuentes heterogéneas a un modelo común; Normalizer; opcional **L0** | Texto, chunks RAG, tool output, etc. | `ContextBundle` / `ContextBlock[]` | Parcial · spec [ingest.md](ingest.md) |
+| **Context Ingest** | Normalizar fuentes heterogéneas a un modelo común; Normalizer; opcional **L0** | Texto, chunks RAG, tool output, etc. | `ContextBundle` / `ContextBlock[]` | v1 · `ingest_context` · `src/coe/ingest/` |
 | **L0 (Language norm.)** | Detectar idioma; traducir a `target_lang` **antes de N1** si hace falta | `ContextBlock[]` | `ContextBlock[]` en idioma base | v1 [l0-ingest.md](l0-ingest.md) · `src/coe/ingest/` |
 | **Normalizer** | Sub-etapa de Ingest: segmentación (líneas, oraciones `zh`), respeto fences | Bloques crudos | Unidades normalizadas | Parcial · `level1/normalize.py` |
 | **Optimization Pipeline** | Aplicar niveles de optimización en cadena configurable | Unidades + metadatos | Estructura optimizada | N1 ✅ · N2 ✅ · N3 v1 · N4 v1 · N5 v1 |
@@ -293,7 +293,7 @@ Ver [execution-plan.md](execution-plan.md) para entregables, criterios de hecho 
 | Fase | Nombre | Estado |
 |------|--------|--------|
 | 0 | Sincronizar documentación | ✅ |
-| 1 | Context Ingest + ContextBundle | ⏳ |
+| 1 | Context Ingest + ContextBundle | ✅ |
 | 2 | Renderer + ensamblaje Gateway | ⏳ |
 | 3 | N5 producción | ⏳ |
 | 4 | Harness madurez + casos reales | ⏳ |

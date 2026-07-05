@@ -20,9 +20,14 @@ class ContextBlock:
 
     id: str
     content: str
+    source_type: str = "prose"
+    detected_lang: str | None = None
+    token_estimate: int | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
 
     def token_count(self) -> int:
+        if self.token_estimate is not None:
+            return self.token_estimate
         return estimate_tokens(self.content)
 
 

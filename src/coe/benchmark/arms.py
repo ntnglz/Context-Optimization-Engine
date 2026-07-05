@@ -23,7 +23,10 @@ def render_multi_turn_arm_a(case: BenchmarkCase) -> str:
     assert case.session is not None
     sections: list[str] = []
     for turn_idx, turn in enumerate(case.session.turns, start=1):
-        turn_blocks = [ContextBlock(id=b.id, content=b.content) for b in turn.blocks]
+        turn_blocks = [
+            ContextBlock(id=b.id, content=b.content, source_type=b.source_type)
+            for b in turn.blocks
+        ]
         body = render_raw_context(turn_blocks).strip()
         sections.append(f"--- Turn {turn_idx} ---\nQ: {turn.question}\n{body}")
     return "\n\n".join(sections) + "\n"

@@ -6,7 +6,7 @@ import time
 from dataclasses import dataclass, field
 from typing import Any
 
-from .ingest import IngestTrace, normalize_language
+from .ingest import ContextBundle, IngestTrace, l0_allowed_for_blocks, normalize_language, resolve_effective_levels
 from .level1 import deduplicate_context
 from .level2 import factorize_context
 from .level3 import structure_context
@@ -34,6 +34,7 @@ class OptimizeOptions:
     l0: bool = False
     session_id: str | None = None
     state_store: StateStore | None = None
+    query_context: str | None = None
 
 
 @dataclass
@@ -98,30 +99,45 @@ class OptimizeResult:
 
 
 def optimize_context(
-    blocks: list[ContextBlock],
+    blocks: list[ContextBlock] | ContextBundle,
     *,
     levels: list[int] | None = None,
-    locale: str | None = "en",
+    locale: str | None = None,
     target_lang: str | None = None,
     l0: bool = False,
     session_id: str | None = None,
     state_store: StateStore | None = None,
 ) -> OptimizeResult:
     """
-    Ejecuta el pipeline COE sobre un bundle de bloques.
+    Ejecuta el pipeline COE sobre bloques o un ``ContextBundle``.
 
     Niveles soportados: **1** (dedup), **2** (factorización), **3** (estructura), **4** (grafo), **5** (estado).
     L0 opcional con ``l0=True`` y ``target_lang``.
     """
+    bundle: ContextBundle | None = None
+    if isinstance(blocks, ContextBundle):
+        bundle = blocks
+        blocks_list = bundle.blocks
+        locale = locale if locale is not None else bundle.locale
+        target_lang = target_lang if target_lang is not None else bundle.target_lang
+        session_id = session_id if session_id is not None else bundle.session_id
+    else:
+        blocks_list = blocks
+        locale = locale if locale is not None else "en"
+
+    requested_levels = _normalize_levels(levels or [1])
+    effective_levels, level_notes = resolve_effective_levels(requested_levels, blocks_list)
+
     opts = OptimizeOptions(
-        levels=_normalize_levels(levels or [1]),
+        levels=effective_levels,
         locale=locale,
         target_lang=target_lang,
         l0=l0,
         session_id=session_id,
         state_store=state_store,
+        query_context=bundle.query_context if bundle else None,
     )
-    return _optimize(blocks, opts)
+    return _optimize(blocks_list, opts, ingest_notes=level_notes)
 
 
 def _normalize_levels(levels: list[int]) -> list[int]:
@@ -130,7 +146,12 @@ def _normalize_levels(levels: list[int]) -> list[int]:
     return sorted(set(levels))
 
 
-def _optimize(blocks: list[ContextBlock], opts: OptimizeOptions) -> OptimizeResult:
+def _optimize(
+    blocks: list[ContextBlock],
+    opts: OptimizeOptions,
+    *,
+    ingest_notes: list[str] | None = None,
+) -> OptimizeResult:
     unsupported = [n for n in opts.levels if n not in _SUPPORTED_LEVELS]
     if unsupported:
         raise NotImplementedError(f"Levels not implemented: {unsupported}")
@@ -143,9 +164,31 @@ def _optimize(blocks: list[ContextBlock], opts: OptimizeOptions) -> OptimizeResu
     ingest_trace: IngestTrace | None = None
     blocks_work = blocks
 
+    if ingest_notes:
+        trace.append(
+            LevelTrace(
+                level=0,
+                latency_ms=0.0,
+                detail="ingest: " + "; ".join(ingest_notes),
+            )
+        )
+
     t_total = time.perf_counter()
 
-    if opts.l0:
+    run_l0 = opts.l0
+    if run_l0:
+        l0_ok, l0_notes = l0_allowed_for_blocks(blocks_work)
+        if not l0_ok:
+            run_l0 = False
+            trace.append(
+                LevelTrace(
+                    level=0,
+                    latency_ms=0.0,
+                    detail="ingest: " + "; ".join(l0_notes),
+                )
+            )
+
+    if run_l0:
         if not opts.target_lang:
             raise ValueError("target_lang is required when l0=True")
         t0 = time.perf_counter()
@@ -179,6 +222,7 @@ def _optimize(blocks: list[ContextBlock], opts: OptimizeOptions) -> OptimizeResu
             store=opts.state_store or InMemoryStateStore(),
             locale=opts.locale,
             levels=sub_levels,
+            query_context=opts.query_context,
         )
         elapsed = (time.perf_counter() - t0) * 1000.0
         latency_by_level["n5"] = elapsed

@@ -156,7 +156,7 @@ Este plan **reemplaza** `architecture.md` §9 como orden de trabajo. La arquitec
 | Fase | Nombre | Estado | Commit cierre |
 |------|--------|--------|---------------|
 | 0 | Sincronizar documentación | ✅ cerrada | — |
-| 1 | Context Ingest + ContextBundle | ⏳ pendiente | — |
+| 1 | Context Ingest + ContextBundle | ✅ cerrada | — |
 | 2 | Renderer + ensamblaje Gateway | ⏳ pendiente | — |
 | 3 | N5 producción | ⏳ pendiente | — |
 | 4 | Harness madurez + casos reales | ⏳ pendiente | — |

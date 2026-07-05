@@ -86,7 +86,12 @@ def _run_n5_multi_turn(
     last = None
     for turn in case.session.turns:
         turn_blocks = [
-            ContextBlock(id=block.id, content=block.content) for block in turn.blocks
+            ContextBlock(
+                id=block.id,
+                content=block.content,
+                source_type=block.source_type,
+            )
+            for block in turn.blocks
         ]
         last = update_semantic_state(
             turn_blocks,

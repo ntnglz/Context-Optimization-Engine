@@ -44,6 +44,6 @@ def effective_expected_facts(case: BenchmarkCase) -> list[str]:
 
 def context_blocks(case: BenchmarkCase) -> list[ContextBlock]:
     return [
-        ContextBlock(id=b.id, content=b.content)
+        ContextBlock(id=b.id, content=b.content, source_type=b.source_type)
         for b in effective_blocks(case)
     ]
