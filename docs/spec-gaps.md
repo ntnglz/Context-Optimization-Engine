@@ -108,7 +108,7 @@ Excepción v1: flag `include_pending_turn=true` si merge difiere de commit (work
 |---|--------|------|
 | 1 | Ampliar `ContextBlock` + `ContextBundle` según [ingest.md](ingest.md) | 1 ✅ |
 | 2 | `ingest_context()` + matriz `source_type` | 1 ✅ |
-| 3 | Refactor N1 render → Renderer prosa + ensamblaje Gateway | 2 |
+| 3 | Refactor N1 render → Renderer prosa + ensamblaje Gateway | 2 ✅ |
 | 4 | N5 producción: auto-store, retención, conflictos | 3 |
 | 5 | Casos `dev_agent` + tier release Ollama | 4 |
 | 6 | MCP `optimize_context` / `estimate_savings` | 5 |

@@ -18,9 +18,9 @@ class TestLevel1Deduplication:
         rendered = result.render()
 
         assert "Empresa=ACME" in rendered
-        assert "Referencias: A, B, C" in rendered
+        assert "References: A, B, C" in rendered
         assert "Cliente=Globex" in rendered
-        assert "Referencias: A, C" in rendered
+        assert "References: A, C" in rendered
         assert "[B]" in rendered
         assert "Presupuesto: 50k" in rendered
         assert result.compression_ratio > 0

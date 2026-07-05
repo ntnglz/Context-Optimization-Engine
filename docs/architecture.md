@@ -104,7 +104,7 @@ flowchart TB
 | **Normalizer** | Sub-etapa de Ingest: segmentación (líneas, oraciones `zh`), respeto fences | Bloques crudos | Unidades normalizadas | Parcial · `level1/normalize.py` |
 | **Optimization Pipeline** | Aplicar niveles de optimización en cadena configurable | Unidades + metadatos | Estructura optimizada | N1 ✅ · N2 ✅ · N3 v1 · N4 v1 · N5 v1 |
 | **CIR** | Representación intermedia estable, optimizable y serializable | Salida de parser / pipeline | Árbol o grafo de contexto | Diseño (sin implementar) |
-| **Renderer** | Proyección **prosa** hacia LLM; ensamblaje final | Resultado del pipeline | String / messages[] | N1/N2 `render_prose` · spec [renderer.md](renderer.md) |
+| **Renderer** | Proyección **prosa** hacia LLM; ensamblaje final | Resultado del pipeline | String / messages[] | v1 · `renderer/assembly.py` |
 | **Metrics** | Tokens, ratio, latencia, integridad semántica | Antes / después del pipeline | Informe de métricas | Gateway + harness |
 | **State Store** | Mantener estado semántico entre turnos (Nivel 5) | Diffs de contexto | Vista materializada | v1 filesystem JSON + in-memory · `src/coe/level5/` |
 
@@ -294,7 +294,7 @@ Ver [execution-plan.md](execution-plan.md) para entregables, criterios de hecho 
 |------|--------|--------|
 | 0 | Sincronizar documentación | ✅ |
 | 1 | Context Ingest + ContextBundle | ✅ |
-| 2 | Renderer + ensamblaje Gateway | ⏳ |
+| 2 | Renderer + ensamblaje Gateway | ✅ |
 | 3 | N5 producción | ⏳ |
 | 4 | Harness madurez + casos reales | ⏳ |
 | 5 | MCP COE | ⏳ |

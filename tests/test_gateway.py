@@ -32,7 +32,7 @@ class TestRenderProse:
             ContextBlock(id="C", content="Empresa: ACME\nCliente: Globex"),
         ]
         result = deduplicate_context(blocks)
-        assert "Referencias:" in result.render()
+        assert "References:" in result.render()
 
 
 class TestOptimizeContext:

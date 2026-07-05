@@ -17,6 +17,8 @@ DEFAULT_SOURCE_TYPE = "prose"
 class IngestOptions:
     max_context_tokens: int | None = None
     cite_sources: bool = False
+    section_delimiters: bool = True
+    include_pending_turn: bool = False
 
 
 @dataclass

@@ -22,6 +22,7 @@ from .models import (
     estimate_tokens,
 )
 from .renderer import render_raw_context
+from .renderer.assembly import assemble_gateway_output, render_turn_prose
 
 _SUPPORTED_LEVELS = frozenset({1, 2, 3, 4, 5})
 
@@ -35,6 +36,8 @@ class OptimizeOptions:
     session_id: str | None = None
     state_store: StateStore | None = None
     query_context: str | None = None
+    section_delimiters: bool = True
+    include_pending_turn: bool = False
 
 
 @dataclass
@@ -107,6 +110,8 @@ def optimize_context(
     l0: bool = False,
     session_id: str | None = None,
     state_store: StateStore | None = None,
+    section_delimiters: bool | None = None,
+    include_pending_turn: bool | None = None,
 ) -> OptimizeResult:
     """
     Ejecuta el pipeline COE sobre bloques o un ``ContextBundle``.
@@ -115,15 +120,30 @@ def optimize_context(
     L0 opcional con ``l0=True`` y ``target_lang``.
     """
     bundle: ContextBundle | None = None
+    bundle_section_delimiters = True
+    bundle_include_pending_turn = False
     if isinstance(blocks, ContextBundle):
         bundle = blocks
         blocks_list = bundle.blocks
         locale = locale if locale is not None else bundle.locale
         target_lang = target_lang if target_lang is not None else bundle.target_lang
         session_id = session_id if session_id is not None else bundle.session_id
+        bundle_section_delimiters = bundle.options.section_delimiters
+        bundle_include_pending_turn = bundle.options.include_pending_turn
     else:
         blocks_list = blocks
         locale = locale if locale is not None else "en"
+
+    resolved_section_delimiters = (
+        section_delimiters
+        if section_delimiters is not None
+        else bundle_section_delimiters
+    )
+    resolved_include_pending_turn = (
+        include_pending_turn
+        if include_pending_turn is not None
+        else bundle_include_pending_turn
+    )
 
     requested_levels = _normalize_levels(levels or [1])
     effective_levels, level_notes = resolve_effective_levels(requested_levels, blocks_list)
@@ -136,6 +156,8 @@ def optimize_context(
         session_id=session_id,
         state_store=state_store,
         query_context=bundle.query_context if bundle else None,
+        section_delimiters=resolved_section_delimiters,
+        include_pending_turn=resolved_include_pending_turn,
     )
     return _optimize(blocks_list, opts, ingest_notes=level_notes)
 
@@ -229,7 +251,19 @@ def _optimize(
         trace.append(LevelTrace(level=5, latency_ms=elapsed, detail="state_view"))
         state_view = n5_result.view
         commit_id = n5_result.commit_id
-        text = state_view.render()
+        turn_prose = None
+        if opts.include_pending_turn:
+            turn_prose = render_turn_prose(
+                blocks_work,
+                levels=opts.levels,
+                locale=opts.locale,
+            )
+        text = assemble_gateway_output(
+            state_prose=state_view.render(),
+            turn_prose=turn_prose,
+            locale=opts.locale,
+            section_delimiters=opts.section_delimiters,
+        )
     elif run_n1:
         t0 = time.perf_counter()
         dedup = deduplicate_context(blocks_work)
@@ -245,32 +279,32 @@ def _optimize(
         latency_by_level["n2"] = elapsed
         trace.append(LevelTrace(level=2, latency_ms=elapsed, detail="factorize"))
 
-    if run_n3 and not run_n4:
-        t0 = time.perf_counter()
-        if factorized is None:
-            source = dedup if dedup is not None else blocks_work
-            factorized = factorize_context(source, locale=opts.locale)
-        structured = structure_context(factorized, locale=opts.locale)
-        text = structured.render_prose(locale=opts.locale)
-        elapsed = (time.perf_counter() - t0) * 1000.0
-        latency_by_level["n3"] = elapsed
-        trace.append(LevelTrace(level=3, latency_ms=elapsed, detail="structure+prose"))
-    elif run_n4:
-        t0 = time.perf_counter()
-        if factorized is None:
-            source = dedup if dedup is not None else blocks_work
-            factorized = factorize_context(source, locale=opts.locale)
-        if structured is None:
+    if not run_n5:
+        if run_n3 and not run_n4:
+            t0 = time.perf_counter()
+            if factorized is None:
+                source = dedup if dedup is not None else blocks_work
+                factorized = factorize_context(source, locale=opts.locale)
             structured = structure_context(factorized, locale=opts.locale)
-        context_graph = build_context_graph(structured, locale=opts.locale)
-        text = context_graph.render_prose(locale=opts.locale)
-        elapsed = (time.perf_counter() - t0) * 1000.0
-        latency_by_level["n4"] = elapsed
-        trace.append(LevelTrace(level=4, latency_ms=elapsed, detail="graph+prose"))
-    elif run_n2 and factorized is not None:
-        text = factorized.render_prose(locale=opts.locale)
-    elif run_n1 and dedup is not None:
-        text = dedup.render_prose(locale=opts.locale)
+            elapsed = (time.perf_counter() - t0) * 1000.0
+            latency_by_level["n3"] = elapsed
+            trace.append(LevelTrace(level=3, latency_ms=elapsed, detail="structure+prose"))
+        elif run_n4:
+            t0 = time.perf_counter()
+            if factorized is None:
+                source = dedup if dedup is not None else blocks_work
+                factorized = factorize_context(source, locale=opts.locale)
+            structured = structure_context(factorized, locale=opts.locale)
+            context_graph = build_context_graph(structured, locale=opts.locale)
+            elapsed = (time.perf_counter() - t0) * 1000.0
+            latency_by_level["n4"] = elapsed
+            trace.append(LevelTrace(level=4, latency_ms=elapsed, detail="graph+prose"))
+
+        text = render_turn_prose(
+            blocks_work,
+            levels=opts.levels,
+            locale=opts.locale,
+        )
 
     optimized_tokens = estimate_tokens(text)
     latency_ms = (time.perf_counter() - t_total) * 1000.0

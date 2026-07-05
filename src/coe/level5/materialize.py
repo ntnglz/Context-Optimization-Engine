@@ -7,17 +7,8 @@ from ..level2 import factorize_context
 from ..level3 import structure_context
 from ..level4 import build_context_graph
 from ..models import SCHEMA_VERSION, ContextBlock, ContextGraph, GraphEdge, StructuredContext
+from ..renderer.templates import get_templates
 from .state import StateView
-
-_VIEW_INTRO = {
-    "en": "Accumulated session state:",
-    "es": "Estado acumulado de la sesión:",
-}
-
-_CHANGE_INTRO = {
-    "en": "Changes since the last turn:",
-    "es": "Cambios desde el último turno:",
-}
 
 
 def blocks_to_context_graph(
@@ -46,16 +37,15 @@ def render_state_view(
     locale: str,
 ) -> StateView:
     """Proyecta el head acumulado a prosa; añade diff reciente si hay cambios."""
-    loc = locale.split("-")[0].lower()
-    intro = _VIEW_INTRO.get(loc, _VIEW_INTRO["en"])
+    tpl = get_templates(locale)
+    intro = tpl["view_intro"]
     body = graph.render_prose(locale=locale).strip()
     sections = [intro, "", body]
 
     if previous is not None:
-        diff = _diff_to_prose(previous, graph, locale=loc)
+        diff = _diff_to_prose(previous, graph, locale=locale)
         if diff:
-            change_intro = _CHANGE_INTRO.get(loc, _CHANGE_INTRO["en"])
-            sections.extend(["", change_intro, diff])
+            sections.extend(["", tpl["change_intro"], diff])
 
     prose = "\n".join(sections).rstrip() + "\n"
     return StateView(prose=prose)
@@ -112,6 +102,7 @@ def _diff_to_prose(
 
 
 def _edge_to_phrase(edge: GraphEdge, graph: ContextGraph, *, locale: str) -> str:
+    tpl = get_templates(locale)
     nodes = {node.id: node for node in graph.nodes}
     source = nodes.get(edge.from_id)
     target = nodes.get(edge.to_id)
@@ -119,11 +110,11 @@ def _edge_to_phrase(edge: GraphEdge, graph: ContextGraph, *, locale: str) -> str
     target_name = target.labels[0] if target and target.labels else edge.to_id
 
     if edge.type == "knows":
-        if locale == "es":
-            return f"{source_name} conoce a {target_name}."
-        return f"{source_name} knows {target_name}."
+        return tpl["edge_knows"].format(source=source_name, target=target_name)
     if edge.type == "company":
-        if locale == "es":
-            return f"{source_name} trabaja en {target_name}."
-        return f"{source_name} works at {target_name}."
-    return f"{source_name} → {target_name} ({edge.type})."
+        return tpl["edge_company"].format(source=source_name, target=target_name)
+    return tpl["edge_generic"].format(
+        source=source_name,
+        target=target_name,
+        edge_type=edge.type,
+    )

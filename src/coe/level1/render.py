@@ -9,11 +9,12 @@ from ..renderer.templates import get_templates
 def render_deduplication(result: DeduplicationResult) -> str:
     """Representación compacta con hechos compartidos y bloques únicos (interno)."""
     sections: list[str] = []
+    tpl = get_templates("en")
 
     for fact in result.shared_facts:
         sections.append(fact.to_compact())
         refs = ", ".join(fact.source_ids)
-        sections.append(f"Referencias: {refs}")
+        sections.append(tpl["compact_refs"].format(refs=refs))
         sections.append("")
 
     for block in result.unique_blocks:

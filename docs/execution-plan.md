@@ -157,7 +157,7 @@ Este plan **reemplaza** `architecture.md` §9 como orden de trabajo. La arquitec
 |------|--------|--------|---------------|
 | 0 | Sincronizar documentación | ✅ cerrada | — |
 | 1 | Context Ingest + ContextBundle | ✅ cerrada | — |
-| 2 | Renderer + ensamblaje Gateway | ⏳ pendiente | — |
+| 2 | Renderer + ensamblaje Gateway | ✅ cerrada | — |
 | 3 | N5 producción | ⏳ pendiente | — |
 | 4 | Harness madurez + casos reales | ⏳ pendiente | — |
 | 5 | MCP COE | ⏳ pendiente | — |

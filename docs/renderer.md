@@ -2,7 +2,7 @@
 
 > Política transversal acordada en [spec-gaps.md](spec-gaps.md) §1 · Ensamblaje con PCM: [architecture.md](architecture.md) §2
 
-**Estado:** spec transversal ✅ cerrada · implementación parcial (`level1/render.py`)
+**Estado:** spec transversal ✅ cerrada · **v1 implementado** (`renderer/assembly.py`, plantillas locale)
 
 ## Regla central
 
