@@ -1,17 +1,17 @@
 {
   "harness_version": "0.4.0",
-  "profile_id": "n1_n2_en",
+  "profile_id": "coe_pcm_n1_en",
   "tier": "smoke",
   "evaluator": "mock",
-  "cases_run": 2,
-  "cases_passed": 2,
+  "cases_run": 1,
+  "cases_passed": 1,
   "gate_passed": true,
   "gate_failures": [],
   "summary": {
     "factual_recall_mean": 1.0,
-    "t_coe_p95_ms": 0.10,
+    "t_coe_p95_ms": 0.06,
     "artifact_leak_rate": 0.0,
-    "prose_ratio_mean": 0.6677,
+    "prose_ratio_mean": 2.4737,
     "comprehension_similarity_mean": 1.0,
     "comprehension_delta_mean": 0.0,
     "factual_f1_mean": 1.0,
@@ -19,47 +19,31 @@
   },
   "results": [
     {
-      "case_id": "acme_budget_v1",
+      "case_id": "acme_team_pcm_v1",
       "passed": true,
       "failures": [],
       "metrics": {
-        "t_coe_ms": 0.07,
-        "optimized_tokens": 28,
-        "original_tokens": 43,
-        "prose_ratio": 0.6512,
-        "artifact_leak": false,
-        "factual_recall": 1.0,
-        "factual_f1": 1.0,
-        "comprehension_similarity": 1.0,
-        "comprehension_delta": 0.0,
-        "user_language_ok": true,
-        "response_artifact_leak": false
-      }
-    },
-    {
-      "case_id": "acme_team_v1",
-      "passed": true,
-      "failures": [],
-      "metrics": {
-        "t_coe_ms": 0.02,
-        "optimized_tokens": 13,
+        "t_coe_ms": 0.06,
+        "optimized_tokens": 47,
         "original_tokens": 19,
-        "prose_ratio": 0.6842,
+        "prose_ratio": 2.4737,
         "artifact_leak": false,
         "factual_recall": 1.0,
         "factual_f1": 1.0,
         "comprehension_similarity": 1.0,
         "comprehension_delta": 0.0,
+        "readability_score": null,
+        "readability_score_a": null,
         "user_language_ok": true,
         "response_artifact_leak": false
-      }
+      },
+      "optimized_context_preview": "The following information appears in multiple sources:\n- Empresa: ACME (sources A, B).\n\nAdditional content by source:\nFrom source A:\nJuan works at ACME.\n\nFrom source B:\nPedro works at ACME.\n"
     }
   ],
   "metadata": {
-    "git_sha": "bd53ffa",
+    "git_sha": "81837d7",
     "embedding_backend": "simple",
     "embedding_model": "paraphrase-multilingual-MiniLM-L12-v2",
-    "evaluator": "mock",
-    "pipeline_levels": [1, 2]
+    "evaluator": "mock"
   }
 }

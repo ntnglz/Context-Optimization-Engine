@@ -1,0 +1,30 @@
+{
+  "id": "acme_team_pcm_v1",
+  "version": 1,
+  "tags": ["core", "coe_pcm", "single_turn", "en"],
+  "description": "ACME team — stack coe+pcm (instrucción comprimida stub + contexto N1)",
+
+  "blocks": [
+    {
+      "id": "A",
+      "source_type": "rag",
+      "content": "Empresa: ACME\nJuan works at ACME."
+    },
+    {
+      "id": "B",
+      "source_type": "rag",
+      "content": "Empresa: ACME\nPedro works at ACME."
+    }
+  ],
+
+  "question": "Who works at ACME?",
+  "expected_facts": ["Juan", "Pedro", "ACME"],
+  "response_lang": "en",
+  "user_message_lang": "en",
+  "system_addendum": "Answer in English. Be clear for a non-technical user.",
+
+  "mock": {
+    "arm_a_response": "Juan and Pedro work at ACME.",
+    "arm_b_response": "Juan and Pedro work at ACME."
+  }
+}

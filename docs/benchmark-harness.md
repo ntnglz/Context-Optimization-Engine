@@ -33,7 +33,7 @@ Modos de composición (fase posterior):
 | Modo | Uso |
 |------|-----|
 | **`coe-only`** (default v1) | Solo bloque contexto; instrucción fija en el caso |
-| **`coe+pcm`** | Instrucción comprimida PCM + contexto COE — validación stack completa |
+| **`coe+pcm`** | Instrucción comprimida PCM + contexto COE — validación stack completa (**perfil `coe_pcm_n1_en`**, backend `stub` en CI) |
 | **`structural-only`** | Sin LLM; integridad + latencia + artifacts |
 
 El harness COE **no sustituye** tests unitarios (`tests/test_level*.py`); los **complementa**.

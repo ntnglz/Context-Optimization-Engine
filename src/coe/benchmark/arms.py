@@ -32,8 +32,25 @@ def render_multi_turn_arm_a(case: BenchmarkCase) -> str:
     return "\n\n".join(sections) + "\n"
 
 
-def build_answer_messages(case: BenchmarkCase, context: str) -> list[Message]:
+def build_answer_messages(
+    case: BenchmarkCase,
+    context: str,
+    *,
+    compressed_instruction: str | None = None,
+) -> list[Message]:
     """Mensajes LLM idénticos salvo el bloque de contexto (invariante A/B)."""
+    if compressed_instruction:
+        from coe.pcm.compose import build_pcm_messages
+
+        raw = build_pcm_messages(
+            compressed_instruction=compressed_instruction,
+            optimized_context=context,
+            user_question=effective_question(case),
+            response_lang=case.response_lang,
+            system_addendum=case.system_addendum,
+        )
+        return [Message(role=m["role"], content=m["content"]) for m in raw]
+
     addendum = case.system_addendum.strip() or "Answer clearly for a non-technical user."
     system = load_prompt("answer_system.txt").format(
         response_lang=case.response_lang,

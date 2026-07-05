@@ -10,7 +10,7 @@ from coe.level5 import InMemoryStateStore, update_semantic_state
 from coe.models import ContextBlock, estimate_tokens
 from coe.renderer import render_raw_context
 
-from .case_utils import context_blocks, is_multi_turn
+from .case_utils import context_blocks, effective_question, is_multi_turn
 from .schema import BenchmarkCase, PipelineProfile
 
 _GATEWAY_LEVELS = frozenset({1, 2, 3, 4, 5})
@@ -23,6 +23,8 @@ class PipelineRunResult:
     original_tokens: int
     optimized_tokens: int
     optimize_result: OptimizeResult | None = None
+    pcm_compressed_instruction: str | None = None
+    composition: str = "coe-only"
 
 
 def _resolve_levels(profile: PipelineProfile) -> list[int]:
@@ -50,6 +52,9 @@ def run_pipeline_on_case(
         raise ValueError(f"Profile {profile.id!r} has l0=true but target_lang is missing")
 
     levels = _resolve_levels(profile)
+    if profile.options.get("composition") == "coe+pcm":
+        return _run_coe_pcm_case(case, profile, blocks, levels, original_tokens)
+
     if 5 in levels and is_multi_turn(case):
         return _run_n5_multi_turn(case, profile, levels, original_tokens)
 
@@ -67,6 +72,45 @@ def run_pipeline_on_case(
         original_tokens=original_tokens,
         optimized_tokens=result.metrics.optimized_tokens,
         optimize_result=result,
+    )
+
+
+def _run_coe_pcm_case(
+    case: BenchmarkCase,
+    profile: PipelineProfile,
+    blocks: list[ContextBlock],
+    levels: list[int],
+    original_tokens: int,
+) -> PipelineRunResult:
+    from coe.pcm.compose import optimize_with_pcm
+
+    instruction = effective_question(case)
+    max_window = profile.options.get("max_window_tokens")
+    if max_window is not None:
+        max_window = int(max_window)
+
+    composed = optimize_with_pcm(
+        blocks,
+        user_instruction=instruction,
+        levels=levels,
+        locale=profile.locale or "en",
+        target_lang=profile.target_lang,
+        l0=profile.l0,
+        max_window_tokens=max_window,
+        response_reserve=int(profile.options.get("response_reserve", 512)),
+        response_lang=case.response_lang,
+        system_addendum=case.system_addendum,
+        pcm_backend=str(profile.options.get("pcm_backend", "stub")),
+    )
+    ctx = composed.context
+    return PipelineRunResult(
+        optimized_text=ctx.text,
+        t_coe_ms=ctx.metrics.latency_ms,
+        original_tokens=original_tokens,
+        optimized_tokens=ctx.metrics.optimized_tokens,
+        optimize_result=ctx,
+        pcm_compressed_instruction=composed.instruction.compressed,
+        composition="coe+pcm",
     )
 
 

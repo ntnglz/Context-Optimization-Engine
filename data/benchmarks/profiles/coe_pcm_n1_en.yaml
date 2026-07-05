@@ -1,0 +1,22 @@
+id: coe_pcm_n1_en
+description: N1 dedup + PCM stub — composición coe+pcm (CI smoke)
+levels: [1]
+target_lang: null
+locale: en
+l0: false
+options:
+  composition: coe+pcm
+  pcm_backend: stub
+  max_window_tokens: 8192
+  response_reserve: 512
+  cite_sources: false
+gate:
+  t_coe_p95_ms: 120
+  comprehension_similarity: 0.90
+  comprehension_delta_min: -0.10
+  factual_recall: 0.95
+  user_language_match: 0.95
+  artifact_leak_rate_max: 0.02
+tier:
+  ci: true
+  release: false

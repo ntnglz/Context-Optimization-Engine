@@ -155,6 +155,38 @@ Gateway
 | Inferencia del LLM | Cliente upstream |
 | Resumir eliminando información | Explícitamente rechazado por diseño |
 
+### 4.4 Composición PCM + COE (Fase 11 ✅)
+
+Pipeline compuesto para el turno completo hacia el LLM:
+
+```python
+from coe import optimize_with_pcm
+
+result = optimize_with_pcm(
+    blocks=[...],
+    user_instruction="Who works at ACME?",
+    levels=[1, 2],
+    locale="en",
+    max_window_tokens=8192,   # reparto ventana
+    response_reserve=512,     # reserva respuesta
+    pcm_backend="stub",         # CI: stub · prod: "ollama"
+)
+# result.instruction.compressed → TASK=… (PCM)
+# result.context.text           → contexto COE optimizado
+# result.messages               → messages[] listos para el LLM
+```
+
+| Pieza | Repo | Rol |
+|-------|------|-----|
+| **PCM** | `../Prompt Compression Middleware` | Comprime **instrucción** del usuario |
+| **COE** | este repo | Optimiza **contexto** con `max_context_tokens` derivado de la ventana |
+
+Reparto de ventana: `coe_budget = max_window_tokens − instruction_tokens − response_reserve`.
+
+Backends PCM: **`stub`** (determinista, CI) · **`ollama`** (``pcm.PromptCompressor`` vía `PCM_ROOT`).
+
+Harness: perfil `coe_pcm_n1_en` · modo `composition: coe+pcm` · ver [benchmark-harness.md](benchmark-harness.md).
+
 ---
 
 ## 5. Pipeline de optimización (niveles)

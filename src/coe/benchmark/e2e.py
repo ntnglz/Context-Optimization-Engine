@@ -40,6 +40,7 @@ def run_e2e_arms(
     profile: PipelineProfile,
     embedding_backend: EmbeddingBackend | None,
     judge_readability_enabled: bool,
+    pcm_compressed_instruction: str | None = None,
 ) -> E2EScores:
     failures: list[str] = []
 
@@ -49,8 +50,16 @@ def run_e2e_arms(
         arm_b = mock.arm_b_response
     else:
         arm_a_context = render_arm_a_context(case)
-        messages_a = build_answer_messages(case, arm_a_context)
-        messages_b = build_answer_messages(case, optimized_context)
+        messages_a = build_answer_messages(
+            case,
+            arm_a_context,
+            compressed_instruction=pcm_compressed_instruction,
+        )
+        messages_b = build_answer_messages(
+            case,
+            optimized_context,
+            compressed_instruction=pcm_compressed_instruction,
+        )
         arm_a = evaluator.complete(messages_a, temperature=0.0).text
         arm_b = evaluator.complete(messages_b, temperature=0.0).text
 

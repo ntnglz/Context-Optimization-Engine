@@ -119,7 +119,7 @@ COE no sustituye al sistema de citas del agente; solo preserva ids para reconstr
 |-------|-----|
 | `options.max_context_tokens` | Tope soft salida COE hacia LLM (post-Renderer) |
 | N4/N5 slice | Recortan antes de superar tope (`build_context_graph_within_budget`, `query_slice`) |
-| Ventana modelo (PCM + instrucción + respuesta) | Responsabilidad **cliente** hasta Gateway unificado (Fase 11) |
+| Ventana modelo (PCM + instrucción + respuesta) | **`optimize_with_pcm(max_window_tokens)`** — Fase 11 ✅ |
 
 Si tras optimizar se supera `max_context_tokens` → truncar por prioridad: **turno reciente / query slice** > **vista de estado N5**; registrar `metrics.truncated: true` y `pre_truncation_tokens`.
 

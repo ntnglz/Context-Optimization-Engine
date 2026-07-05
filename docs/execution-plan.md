@@ -48,7 +48,7 @@ Orden de las fases 6–18 según **dependencias técnicas** y **cierre de deuda*
 | `case.schema.json` | ✅ | ✅ | **8** |
 | Casos benchmark | — | 10 | **8** |
 | Presupuesto tokens COE | ✅ | ✅ | **10** |
-| PCM+COE runtime | ✅ doc | ❌ | **11** |
+| PCM+COE runtime | ✅ | ✅ | **11** |
 | HTTP API | ✅ doc | ❌ | **12** |
 | Model Adapter | ✅ acotado | ❌ | **13** |
 | N5 TTL / archivado | ✅ doc | ❌ | **14** |
@@ -175,7 +175,7 @@ Resumen; detalle histórico en commits de cierre.
 
 ---
 
-### Fase 11 — Integración PCM+COE
+### Fase 11 — Integración PCM+COE ✅
 
 **Objetivo:** Pipeline compuesto documentado en visión: instrucción comprimida + contexto optimizado.
 
@@ -342,8 +342,8 @@ Temas de [Context Optimization Engine (COE).md](Context%20Optimization%20Engine%
 | 8 | Harness contrato + corpus | ✅ cerrada | 872d5d1 |
 | 9 | L0 v2 | ✅ cerrada | — |
 | 10 | Presupuesto tokens COE | ✅ cerrada | — |
-| 11 | Integración PCM+COE | ⏳ **activa** | — |
-| 12 | HTTP API | ⏳ pendiente | — |
+| 11 | Integración PCM+COE | ✅ cerrada | — |
+| 12 | HTTP API | ⏳ **activa** | — |
 | 13 | Model Adapter | ⏳ pendiente | — |
 | 14 | N5 operaciones (TTL) | ⏳ pendiente | — |
 | 15 | Entity linking fuzzy | ⏳ pendiente | — |

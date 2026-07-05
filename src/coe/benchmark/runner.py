@@ -126,6 +126,7 @@ def _run_case(
             profile=profile,
             embedding_backend=embedding_backend,
             judge_readability_enabled=judge_readability,
+            pcm_compressed_instruction=pipeline.pcm_compressed_instruction,
         )
         arm_a = e2e.arm_a
         arm_b = e2e.arm_b
