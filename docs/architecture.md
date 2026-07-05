@@ -77,7 +77,7 @@ flowchart TB
         CIR[CIR\nrepresentación intermedia]
         REN[Renderer\nserialización para LLM]
         MET[Metrics\nmedición y validación]
-        ST[(State Store\nNivel 5, futuro)]
+        ST[(State Store\nNivel 5)]
     end
 
     SRC --> ING
@@ -270,18 +270,46 @@ Los benchmarks vivirán en `data/` + `tests/` + `scripts/comprehension_benchmark
 
 ---
 
-## 9. Roadmap de implementación por bloques
+## 9. Roadmap de implementación
 
-Orden sugerido para construir las piezas:
+> **Fuente única de verdad del orden de trabajo:** [execution-plan.md](execution-plan.md)  
+> Las fases A–F de abajo son **histórico**; el plan vigente usa Fases 0–6 con gates estrictos.
+
+### Estado por bloques (foto 2026-07-05)
+
+| Bloque | Contenido | Estado código |
+|--------|-----------|---------------|
+| **A** | Ingest mínimo + N1 + Renderer + Metrics | ✅ N1 + Metrics; Ingest/Renderer parciales |
+| **B** | Gateway `optimize_context` | ✅ L0, N1–N5 |
+| **C** | N2 factorización | ✅ |
+| **D** | CIR + refactor pipeline | 📝 Fase 6 — diferido |
+| **E** | MCP + benchmark RAG | ⏳ Fase 5 |
+| **F** | N3–N5 + State Store | ✅ N3–N5 v1; Store parcial (Fase 3 cierra producción) |
+
+### Orden vigente (resumen)
+
+Ver [execution-plan.md](execution-plan.md) para entregables, criterios de hecho y reglas estrictas.
+
+| Fase | Nombre | Estado |
+|------|--------|--------|
+| 0 | Sincronizar documentación | ✅ |
+| 1 | Context Ingest + ContextBundle | ⏳ |
+| 2 | Renderer + ensamblaje Gateway | ⏳ |
+| 3 | N5 producción | ⏳ |
+| 4 | Harness madurez + casos reales | ⏳ |
+| 5 | MCP COE | ⏳ |
+| 6 | CIR formal | 📝 diferido |
+
+### Histórico (fases A–F originales)
 
 | Fase | Bloques | Entregable |
 |------|---------|------------|
 | **A** ✅ | Ingest mínimo + N1 + Renderer + Metrics básicas | Prototipo deduplicación |
-| **B** | Gateway unificado (`optimize_context`) + tests de integración | API estable N1 |
-| **C** | N2 factorización + ampliación de `ContextBlock` | Pipeline N1+N2 |
+| **B** ✅ | Gateway unificado (`optimize_context`) + tests de integración | API estable |
+| **C** ✅ | N2 factorización + ampliación de `ContextBlock` | Pipeline N1+N2 |
 | **D** | Esbozo CIR + refactor pipeline sobre CIR | Contrato interno |
 | **E** | MCP + benchmark RAG | Integración agentes |
-| **F** | N3–N5 + State Store | Investigación |
+| **F** ✅ | N3–N5 + State Store | Pipeline completo v1 |
 
 ---
 

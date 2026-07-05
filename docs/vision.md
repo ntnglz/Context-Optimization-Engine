@@ -13,7 +13,8 @@ En [Prompt-Compression-Middleware](https://github.com/ntnglz/Prompt-Compression-
 | Documento | Contenido |
 |-----------|-----------|
 | [Context Optimization Engine (COE).md](Context%20Optimization%20Engine%20(COE).md) | Visión fundacional (canónica) |
-| [architecture.md](architecture.md) | Diseño global: piezas, relaciones, roadmap de implementación |
+| [architecture.md](architecture.md) | Diseño global: piezas, relaciones |
+| [execution-plan.md](execution-plan.md) | **Orden de trabajo estricto** (fases 0–6) |
 | [i18n.md](i18n.md) | Multilingüe: `target_lang`, locale packs ✅ aprobado |
 | [l0-ingest.md](l0-ingest.md) | Spec L0 — normalización de idioma ✅ aprobada |
 | [benchmarks.md](benchmarks.md) | KPIs comprensión, redacción, latencia COE ✅ aprobado |
@@ -28,7 +29,7 @@ En [Prompt-Compression-Middleware](https://github.com/ntnglz/Prompt-Compression-
 | [level3.md](level3.md) | Spec N3 ✅ |
 | [level4.md](level4.md) | Spec N4 ✅ |
 | [level5.md](level5.md) | Spec N5 ✅ · `src/coe/level5/` |
-| `src/coe/gateway.py` | `optimize_context` — L0, N1, N2, N5 |
+| `src/coe/gateway.py` | `optimize_context` — L0, N1–N5 |
 | `src/coe/ingest/` | L0 `normalize_language` |
 | `scripts/benchmark/run.py` | CLI harness + gates |
 | `data/examples/level1_acme.json` | Ejemplo ACME |

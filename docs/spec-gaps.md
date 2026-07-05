@@ -102,12 +102,22 @@ Excepción v1: flag `include_pending_turn=true` si merge difiere de commit (work
 
 ---
 
-## 8. Acciones antes de commit «specs cerradas»
+## 8. Acciones de implementación (orden en execution-plan.md)
 
-- [ ] Usuario revisa N5, benchmarks, ingest, renderer, spec-gaps
+| # | Acción | Fase |
+|---|--------|------|
+| 1 | Ampliar `ContextBlock` + `ContextBundle` según [ingest.md](ingest.md) | 1 |
+| 2 | `ingest_context()` + matriz `source_type` | 1 |
+| 3 | Refactor N1 render → Renderer prosa + ensamblaje Gateway | 2 |
+| 4 | N5 producción: auto-store, retención, conflictos | 3 |
+| 5 | Casos `dev_agent` + tier release Ollama | 4 |
+| 6 | MCP `optimize_context` / `estimate_savings` | 5 |
+
+Checklist spec (pre-código):
+
+- [x] Usuario revisa N5, benchmarks, ingest, renderer, spec-gaps
 - [x] Marcar N5 ✅ + benchmarks ✅ en índices
-- [ ] (Implementación) Refactor N1 render → Renderer prosa
-- [ ] (Implementación) Ampliar `ContextBlock` según ingest.md
+- [x] Plan de ejecución estricto — [execution-plan.md](execution-plan.md)
 
 ---
 
