@@ -28,7 +28,7 @@ Este plan **reemplaza** `architecture.md` §9 como orden de trabajo. La arquitec
 | Harness capa 0–1 | ✅ | ✅ | 8 perfiles smoke mock |
 | Harness capa 2 (Ollama) | ✅ | ✅ | `scripts/ci/release-dev-agent.sh`; fuera de `--ci` |
 | MCP | ✅ acotado | ✅ | `optimize_context`, `estimate_savings` vía stdio |
-| CIR formal | 📝 diferido | ❌ | Fase 6 — no bloquea |
+| CIR formal | 📝 diferido | ❌ | Fase 6 Opción A — solo grafo; ver [cir-v1-draft.md](cir-v1-draft.md) |
 | Casos benchmark | — | 6 | 2 core, 1 ES, 1 multi_turn, 2 dev_agent |
 
 ---
@@ -140,14 +140,20 @@ Este plan **reemplaza** `architecture.md` §9 como orden de trabajo. La arquitec
 
 ### Fase 6 — CIR formal (diferido)
 
-**Objetivo:** Contrato interno fase D original. **Solo tras Fase 5 ✅.**
+**Objetivo:** Contrato interno del grafo (Opción A). **Solo tras Fase 5 ✅.**
+
+**Decisión de diseño:** formalizar **solo `stage=graph`**; N1–N3 siguen como tipos Python en memoria (sin serialización CIR intermedia). Ver [cir-v1-draft.md](cir-v1-draft.md).
 
 | Entregable | Criterio de hecho |
 |------------|-------------------|
-| Gramática / versión CIR | Spec en `docs/` |
-| Refactor pipeline | Tipos encadenados N1→N5 sobre CIR |
+| Spec CIR v1.0 | `docs/cir-v1.md` congelado desde borrador (grafo, envelope, enums) |
+| JSON Schema | `data/benchmarks/schema/cir-1.0.schema.json` |
+| Builder N4 | `document`/`chunk`, aristas `action`/`contains`/`reference` |
+| Envelope N5 | `semantic_state_to_dict` con `cir_version` + `graph` |
+| Tests | Roundtrip JSON, merge conflictos, proyección prosa sin regresión |
+| **Fuera de alcance** | CIR `stage=fact|entity|tree`; refactor de `DeduplicationResult` / `FactorizationResult` |
 
-**No iniciar hasta que el usuario re-priorice tras Fase 5.**
+**No iniciar hasta re-priorización explícita del usuario.**
 
 ---
 
@@ -172,6 +178,7 @@ Este plan **reemplaza** `architecture.md` §9 como orden de trabajo. La arquitec
 | Fecha | Cambio | Motivo |
 |-------|--------|--------|
 | 2026-07-05 | Plan inicial | Desvío respecto a `architecture.md` §9; acuerdo de seguimiento estricto |
+| 2026-07-05 | CIR v1.0 diseño | Opción A: solo grafo serializado; N1–N3 en Python; `document`/`chunk`; `action` arista |
 
 ---
 
@@ -186,3 +193,4 @@ Este plan **reemplaza** `architecture.md` §9 como orden de trabajo. La arquitec
 | [renderer.md](renderer.md) | Spec Fase 2 |
 | [level5.md](level5.md) | Spec Fase 3 |
 | [benchmark-harness.md](benchmark-harness.md) | Spec Fase 4 |
+| [cir-v1-draft.md](cir-v1-draft.md) | Borrador CIR v1.0 (Fase 6, Opción A) |

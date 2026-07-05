@@ -141,7 +141,7 @@ Gateway
   └── Metrics (observa todo el flujo)
 ```
 
-- **CIR** será el contrato interno (fase D): cada nivel transforma hacia tipos encadenados hasta grafo — ver [levels.md](levels.md). Hoy: `DeduplicationResult` → … → `ContextGraph`.
+- **CIR** será el contrato interno (Fase 6, **Opción A**): solo el grafo N4+ se versiona y persiste; N1–N3 permanecen lowering en Python — ver [cir-v1-draft.md](cir-v1-draft.md). Hoy: `DeduplicationResult` → … → `ContextGraph`.
 - **Renderer** consume la salida del último nivel activo y produce **prosa** — [renderer.md](renderer.md).
 - **Metrics** no modifica datos; es transversal (observabilidad + benchmarks).
 - **State Store** solo interviene en Nivel 5; los niveles 1–4 son stateless sobre el bundle de entrada.

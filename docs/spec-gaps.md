@@ -19,7 +19,7 @@
 | 6 | N5: entity linking inter-turno v1 | [level5.md](level5.md) | ✅ Cerrado |
 | 7 | N5: conflictos y retracts en prosa | [level5.md](level5.md) | ✅ Cerrado |
 | 8 | Principio «sin pérdida» acotado (N5) | [levels.md](levels.md) | ✅ Cerrado |
-| 9 | CIR formal (gramática, versión) | Fase D roadmap; borrador N3 | 📝 Diferido |
+| 9 | CIR formal (gramática, versión) | Fase 6 · [cir-v1-draft.md](cir-v1-draft.md) Opción A | 📝 Diferido |
 | 10 | Model Adapter spec | [architecture.md](architecture.md) §3.4 | ✅ Acotado |
 | 11 | Presupuesto tokens global (COE+PCM) | [ingest.md](ingest.md) + Gateway futuro | 📝 Parcial |
 | 12 | Robustez estadística benchmarks | [benchmarks.md](benchmarks.md) §9 | ✅ Cerrado |
@@ -95,7 +95,7 @@ Excepción v1: flag `include_pending_turn=true` si merge difiere de commit (work
 
 | Tema | Cuándo |
 |------|--------|
-| Gramática CIR formal | Fase D ([architecture.md](architecture.md) roadmap) |
+| Gramática CIR formal | Fase 6 Opción A — solo `stage=graph`; [cir-v1-draft.md](cir-v1-draft.md) |
 | Presupuesto tokens ventana completa | Al integrar Gateway + PCM |
 | Entity linking fuzzy / LLM | Post-v1 N5 |
 | Normalizer zh segmentador | Con locale pack `zh` |
