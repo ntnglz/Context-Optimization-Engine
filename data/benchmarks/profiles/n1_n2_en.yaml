@@ -1,7 +1,7 @@
 id: n1_n2_en
 description: N1 + N2 factorization, English locale — first E2E gate
 levels: [1, 2]
-target_lang: en
+target_lang: null
 locale: en
 l0: false
 options:

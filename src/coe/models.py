@@ -101,3 +101,61 @@ class DeduplicationResult:
 
     def to_json(self, indent: int = 2) -> str:
         return json.dumps(self.to_dict(), indent=indent, ensure_ascii=False)
+
+
+@dataclass
+class EntityRecord:
+    """Entidad factorizada con atributos y acciones."""
+
+    name: str
+    attributes: dict[str, str] = field(default_factory=dict)
+    actions: list[str] = field(default_factory=list)
+    source_refs: list[str] = field(default_factory=list)
+
+
+@dataclass
+class FactorizationResult:
+    """Resultado del optimizador Nivel 2."""
+
+    entities: list[EntityRecord]
+    unparsed: list[str]
+    shared_facts: list[SharedFact]
+    original_tokens: int
+    optimized_tokens: int
+
+    @property
+    def compression_ratio(self) -> float:
+        if self.original_tokens == 0:
+            return 0.0
+        return 1.0 - (self.optimized_tokens / self.original_tokens)
+
+    def render_prose(self, *, locale: str | None = "en") -> str:
+        from .level2.render import render_factorization_prose
+
+        return render_factorization_prose(self, locale=locale)
+
+    def render_structured(self) -> str:
+        from .level2.render import render_factorization_structured
+
+        return render_factorization_structured(self)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "entities": [
+                {
+                    "name": e.name,
+                    "attributes": dict(e.attributes),
+                    "actions": list(e.actions),
+                    "source_refs": list(e.source_refs),
+                }
+                for e in self.entities
+            ],
+            "unparsed": list(self.unparsed),
+            "shared_facts": [fact.to_compact() for fact in self.shared_facts],
+            "original_tokens": self.original_tokens,
+            "optimized_tokens": self.optimized_tokens,
+            "compression_ratio": round(self.compression_ratio, 4),
+        }
+
+    def to_json(self, indent: int = 2) -> str:
+        return json.dumps(self.to_dict(), indent=indent, ensure_ascii=False)

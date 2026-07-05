@@ -7,8 +7,16 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from .level1 import deduplicate_context
-from .models import ContextBlock, DeduplicationResult, estimate_tokens
+from .level2 import factorize_context
+from .models import (
+    ContextBlock,
+    DeduplicationResult,
+    FactorizationResult,
+    estimate_tokens,
+)
 from .renderer import render_raw_context
+
+_SUPPORTED_LEVELS = frozenset({1, 2})
 
 
 @dataclass
@@ -41,10 +49,11 @@ class OptimizeResult:
     text: str
     metrics: OptimizationMetrics
     deduplication: DeduplicationResult | None = None
+    factorization: FactorizationResult | None = None
     trace: list[LevelTrace] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        data: dict[str, Any] = {
             "text": self.text,
             "metrics": {
                 "original_tokens": self.metrics.original_tokens,
@@ -61,6 +70,11 @@ class OptimizeResult:
                 for t in self.trace
             ],
         }
+        if self.deduplication is not None:
+            data["deduplication"] = self.deduplication.to_dict()
+        if self.factorization is not None:
+            data["factorization"] = self.factorization.to_dict()
+        return data
 
 
 def optimize_context(
@@ -74,10 +88,10 @@ def optimize_context(
     """
     Ejecuta el pipeline COE sobre un bundle de bloques.
 
-    v1 (H2): N1 con salida ``render_prose()``. L0 y N2+ lanzan NotImplementedError.
+    Niveles soportados: **1** (dedup), **2** (factorización). L0 pendiente.
     """
     opts = OptimizeOptions(
-        levels=list(levels or [1]),
+        levels=_normalize_levels(levels or [1]),
         locale=locale,
         target_lang=target_lang,
         l0=l0,
@@ -85,11 +99,17 @@ def optimize_context(
     return _optimize(blocks, opts)
 
 
+def _normalize_levels(levels: list[int]) -> list[int]:
+    if not levels:
+        return [1]
+    return sorted(set(levels))
+
+
 def _optimize(blocks: list[ContextBlock], opts: OptimizeOptions) -> OptimizeResult:
-    if opts.l0 or opts.target_lang:
+    if opts.l0:
         raise NotImplementedError("L0 language normalization not implemented yet")
 
-    unsupported = [n for n in opts.levels if n not in (1,)]
+    unsupported = [n for n in opts.levels if n not in _SUPPORTED_LEVELS]
     if unsupported:
         raise NotImplementedError(f"Levels not implemented: {unsupported}")
 
@@ -99,17 +119,31 @@ def _optimize(blocks: list[ContextBlock], opts: OptimizeOptions) -> OptimizeResu
     trace: list[LevelTrace] = []
     latency_by_level: dict[str, float] = {}
     dedup: DeduplicationResult | None = None
+    factorized: FactorizationResult | None = None
     text = original_text
 
     t_total = time.perf_counter()
 
-    if 1 in opts.levels:
+    run_n1 = 1 in opts.levels
+    run_n2 = 2 in opts.levels
+
+    if run_n1:
         t0 = time.perf_counter()
         dedup = deduplicate_context(blocks)
-        text = dedup.render_prose(locale=opts.locale)
         elapsed = (time.perf_counter() - t0) * 1000.0
         latency_by_level["n1"] = elapsed
-        trace.append(LevelTrace(level=1, latency_ms=elapsed, detail="deduplicate+prose"))
+        trace.append(LevelTrace(level=1, latency_ms=elapsed, detail="deduplicate"))
+
+    if run_n2:
+        t0 = time.perf_counter()
+        source = dedup if dedup is not None else blocks
+        factorized = factorize_context(source, locale=opts.locale)
+        text = factorized.render_prose(locale=opts.locale)
+        elapsed = (time.perf_counter() - t0) * 1000.0
+        latency_by_level["n2"] = elapsed
+        trace.append(LevelTrace(level=2, latency_ms=elapsed, detail="factorize+prose"))
+    elif run_n1 and dedup is not None:
+        text = dedup.render_prose(locale=opts.locale)
 
     optimized_tokens = estimate_tokens(text)
     latency_ms = (time.perf_counter() - t_total) * 1000.0
@@ -126,4 +160,10 @@ def _optimize(blocks: list[ContextBlock], opts: OptimizeOptions) -> OptimizeResu
         latency_ms_by_level=latency_by_level,
     )
 
-    return OptimizeResult(text=text, metrics=metrics, deduplication=dedup, trace=trace)
+    return OptimizeResult(
+        text=text,
+        metrics=metrics,
+        deduplication=dedup,
+        factorization=factorized,
+        trace=trace,
+    )

@@ -1,0 +1,65 @@
+{
+  "harness_version": "0.4.0",
+  "profile_id": "n1_n2_en",
+  "tier": "smoke",
+  "evaluator": "mock",
+  "cases_run": 2,
+  "cases_passed": 2,
+  "gate_passed": true,
+  "gate_failures": [],
+  "summary": {
+    "factual_recall_mean": 1.0,
+    "t_coe_p95_ms": 0.02,
+    "artifact_leak_rate": 0.0,
+    "prose_ratio_mean": 0.6677,
+    "comprehension_similarity_mean": 1.0,
+    "comprehension_delta_mean": 0.0,
+    "factual_f1_mean": 1.0,
+    "user_language_match_rate": 1.0
+  },
+  "results": [
+    {
+      "case_id": "acme_budget_v1",
+      "passed": true,
+      "failures": [],
+      "metrics": {
+        "t_coe_ms": 0.07,
+        "optimized_tokens": 28,
+        "original_tokens": 43,
+        "prose_ratio": 0.6512,
+        "artifact_leak": false,
+        "factual_recall": 1.0,
+        "factual_f1": 1.0,
+        "comprehension_similarity": 1.0,
+        "comprehension_delta": 0.0,
+        "user_language_ok": true,
+        "response_artifact_leak": false
+      }
+    },
+    {
+      "case_id": "acme_team_v1",
+      "passed": true,
+      "failures": [],
+      "metrics": {
+        "t_coe_ms": 0.02,
+        "optimized_tokens": 13,
+        "original_tokens": 19,
+        "prose_ratio": 0.6842,
+        "artifact_leak": false,
+        "factual_recall": 1.0,
+        "factual_f1": 1.0,
+        "comprehension_similarity": 1.0,
+        "comprehension_delta": 0.0,
+        "user_language_ok": true,
+        "response_artifact_leak": false
+      }
+    }
+  ],
+  "metadata": {
+    "git_sha": "bd53ffa",
+    "embedding_backend": "simple",
+    "embedding_model": "paraphrase-multilingual-MiniLM-L12-v2",
+    "evaluator": "mock",
+    "pipeline_levels": [1, 2]
+  }
+}

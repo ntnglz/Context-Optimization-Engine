@@ -1,5 +1,7 @@
 """Tests del Gateway y render_prose N1."""
 
+import pytest
+
 from coe import optimize_context
 from coe.level1 import deduplicate_context
 from coe.models import ContextBlock
@@ -64,3 +66,41 @@ class TestOptimizeContext:
         raw = render_raw_context(blocks)
         assert "[A]" in raw
         assert "[B]" in raw
+
+
+class TestOptimizeContextN2:
+    def test_n1_n2_pipeline(self):
+        blocks = [
+            ContextBlock(id="A", content="Juan works at ACME."),
+            ContextBlock(id="B", content="Juan created Project X."),
+            ContextBlock(id="C", content="Juan approved the budget."),
+        ]
+        out = optimize_context(blocks, levels=[1, 2], locale="en")
+
+        assert "Juan works at ACME" in out.text
+        assert "approved the budget" in out.text
+        assert "entity:" not in out.text
+        assert "n1" in out.metrics.latency_ms_by_level
+        assert "n2" in out.metrics.latency_ms_by_level
+        assert out.deduplication is not None
+        assert out.factorization is not None
+        assert len(out.factorization.entities) == 1
+
+    def test_n2_only(self):
+        blocks = [
+            ContextBlock(id="A", content="Juan works at ACME."),
+            ContextBlock(id="B", content="Juan created Project X."),
+        ]
+        out = optimize_context(blocks, levels=[2], locale="en")
+
+        assert "Juan" in out.text
+        assert "n2" in out.metrics.latency_ms_by_level
+        assert "n1" not in out.metrics.latency_ms_by_level
+        assert out.deduplication is None
+        assert out.factorization is not None
+
+    def test_n3_not_implemented(self):
+        blocks = [ContextBlock(id="A", content="Juan works at ACME.")]
+
+        with pytest.raises(NotImplementedError, match="Levels not implemented"):
+            optimize_context(blocks, levels=[3])

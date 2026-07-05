@@ -24,7 +24,12 @@ jobs:
       - name: Run unit tests (capa 0)
         run: python -m pytest tests/ -q
 
-      - name: Run benchmark smoke + baseline compare
+      - name: Benchmark smoke n1 + baseline compare
         run: |
           python scripts/benchmark/run.py --tier smoke --profile n1 \
             --compare-baseline data/benchmarks/baselines/n1_smoke.json
+
+      - name: Benchmark smoke n1_n2_en + baseline compare
+        run: |
+          python scripts/benchmark/run.py --tier smoke --profile n1_n2_en \
+            --compare-baseline data/benchmarks/baselines/n1_n2_en_smoke.json

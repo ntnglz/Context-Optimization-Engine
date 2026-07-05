@@ -11,6 +11,8 @@ from coe.renderer import render_raw_context
 from .case_utils import context_blocks
 from .schema import BenchmarkCase, PipelineProfile
 
+_GATEWAY_LEVELS = frozenset({1, 2, 5})
+
 
 @dataclass
 class PipelineRunResult:
@@ -22,17 +24,17 @@ class PipelineRunResult:
 
 
 def _resolve_levels(profile: PipelineProfile) -> list[int]:
-    """N5 aún no implementado — perfiles con nivel 5 usan N1 sobre bloques aplanados."""
-    levels = list(profile.levels)
-    if not levels:
+    """Mapea perfil YAML a niveles soportados por el Gateway."""
+    levels = list(profile.levels) or [1]
+    level_set = set(levels)
+
+    if level_set <= {1, 2}:
+        return sorted(level_set)
+    if level_set <= {1, 5} or level_set == {5}:
         return [1]
-    if all(n == 1 for n in levels):
-        return [1]
-    if set(levels) <= {1, 5}:
-        return [1]
-    unsupported = [n for n in levels if n > 1]
+    unsupported = sorted(n for n in level_set if n not in _GATEWAY_LEVELS)
     raise NotImplementedError(
-        f"Benchmark profile levels {unsupported} not implemented (max ready: N1, N5 passthrough)"
+        f"Benchmark profile levels {unsupported} not implemented (gateway: N1, N2; N5 passthrough)"
     )
 
 
