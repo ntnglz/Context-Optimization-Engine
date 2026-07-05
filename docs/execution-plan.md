@@ -68,7 +68,7 @@ Orden de las fases 6–18 según **dependencias técnicas** y **cierre de deuda*
 3. **Cierre de fase** = todos los entregables ✅ + CI PASS + fila actualizada a `✅` + commit con `CI: PASS antes de push`.
 4. **Enmiendas.** Si hace falta desviarse, primero se edita este archivo (sección «Enmiendas») y el usuario aprueba.
 5. **Specs > código.** Si código y spec discrepan, el trabajo de la fase alinea código a spec (no al revés), salvo enmienda documentada.
-6. **Release Ollama** — obligatorio en cierre de fases **8, 11, 15** (cambios que afectan calidad E2E); opcional en el resto. Comando: `bash scripts/ci/release-dev-agent.sh`.
+6. **Release Ollama (quality)** — obligatorio en cierre de fases **8, 11, 15** si hay cambios E2E. Comando: `python run.py --release-dev-agent` (qwen3:4b). Iteración rápida: `--benchmark-dev-agent-fast` — [benchmark-ollama.md](benchmark-ollama.md).
 
 ---
 
@@ -414,4 +414,5 @@ flowchart LR
 | [l0-ingest.md](l0-ingest.md) | Spec Fase 9 |
 | [ingest.md](ingest.md) | Spec Fases 1, 10, 18 |
 | [benchmark-harness.md](benchmark-harness.md) | Spec Fase 8 |
+| [benchmark-ollama.md](benchmark-ollama.md) | Evaluadores Ollama fast vs quality |
 | [level5.md](level5.md) | Spec Fases 14–16 |

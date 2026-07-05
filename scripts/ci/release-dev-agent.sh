@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 # Release tier — dev_agent cases with Ollama (local, manual; not part of run.py --ci)
+#
+# Quality path — ver docs/benchmark-ollama.md
+#   Default: OLLAMA_MODEL=qwen3:4b  PROFILE=n5_graph_session_release  RUNS=3
+# Fast path (Granite/Gemma, informativo):
+#   bash scripts/ci/benchmark-dev-agent-fast.sh
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"

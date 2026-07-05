@@ -8,7 +8,7 @@ Contexto bruto (N bloques)  →  COE  →  Representación compacta  →  LLM
 
 ## Estado
 
-> Orden de trabajo: [execution-plan.md](docs/execution-plan.md) · **Fases 0–6 ✅** · activa: **Fase 8** (tras cierre doc Fase 7)
+> Orden de trabajo: [execution-plan.md](docs/execution-plan.md) · **Fases 0–8 ✅** · activa: **Fase 9**
 
 | Componente | Spec | Implementación |
 |------------|------|----------------|
@@ -22,7 +22,8 @@ Contexto bruto (N bloques)  →  COE  →  Representación compacta  →  LLM
 | [Renderer](docs/renderer.md) | ✅ | ✅ prosa N1–N5 vía `renderer/assembly.py` |
 | [CIR v1.0](docs/cir-v1.md) | ✅ | ✅ grafo + envelope N5 (`src/coe/cir/`) |
 | [Benchmarks y KPIs](docs/benchmarks.md) | ✅ | — |
-| [Harness de benchmarks](docs/benchmark-harness.md) | ✅ | ✅ H1–H5 · CI local smoke (8 perfiles) |
+| [Harness de benchmarks](docs/benchmark-harness.md) | ✅ | ✅ H1–H5 · CI smoke |
+| [Evaluadores Ollama](docs/benchmark-ollama.md) | ✅ | Granite/Gemma fast · Qwen release |
 | [Nivel 1](docs/level1.md) | ✅ | ✅ |
 | [Nivel 2](docs/level2.md) | ✅ | ✅ (EN/ES) |
 | [Nivel 3](docs/level3.md) | ✅ | ✅ (relaciones tipadas) |

@@ -76,7 +76,12 @@ def main() -> int:
     parser.add_argument(
         "--release-dev-agent",
         action="store_true",
-        help="Release tier dev_agent con Ollama (scripts/ci/release-dev-agent.sh)",
+        help="Release tier dev_agent con Ollama qwen3:4b (scripts/ci/release-dev-agent.sh)",
+    )
+    parser.add_argument(
+        "--benchmark-dev-agent-fast",
+        action="store_true",
+        help="Iteración rápida dev_agent con Granite/Gemma (informativo; ver docs/benchmark-ollama.md)",
     )
     parser.add_argument("--profile", default="n1", help="Perfil benchmark con --benchmark")
     args = parser.parse_args()
@@ -91,6 +96,11 @@ def main() -> int:
         import subprocess
 
         script = ROOT / "scripts" / "ci" / "release-dev-agent.sh"
+        return subprocess.call(["bash", str(script)], cwd=ROOT)
+    if args.benchmark_dev_agent_fast:
+        import subprocess
+
+        script = ROOT / "scripts" / "ci" / "benchmark-dev-agent-fast.sh"
         return subprocess.call(["bash", str(script)], cwd=ROOT)
     if args.benchmark:
         import subprocess

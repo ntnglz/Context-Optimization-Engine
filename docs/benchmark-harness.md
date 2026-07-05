@@ -402,13 +402,14 @@ python run.py --ci
 # Nightly mock (opcional)
 bash scripts/ci/nightly-mock.sh
 
-# Pre-release dev_agent — Ollama local (requiere Ollama en marcha)
+# Pre-release dev_agent — Ollama quality path (qwen3:4b, ~7 min)
 python run.py --release-dev-agent
-# equivalente:
-# OLLAMA_MODEL=qwen3:4b bash scripts/ci/release-dev-agent.sh
-# PROFILE=n5_graph_session_release RUNS=3 bash scripts/ci/release-dev-agent.sh
 
-Por defecto el script usa **`qwen3:4b`** (modelo instalado en DevSSD) y perfil **`n5_graph_session_release`** (gates calibrados para modelos ~4b). Gate estricto documentado: `n5_graph_session` + `qwen3:8b` tras `ollama pull qwen3:8b`.
+# Iteración rápida — Granite/Gemma (~12 s, gate informativo)
+python run.py --benchmark-dev-agent-fast
+# OLLAMA_MODEL=granite4.1:3b bash scripts/ci/benchmark-dev-agent-fast.sh
+
+Ver matriz de modelos, tiempos y KPIs: [benchmark-ollama.md](benchmark-ollama.md).
 
 # Pre-release general — coste real (Ollama local)
 python scripts/benchmark/run.py --tier release --profile n1 \
