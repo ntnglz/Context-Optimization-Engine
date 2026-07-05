@@ -320,12 +320,14 @@ Los benchmarks vivirán en `data/` + `tests/` + `scripts/comprehension_benchmark
 
 | Bloque | Contenido | Estado código |
 |--------|-----------|---------------|
-| **A** | Ingest mínimo + N1 + Renderer + Metrics | ✅ N1 + Metrics; Ingest/Renderer parciales |
+| **A** | Ingest mínimo + N1 + Renderer + Metrics | ✅ Fases 1–2 |
 | **B** | Gateway `optimize_context` | ✅ L0, N1–N5 |
 | **C** | N2 factorización | ✅ |
-| **D** | CIR + refactor pipeline | 📝 Fase 6 — diferido |
-| **E** | MCP + benchmark RAG | ✅ MCP stdio (`optimize_context`, `estimate_savings`) |
-| **F** | N3–N5 + State Store | ✅ N3–N5 v1; Store producción (auto-store, retención, conflictos) |
+| **D** | CIR + refactor pipeline | ⏳ Fase 6 |
+| **E** | MCP + benchmark RAG | ✅ MCP; harness Fase 8 |
+| **F** | N3–N5 + State Store | ✅ v1; escala Fases 14–16 |
+| **G** | Integración despliegue | ⏳ Fases 10–13 (tokens, PCM, HTTP, adapter) |
+| **H** | i18n + ingest completo | ⏳ Fases 17–18 |
 
 ### Orden vigente (resumen)
 
@@ -333,13 +335,22 @@ Ver [execution-plan.md](execution-plan.md) para entregables, criterios de hecho 
 
 | Fase | Nombre | Estado |
 |------|--------|--------|
-| 0 | Sincronizar documentación | ✅ |
-| 1 | Context Ingest + ContextBundle | ✅ |
-| 2 | Renderer + ensamblaje Gateway | ✅ |
-| 3 | N5 producción | ✅ |
-| 4 | Harness madurez + casos reales | ✅ |
-| 5 | MCP COE | ✅ |
-| 6 | CIR formal | 📝 diferido |
+| 0–5 | Núcleo v1 (Ingest → MCP) | ✅ |
+| 6 | CIR formal | ⏳ activa |
+| 7 | Sincronización documental | ⏳ |
+| 8 | Harness contrato + corpus | ⏳ |
+| 9 | L0 v2 | ⏳ |
+| 10 | Presupuesto tokens COE | ⏳ |
+| 11 | Integración PCM+COE | ⏳ |
+| 12 | HTTP API | ⏳ |
+| 13 | Model Adapter | ⏳ |
+| 14 | N5 operaciones (TTL) | ⏳ |
+| 15 | Entity linking fuzzy | ⏳ |
+| 16 | Store distribuido | ⏳ |
+| 17 | Locale `zh` | ⏳ |
+| 18 | Ingest structured/code | ⏳ |
+| 19 | CIR v1.1 Opción B | ⏳ opcional |
+| I | Investigación (ML, CIR→LLM) | sin fase |
 
 ### Histórico (fases A–F originales)
 

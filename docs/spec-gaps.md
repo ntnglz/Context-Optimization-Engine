@@ -19,9 +19,9 @@
 | 6 | N5: entity linking inter-turno v1 | [level5.md](level5.md) | ✅ Cerrado |
 | 7 | N5: conflictos y retracts en prosa | [level5.md](level5.md) | ✅ Cerrado |
 | 8 | Principio «sin pérdida» acotado (N5) | [levels.md](levels.md) | ✅ Cerrado |
-| 9 | CIR formal (gramática, versión) | Fase 6 · [cir-v1-draft.md](cir-v1-draft.md) Opción A | 📝 Diferido |
-| 10 | Model Adapter spec | [architecture.md](architecture.md) §3.4 | ✅ Acotado |
-| 11 | Presupuesto tokens global (COE+PCM) | [ingest.md](ingest.md) + Gateway futuro | 📝 Parcial |
+| 9 | CIR formal (gramática, versión) | Fase 6 · [cir-v1-draft.md](cir-v1-draft.md) Opción A | ⏳ Fase 6 |
+| 10 | Model Adapter spec | [architecture.md](architecture.md) §3.4 | ⏳ Fase 13 |
+| 11 | Presupuesto tokens global (COE+PCM) | [ingest.md](ingest.md) + Gateway | ⏳ Fases 10–11 |
 | 12 | Robustez estadística benchmarks | [benchmarks.md](benchmarks.md) §9 | ✅ Cerrado |
 | 13 | Aprobar N5 + benchmarks | ✅ Cerrado |
 
@@ -91,14 +91,23 @@ Excepción v1: flag `include_pending_turn=true` si merge difiere de commit (work
 
 ---
 
-## 7. Diferido (no bloquea N1–N2)
+## 7. Deuda → fase ([execution-plan.md](execution-plan.md) 6–18)
 
-| Tema | Cuándo |
-|------|--------|
-| Gramática CIR formal | Fase 6 Opción A — solo `stage=graph`; [cir-v1-draft.md](cir-v1-draft.md) |
-| Presupuesto tokens ventana completa | Al integrar Gateway + PCM |
-| Entity linking fuzzy / LLM | Post-v1 N5 |
-| Normalizer zh segmentador | Con locale pack `zh` |
+| Tema | Fase |
+|------|------|
+| Gramática CIR formal (Opción A) | 6 |
+| `case.schema.json` + corpus ampliado | 8 |
+| L0 detección + traducción robusta | 9 |
+| Presupuesto tokens COE | 10 |
+| Presupuesto ventana COE+PCM | 11 |
+| HTTP API | 12 |
+| Model Adapter | 13 |
+| N5 TTL / archivado | 14 |
+| Entity linking fuzzy | 15 |
+| Store distribuido | 16 |
+| Normalizer zh + locale pack | 17 |
+| Ingest `structured` / `code` | 18 |
+| CIR v1.1 Opción B (`stage` N1–N3) | 19 (opcional) |
 
 ---
 
@@ -109,15 +118,29 @@ Excepción v1: flag `include_pending_turn=true` si merge difiere de commit (work
 | 1 | Ampliar `ContextBlock` + `ContextBundle` según [ingest.md](ingest.md) | 1 ✅ |
 | 2 | `ingest_context()` + matriz `source_type` | 1 ✅ |
 | 3 | Refactor N1 render → Renderer prosa + ensamblaje Gateway | 2 ✅ |
-| 4 | N5 producción: auto-store, retención, conflictos | 3 |
-| 5 | Casos `dev_agent` + tier release Ollama | 4 |
-| 6 | MCP `optimize_context` / `estimate_savings` | 5 |
+| 4 | N5 producción: auto-store, retención, conflictos | 3 ✅ |
+| 5 | Casos `dev_agent` + tier release Ollama | 4 ✅ |
+| 6 | MCP `optimize_context` / `estimate_savings` | 5 ✅ |
+| 7 | CIR v1.0 grafo + schema + envelope N5 | 6 |
+| 8 | README + architecture §9 + vision al día | 7 |
+| 9 | `case.schema.json` + ≥4 casos nuevos | 8 |
+| 10 | L0 v2 (detección, `TranslationBackend`) | 9 |
+| 11 | `max_context_tokens` en Gateway | 10 |
+| 12 | Composición PCM+COE + harness `coe+pcm` | 11 |
+| 13 | HTTP `/optimize` + `/estimate` | 12 |
+| 14 | Model Adapter + `target_model` | 13 |
+| 15 | N5 TTL + archivado | 14 |
+| 16 | Entity linking fuzzy | 15 |
+| 17 | `SQLiteStateStore` | 16 |
+| 18 | Locale pack `zh` | 17 |
+| 19 | Ingest structured/code/glossary | 18 |
 
-Checklist spec (pre-código):
+Checklist spec:
 
 - [x] Usuario revisa N5, benchmarks, ingest, renderer, spec-gaps
-- [x] Marcar N5 ✅ + benchmarks ✅ en índices
-- [x] Plan de ejecución estricto — [execution-plan.md](execution-plan.md)
+- [x] Plan fases 0–5 cerrado
+- [x] Plan fases 6–18 priorizado (2026-07-05)
+- [ ] Producto v1 completo (fases 6–18 ✅)
 
 ---
 
