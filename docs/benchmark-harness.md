@@ -266,6 +266,7 @@ tier:
 | `l0_n1_n4_en` | L0+[1..4] | latencia 200ms |
 | `n5_session` | [1,5] | multi_turn + 350ms |
 | `n5_graph_session` | [1,2,3,4,5] | multi_turn graph merge + 400ms |
+| Casos `dev_agent` | tag `dev_agent` | Transcripts anonimizados (agente dev) |
 
 El harness **no hardcodea** niveles: lee perfil → llama `optimize_context` (cuando exista Gateway).
 

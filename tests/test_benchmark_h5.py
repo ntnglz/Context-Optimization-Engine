@@ -38,6 +38,30 @@ class TestMultiTurnCase:
         assert report.gate_passed
 
 
+class TestDevAgentCase:
+    def test_load_dev_warnings_session(self):
+        case = load_case(BENCH / "cases" / "dev_agent" / "dev_warnings_session_v1.json")
+        assert is_multi_turn(case)
+        assert "dev_agent" in case.tags
+        assert case.response_lang == "es"
+        assert effective_question(case) == (
+            "Tras compilar para macOS, ¿cuántos warnings quedan y de qué tipo?"
+        )
+        assert "AppIntents" in effective_expected_facts(case)
+        assert len(context_blocks(case)) == 4
+
+    def test_dev_warnings_n5_graph_smoke_mock(self):
+        report = run_suite_from_ids(
+            profile_id="n5_graph_session",
+            tier="smoke",
+            tags={"dev_agent"},
+            benchmark_root=BENCH,
+        )
+        assert report.cases_run == 1
+        assert report.gate_passed
+        assert report.results[0].case_id == "dev_warnings_session_v1"
+
+
 class TestMultilingualCase:
     def test_load_es_case(self):
         case = load_case(BENCH / "cases" / "multilingual" / "acme_budget_es_v1.json")

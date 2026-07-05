@@ -18,3 +18,4 @@ htmlcov/
 .vscode/
 data/benchmarks/runs/*
 !data/benchmarks/runs/.gitkeep
+data/benchmarks/corpus/raw/

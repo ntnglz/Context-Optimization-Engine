@@ -1,0 +1,59 @@
+{
+  "id": "dev_warnings_session_v1",
+  "version": 1,
+  "tags": ["dev_agent", "n5", "swift", "es"],
+  "description": "Sesión derivada (anonimizada) de análisis de warnings en app Swift — 3 turnos",
+
+  "response_lang": "es",
+  "user_message_lang": "es",
+  "system_addendum": "Responde en español, claro para un desarrollador.",
+
+  "session": {
+    "session_id": "bench-dev-warnings-session-1",
+    "turns": [
+      {
+        "blocks": [
+          {
+            "id": "build_log",
+            "source_type": "tool",
+            "content": "[xcodebuild] ExampleApp\nwarning: non-sendable result type '[RecordItem]' cannot be sent from main actor-isolated context (MapScreenViewModel.swift:60)\nwarning: capture of 'itemsWithLocation' with non-sendable type '[RecordItem]' in a '@Sendable' closure (MapScreenViewModel.swift:64)\nwarning: non-sendable result type '[RecordItem]' cannot be sent from main actor-isolated context (ExportService.swift:67)\nwarning: 'init(coordinateRegion:...)' was deprecated in iOS 17.0 (DetailView.swift:297)\nwarning: 'onChange(of:perform:)' was deprecated in iOS 17.0 (GalleryView.swift:96)\nwarning: string interpolation produces a debug description for an optional value (SyncViewModel.swift:201)\nwarning: initialization of immutable value 'totalItems' was never used (SyncViewModel.swift:206)\n(... build truncated ...)"
+          },
+          {
+            "id": "analysis",
+            "source_type": "prose",
+            "content": "Análisis de warnings en ExampleApp: 15 warnings principales.\nPrioridad 1 — Swift 6 Concurrency: RecordItem / [RecordItem] no Sendable en MapScreenViewModel, ExportService, ImportService, ImportViewModel.\nPrioridad 2 — Deprecación iOS 17+: Map APIs en DetailView, onChange en GalleryView y HelpView.\nPrioridad 3 — Lógica: interpolación opcional, variables no usadas, catch inalcanzable, nil coalescing redundante.\nPrioridad 4 — Preview: modelContainer no usado en preview de GalleryView."
+          }
+        ],
+        "question": "¿Cuántos warnings principales se identificaron y cuál es la prioridad más alta?",
+        "expected_facts": ["15", "Swift 6", "Concurrency"]
+      },
+      {
+        "blocks": [
+          {
+            "id": "fix_plan",
+            "source_type": "prose",
+            "content": "Plan de corrección por prioridad:\n1. Hacer RecordItem y RecordType @Sendable; ajustar MapScreenViewModel.loadItems() en MainActor.\n2. Migrar Map y onChange a APIs iOS 17+.\n3. Limpiar variables no usadas, catch inalcanzable y coalescing redundante.\nUsuario pidió: corregir por orden de prioridad, empezando por concurrencia."
+          }
+        ],
+        "question": "¿Qué cambio se aplica primero según la prioridad acordada?",
+        "expected_facts": ["Sendable", "RecordItem"]
+      },
+      {
+        "blocks": [
+          {
+            "id": "macos_build",
+            "source_type": "tool",
+            "content": "[xcodebuild] ExampleApp (macOS)\nBuild succeeded.\nwarning: AppIntents metadata generation skipped — target does not include AppIntents framework.\n(iOS build also verified — no regressions from concurrency fixes.)"
+          }
+        ],
+        "question": "Tras compilar para macOS, ¿cuántos warnings quedan y de qué tipo?",
+        "expected_facts": ["1", "AppIntents"]
+      }
+    ]
+  },
+
+  "mock": {
+    "arm_a_response": "Tras compilar para macOS queda 1 warning de AppIntents (metadata generation skipped).",
+    "arm_b_response": "Tras compilar para macOS queda 1 warning de AppIntents (metadata generation skipped)."
+  }
+}
