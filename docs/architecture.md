@@ -373,7 +373,7 @@ Ver [execution-plan.md](execution-plan.md) para entregables, criterios de hecho 
 | 8 | Harness contrato + corpus | ✅ |
 | 9 | L0 v2 | ⏳ activa |
 | 10 | Presupuesto tokens COE | ⏳ |
-| 11 | Integración PCM+COE | ⏳ |
+| 11 | Integración PCM+COE | ✅ |
 | 12 | HTTP API | ⏳ |
 | 13 | Model Adapter | ⏳ |
 | 14 | N5 operaciones (TTL) | ⏳ |
