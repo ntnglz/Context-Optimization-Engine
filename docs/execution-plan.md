@@ -21,11 +21,13 @@ Orden de las fases 6–18 según **dependencias técnicas** y **cierre de deuda*
 1. **Contrato interno antes de escala** — CIR serializado antes de store distribuido e intercambio de grafos.
 2. **Validación antes de integración externa** — harness con schema y más casos antes de HTTP/PCM en producción.
 3. **Entrada antes de salida** — L0 e ingest maduros antes de locale `zh` y presupuesto de ventana.
-4. **Superficies de integración en orden** — MCP ✅ → PCM+COE → HTTP → Model Adapter (cada capa asume la anterior estable).
+4. **Superficies de integración en orden** — MCP ✅ → PCM+COE ✅ → HTTP ✅ → Model Adapter ✅ (Fases 5, 11–13).
 5. **N5 escala tras CIR** — TTL, fuzzy linking y store remoto asumen envelope y merge probados.
 6. **Investigación explícita** — hipótesis no validadas (ML, CIR hacia LLM) fuera del producto v1; pista I al final.
 
-**Deuda que este plan elimina:** L0 parcial, README desactualizado, `case.schema.json` ausente, presupuesto tokens, PCM+COE, HTTP, Model Adapter, N5 post-v1 (TTL, fuzzy, store), locale `zh`, ingest `structured`/`code`, CIR v1.1 opcional.
+**Deuda cerrada (fases 0–13):** L0 v2, `case.schema.json`, presupuesto tokens COE, PCM+COE, HTTP API, Model Adapter, CIR v1.0, harness, MCP, Gateway/N1–N5, README al día.
+
+**Deuda pendiente (fases 14–19):** N5 post-v1 (TTL, archivado, fuzzy, store distribuido), locale `zh`, ingest `structured`/`code`, CIR v1.1 opcional.
 
 **Fuera de alcance producto v1:** optimización por ML, representación no-prosa hacia el LLM, parser semántico dedicado, «capa universal» como estándar de industria.
 
@@ -72,9 +74,9 @@ Orden de las fases 6–18 según **dependencias técnicas** y **cierre de deuda*
 
 ---
 
-## Fases cerradas (0–5)
+## Fases cerradas (0–13)
 
-Resumen; detalle histórico en commits de cierre.
+Resumen; detalle de entregables en secciones siguientes (fases 6–18).
 
 | Fase | Nombre | Commit cierre |
 |------|--------|---------------|
@@ -84,10 +86,18 @@ Resumen; detalle histórico en commits de cierre.
 | 3 | N5 producción | d733bb7 |
 | 4 | Harness madurez + casos reales | b8de213 |
 | 5 | MCP COE | bf9ddf2 |
+| 6 | CIR formal | dd51755 |
+| 7 | Sincronización documental | 727a182 |
+| 8 | Harness contrato + corpus | 872d5d1 |
+| 9 | L0 v2 | d8fbbc4 |
+| 10 | Presupuesto tokens COE | 81837d7 |
+| 11 | Integración PCM+COE | 594f63b |
+| 12 | HTTP API | b191a62 |
+| 13 | Model Adapter | 8b84bb5 |
 
 ---
 
-## Fases pendientes (6–18)
+## Detalle de fases (6–18)
 
 ### Fase 6 — CIR formal ✅
 
@@ -340,11 +350,11 @@ Temas de [Context Optimization Engine (COE).md](Context%20Optimization%20Engine%
 | 6 | CIR formal | ✅ cerrada | dd51755 |
 | 7 | Sincronización documental | ✅ cerrada | 727a182 |
 | 8 | Harness contrato + corpus | ✅ cerrada | 872d5d1 |
-| 9 | L0 v2 | ✅ cerrada | — |
-| 10 | Presupuesto tokens COE | ✅ cerrada | — |
-| 11 | Integración PCM+COE | ✅ cerrada | — |
-| 12 | HTTP API | ✅ cerrada | — |
-| 13 | Model Adapter | ✅ cerrada | — |
+| 9 | L0 v2 | ✅ cerrada | d8fbbc4 |
+| 10 | Presupuesto tokens COE | ✅ cerrada | 81837d7 |
+| 11 | Integración PCM+COE | ✅ cerrada | 594f63b |
+| 12 | HTTP API | ✅ cerrada | b191a62 |
+| 13 | Model Adapter | ✅ cerrada | 8b84bb5 |
 | 14 | N5 operaciones (TTL) | ⏳ **activa** | — |
 | 15 | Entity linking fuzzy | ⏳ pendiente | — |
 | 16 | Store distribuido | ⏳ pendiente | — |
@@ -399,6 +409,11 @@ flowchart LR
 | 2026-07-05 | Fases 6–18 + Pista I | Cierre de deuda sin presión de fechas; Fase 6 activa; 19 opcional |
 | 2026-07-05 | Fase 6 CIR v1.0 | Envelope, schema, action aristas, document/chunk RAG |
 | 2026-07-05 | Fase 8 harness | case.schema.json, 4 casos, validación loader; release Ollama manual si Ollama local |
+| 2026-07-05 | Cierre Fase 9 L0 v2 | d8fbbc4 — langdetect, TranslationBackend, mixed bundle |
+| 2026-07-05 | Cierre Fase 10 presupuesto | 81837d7 — max_context_tokens, budget/, métricas truncated |
+| 2026-07-05 | Cierre Fase 11 PCM+COE | 594f63b — optimize_with_pcm, perfil coe_pcm_n1_en |
+| 2026-07-05 | Cierre Fase 12 HTTP | b191a62 — FastAPI /optimize, /estimate, /health |
+| 2026-07-05 | Cierre Fase 13 Model Adapter | 8b84bb5 — target_model, adaptadores default/mistral/openai |
 
 ---
 
