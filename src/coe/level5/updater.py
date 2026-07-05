@@ -6,6 +6,7 @@ from ..models import ContextBlock, estimate_tokens
 from .entity_linking import DEFAULT_FUZZY_THRESHOLD, build_alias_map
 from .materialize import blocks_to_context_graph, render_state_view
 from .merge import merge_context_graphs, _clone_graph
+from .glossary import merge_glossary_terms
 from .retention import DEFAULT_MAX_COMMITS, prune_history
 from .state import Commit, RetractRecord, SemanticState, StateView, UpdateResult
 from .store import StateStore, resolve_state_store
@@ -64,6 +65,9 @@ def update_semantic_state(
         alias_map=build_alias_map(blocks),
         fuzzy_link_threshold=fuzzy_link_threshold,
     )
+    glossary_blocks = [block for block in blocks if block.source_type == "glossary"]
+    if glossary_blocks and state.graph is not None:
+        state.graph = merge_glossary_terms(state.graph, glossary_blocks)
     if state.graph is not None:
         prose_body = state.graph.render_prose(locale=loc)
         state.graph.optimized_tokens = estimate_tokens(prose_body)

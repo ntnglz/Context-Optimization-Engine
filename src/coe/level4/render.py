@@ -55,6 +55,12 @@ def graph_to_structured_view(
     for node in nodes:
         if node.kind == "chunk" and node.labels:
             unparsed.append(node.labels[0])
+        if node.kind == "term" and node.labels:
+            translation = str(node.properties.get("translation") or "").strip()
+            if translation:
+                unparsed.append(f"{node.labels[0]}: {translation}")
+            else:
+                unparsed.append(node.labels[0])
 
     return StructuredContext(
         entities=sorted(entities, key=lambda e: e.name),

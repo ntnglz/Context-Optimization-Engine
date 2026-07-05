@@ -65,6 +65,8 @@ def raw_block_to_context_block(raw: dict[str, Any], *, index: int) -> ContextBlo
     source_type = coerce_source_type(raw.get("source_type"))
 
     metadata = dict(raw.get("metadata") or {})
+    if source_type == "glossary":
+        metadata.setdefault("preserve_lang", True)
     if "uri" in raw and raw["uri"] is not None:
         metadata.setdefault("source_uri", raw["uri"])
     if "source_uri" in raw and raw["source_uri"] is not None:

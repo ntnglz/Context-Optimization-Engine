@@ -43,6 +43,9 @@ def ingest_context(
 
     resolved_locale = locale or target_lang or "en"
     blocks = normalize_blocks(blocks, locale=resolved_locale)
+    from .prepare import prepare_blocks
+
+    blocks = prepare_blocks(blocks)
 
     bundle = ContextBundle(
         blocks=blocks,

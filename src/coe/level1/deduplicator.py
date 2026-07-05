@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections import defaultdict
 
 from ..models import ContextBlock, DeduplicationResult, SharedFact, estimate_tokens
+from .code_signature import code_line_signature
 from .normalize import normalize_line, split_lines
 from .render import render_deduplication
 
@@ -37,7 +38,12 @@ def deduplicate_context(
     for block in blocks:
         block_lines[block.id] = []
         for line in split_lines(block.content):
-            key = normalize_line(line)
+            if block.source_type == "code" or block.metadata.get("code_dedup"):
+                key = code_line_signature(line)
+            else:
+                key = normalize_line(line)
+            if not key:
+                continue
             entry = occurrences[key]
             if not entry["canonical"]:
                 entry["canonical"] = line.strip()
