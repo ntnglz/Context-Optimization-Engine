@@ -59,6 +59,16 @@ class OllamaEvaluator:
         try:
             with urllib.request.urlopen(request, timeout=self.timeout_s) as response:
                 raw = response.read().decode("utf-8")
+        except urllib.error.HTTPError as exc:
+            if exc.code == 404:
+                raise ConnectionError(
+                    f"Ollama model or endpoint not found ({url}): {exc}. "
+                    f"Check model name {self.model!r} with `ollama list` or `ollama pull`."
+                ) from exc
+            raise ConnectionError(
+                f"Ollama request failed ({url}): {exc}. "
+                "Is Ollama running? Set OLLAMA_HOST if needed."
+            ) from exc
         except urllib.error.URLError as exc:
             raise ConnectionError(
                 f"Ollama request failed ({url}): {exc}. "

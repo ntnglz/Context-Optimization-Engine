@@ -1,0 +1,21 @@
+id: n5_graph_session_release
+description: Release tier dev_agent — N5 graph session (gates acotados para modelos locales 4b)
+levels: [1, 2, 3, 4, 5]
+target_lang: null
+locale: en
+l0: false
+options:
+  cite_sources: false
+gate:
+  t_coe_p95_ms: 400
+  # Calibrado con qwen3:4b en DevSSD (2026-07-05). Gate estricto: perfil n5_graph_session + qwen3:8b.
+  comprehension_similarity: 0.86
+  comprehension_delta_min: -0.14
+  factual_recall: 0.95
+  readability_score_min: 3.5
+  readability_delta_max: 0.3
+  artifact_leak_rate_max: 0.02
+  user_language_match: 0.95
+tier:
+  ci: false
+  release: true

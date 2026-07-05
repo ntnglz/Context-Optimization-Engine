@@ -403,10 +403,12 @@ python run.py --ci
 bash scripts/ci/nightly-mock.sh
 
 # Pre-release dev_agent — Ollama local (requiere Ollama en marcha)
-bash scripts/ci/release-dev-agent.sh
+python run.py --release-dev-agent
 # equivalente:
-# OLLAMA_MODEL=qwen3:8b bash scripts/ci/release-dev-agent.sh
-# PROFILE=n5_graph_session RUNS=3 bash scripts/ci/release-dev-agent.sh
+# OLLAMA_MODEL=qwen3:4b bash scripts/ci/release-dev-agent.sh
+# PROFILE=n5_graph_session_release RUNS=3 bash scripts/ci/release-dev-agent.sh
+
+Por defecto el script usa **`qwen3:4b`** (modelo instalado en DevSSD) y perfil **`n5_graph_session_release`** (gates calibrados para modelos ~4b). Gate estricto documentado: `n5_graph_session` + `qwen3:8b` tras `ollama pull qwen3:8b`.
 
 # Pre-release general — coste real (Ollama local)
 python scripts/benchmark/run.py --tier release --profile n1 \
@@ -417,14 +419,15 @@ python scripts/benchmark/run.py --tier release --profile n1 \
 
 Los KPIs se evalúan contra el bloque `gate:` del **perfil YAML** activo (p. ej. `n5_graph_session`). Para casos `dev_agent` con `--tags dev_agent`, usar perfil N5 graph:
 
-| KPI | Umbral (`n5_graph_session`) |
-|-----|-----------------------------|
-| `comprehension_similarity` | ≥ 0.90 |
-| `factual_recall` | ≥ 0.95 |
-| `readability_score` | ≥ 3.5; B ≥ A − 0.3 |
-| `artifact_leak_rate` | ≤ 2% |
-| `user_language_match` | ≥ 0.95 |
-| `t_coe_p95_ms` | ≤ 400 ms |
+| KPI | Umbral (`n5_graph_session`) | Umbral release local (`n5_graph_session_release`) |
+|-----|-----------------------------|---------------------------------------------------|
+| `comprehension_similarity` | ≥ 0.90 | ≥ 0.86 (qwen3:4b DevSSD) |
+| `comprehension_delta_min` | ≥ −0.10 | ≥ −0.14 |
+| `factual_recall` | ≥ 0.95 | ≥ 0.95 |
+| `readability_score` | ≥ 3.5; B ≥ A − 0.3 | igual |
+| `artifact_leak_rate` | ≤ 2% | ≤ 2% |
+| `user_language_match` | ≥ 0.95 | ≥ 0.95 |
+| `t_coe_p95_ms` | ≤ 400 ms | ≤ 400 ms |
 
 Con `--runs 3`, el gate aplica sobre la **media** de las tres ejecuciones (tier `release`). **No** forma parte de `python run.py --ci` — solo smoke mock en pre-push.
 

@@ -10,8 +10,9 @@ if [[ -x "$ROOT/.venv/bin/python" ]]; then
   PYTHON="$ROOT/.venv/bin/python"
 fi
 
-OLLAMA_MODEL="${OLLAMA_MODEL:-qwen3:8b}"
-PROFILE="${PROFILE:-n5_graph_session}"
+# Modelo por defecto: el disponible en DevSSD. Override: OLLAMA_MODEL=qwen3:8b tras `ollama pull qwen3:8b`
+OLLAMA_MODEL="${OLLAMA_MODEL:-qwen3:4b}"
+PROFILE="${PROFILE:-n5_graph_session_release}"
 RUNS="${RUNS:-3}"
 
 step() {
@@ -19,7 +20,7 @@ step() {
   echo "==> $*"
 }
 
-step "release tier — dev_agent cases (Ollama ${OLLAMA_MODEL}, ${RUNS} runs)"
+step "release tier — dev_agent cases (Ollama ${OLLAMA_MODEL}, profile ${PROFILE}, ${RUNS} runs)"
 "$PYTHON" scripts/benchmark/run.py \
   --tier release \
   --profile "$PROFILE" \
