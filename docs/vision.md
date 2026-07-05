@@ -66,6 +66,7 @@ PCM y COE son complementarios (repos independientes). Integración runtime: [exe
 
 | Vía | Contenido |
 |-----|-----------|
+| **Fase 20** | README, getting-started, FAQ, STATUS, ejemplos — [execution-plan.md](execution-plan.md) |
 | **Pista I** | ML, CIR→LLM, parser semántico — solo con benchmark A/B favorable ([execution-plan.md](execution-plan.md)) |
 | **Enmienda al plan** | Nuevo trabajo producto requiere fila en execution-plan + aprobación |
 | **Despliegue / adopción** | HTTP, MCP, stores SQLite en producción |

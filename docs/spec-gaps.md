@@ -108,6 +108,7 @@ Excepción v1: flag `include_pending_turn=true` si merge difiere de commit (work
 | Normalizer zh + locale pack | 17 ✅ |
 | Ingest `structured` / `code` | 18 ✅ |
 | CIR v1.1 Opción B (`stage` N1–N3) | 19 🚫 omitida |
+| Docs visitante / integrador | 20 ⏳ |
 
 ---
 
@@ -134,6 +135,7 @@ Excepción v1: flag `include_pending_turn=true` si merge difiere de commit (work
 | 17 | `SQLiteStateStore` | 16 ✅ |
 | 18 | Locale pack `zh` | 17 ✅ |
 | 19 | Ingest structured/code/glossary | 18 ✅ |
+| 20 | Docs visitante e integrador | 20 ⏳ |
 
 Checklist spec:
 
@@ -141,6 +143,7 @@ Checklist spec:
 - [x] Plan fases 0–5 cerrado
 - [x] Plan fases 6–18 cerradas (commits en execution-plan.md)
 - [x] Producto v1 completo (fases 0–18 ✅; Fase 19 omitida)
+- [ ] Docs visitante e integrador (Fase 20 — README, getting-started, FAQ, STATUS, ejemplos)
 
 ---
 

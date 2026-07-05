@@ -424,6 +424,7 @@ Ver [execution-plan.md](execution-plan.md) para entregables, criterios de hecho 
 | 17 | Locale `zh` | ✅ |
 | 18 | Ingest structured/code | ✅ |
 | 19 | CIR v1.1 Opción B | 🚫 omitida |
+| 20 | Docs visitante e integrador | ⏳ **activa** |
 | I | Investigación (ML, CIR→LLM) | sin fase |
 
 ### Histórico (fases A–F originales)

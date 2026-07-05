@@ -8,7 +8,7 @@ Contexto bruto (N bloques)  →  COE  →  Representación compacta  →  LLM
 
 ## Estado
 
-> Orden de trabajo: [execution-plan.md](docs/execution-plan.md) · **Producto v1 cerrado (fases 0–18 ✅)** · Fase 19 omitida
+> Orden de trabajo: [execution-plan.md](docs/execution-plan.md) · **Producto v1 cerrado (fases 0–18 ✅)** · activa: **Fase 20** (docs visitante)
 
 | Componente | Spec | Implementación |
 |------------|------|----------------|

@@ -24,8 +24,9 @@ Orden de las fases 6–18 según **dependencias técnicas** y **cierre de deuda*
 4. **Superficies de integración en orden** — MCP ✅ → PCM+COE ✅ → HTTP ✅ → Model Adapter ✅ (Fases 5, 11–13).
 5. **N5 escala tras CIR** — TTL, fuzzy linking y store remoto asumen envelope y merge probados.
 6. **Investigación explícita** — hipótesis no validadas (ML, CIR hacia LLM) fuera del producto v1; pista I al final.
+7. **Adopción tras v1** — documentación de visitante/integrador (Fase 20) antes de nuevas features o Pista I.
 
-**Producto v1 cerrado (fases 0–18 ✅).** CIR v1.1 (Fase 19) **omitida** — sin demanda de interoperabilidad por stage.
+**Producto v1 cerrado (fases 0–18 ✅).** CIR v1.1 (Fase 19) **omitida**. **Fase activa:** **20 — Docs visitante e integrador**.
 
 **Deuda cerrada (fases 0–18):** núcleo L0→N5, CIR v1.0, harness, MCP, HTTP, PCM+COE, Model Adapter, N5 operaciones, fuzzy linking, SQLite store, locale `zh`, ingest structured/code/glossary.
 
@@ -57,13 +58,14 @@ Orden de las fases 6–18 según **dependencias técnicas** y **cierre de deuda*
 | Locale `zh` | ✅ | ✅ | **17** |
 | Ingest structured/code/glossary | ✅ | ✅ | **18** |
 | CIR v1.1 (stage N1–N3) | — | 🚫 omitida | **19** |
-| Docs/README al día | ✅ | ✅ | **7** |
+| Docs visitante / integrador | ⏳ | ⏳ | **20** ⏳ **activa** |
+| Docs/README al día (specs) | ✅ | ✅ | **7** |
 
 ---
 
 ## Reglas de ejecución estricta
 
-1. **Plan producto v1 cerrado.** Fases 0–18 ✅. Nuevo trabajo producto → enmienda + fila en progreso.
+1. **Fase activa: 20 (docs visitante).** Producto v1 (fases 0–18) cerrado. Nuevo trabajo producto o Pista I → enmienda + fila en progreso.
 2. **Sin saltos** (durante el plan 0–18; histórico).
 3. **Cierre de fase** = todos los entregables ✅ + CI PASS + fila actualizada a `✅` + commit con `CI: PASS antes de push`.
 4. **Enmiendas.** Si hace falta desviarse, primero se edita este archivo (sección «Enmiendas») y el usuario aprueba.
@@ -322,6 +324,38 @@ Resumen; detalle de entregables en secciones siguientes (fases 6–18).
 
 ---
 
+### Fase 20 — Documentación visitante e integrador ⏳ **activa**
+
+**Objetivo:** Reorganizar la documentación del repo para que un visitante de GitHub (sin conocer N1–N5) pueda **entender, probar e integrar** COE en minutos. Separar **producto/adopción** (README, guías) de **diseño/mantenimiento** (specs, execution-plan).
+
+**Audiencias:**
+
+| Audiencia | Necesita | No necesita (en portada) |
+|-----------|----------|---------------------------|
+| Visitante GitHub | Qué es, before/after, quickstart | Tabla spec vs implementación |
+| Integrador (RAG, agente) | MCP, HTTP, `levels`, `session_id`, `source_type` | CIR, lowering, merge N5 |
+| Maintainer | execution-plan, architecture, level1–5 | — |
+
+| Entregable | Criterio de hecho |
+|------------|-------------------|
+| **README.md** reordenado | Arriba: propuesta + diagrama + 3 caminos (librería / MCP / HTTP) + ejemplo before/after con tokens; abajo: enlaces. Tabla de estado **fuera** del primer pantallazo |
+| **`docs/getting-started.md`** | Guía por tareas: RAG one-shot, sesión N5 multi-turn, L0 ES→EN, structured/code/glossary, PCM+COE, Cursor MCP, `curl` HTTP |
+| **`docs/STATUS.md`** (o equivalente) | Tabla spec/implementación + fases cerradas; enlace desde README en sección «Para mantenedores» |
+| **`docs/FAQ.md`** | ≥8 preguntas: ¿resume?, ¿reemplaza RAG?, cuándo `levels`, cuándo `session_id`, MCP vs HTTP, relación PCM, limitaciones heurísticas |
+| **Ejemplos** | `data/examples/`: al menos MCP JSON, HTTP body, sesión N5, bloque `structured`/`code`/`glossary` |
+| **Consistencia docs** | Corregir desalineaciones conocidas: `architecture.md` §6 (modelo de datos), conteo tests en README, licencia |
+| **`LICENSE`** | MIT formalizado (README ya lo declara) |
+| **`CHANGELOG.md`** | Entrada v1.0.0 producto (fases 0–18) |
+| **Enlaces cruzados** | `vision.md` → getting-started; architecture §7 → getting-started (no duplicar curl/MCP enteros) |
+
+**Fuera de alcance Fase 20:** reescribir level1–5; Pista I; `pyproject.toml` / PyPI (opcional enmienda posterior); Docker (opcional enmienda posterior).
+
+**Gate:** revisión manual «visitante limpio» (clonar → README → demo o MCP en &lt;15 min) + `python run.py --ci` PASS si solo docs/ejemplos.
+
+**Requiere:** Fases 0–18 ✅.
+
+---
+
 ## Pista I — Investigación (sin fase obligatoria)
 
 Temas de [Context Optimization Engine (COE).md](Context%20Optimization%20Engine%20(COE).md) § visión largo plazo **no** son deuda de producto v1:
@@ -361,6 +395,7 @@ Temas de [Context Optimization Engine (COE).md](Context%20Optimization%20Engine%
 | 17 | Locale `zh` | ✅ cerrada | 6ec6435 |
 | 18 | Ingest structured/code | ✅ cerrada | 2c91a7e |
 | 19 | CIR v1.1 Opción B | 🚫 omitida | — |
+| 20 | Docs visitante e integrador | ⏳ **activa** | — |
 
 **Leyenda:** ⏳ pendiente · 🔄 en curso · ✅ cerrada · 📝 diferido · 🚫 omitida
 
@@ -384,6 +419,7 @@ flowchart LR
     F17[17 zh]
     F18[18 Ingest]
     F19[19 CIR v1.1]
+    F20[20 Docs visitante]
 
     F6 --> F16
     F6 --> F19
@@ -396,7 +432,10 @@ flowchart LR
     F6 --> F14
     F14 --> F15
     F15 --> F16
+    F18 --> F20
 ```
+
+> **Fase 20** (docs visitante): post-v1; depende del cierre 0–18, no de código nuevo.
 
 ---
 
@@ -414,6 +453,7 @@ flowchart LR
 | 2026-07-05 | Cierre Fase 11 PCM+COE | 594f63b — optimize_with_pcm, perfil coe_pcm_n1_en |
 | 2026-07-05 | Cierre Fase 12 HTTP | b191a62 — FastAPI /optimize, /estimate, /health |
 | 2026-07-05 | Cierre Fase 13 Model Adapter | 8b84bb5 — target_model, adaptadores default/mistral/openai |
+| 2026-07-05 | Fase 20 docs visitante | Reorganizar README, getting-started, STATUS, FAQ y ejemplos para adopción GitHub |
 | 2026-07-05 | Producto v1 cerrado; Fase 19 omitida | Fases 0–18 ✅; CIR v1.1 sin demanda; Pista I para investigación |
 | 2026-07-05 | Cierre Fase 18 ingest structured/code/glossary | 2c91a7e — flatten JSON/CSV/log, code dedup, N5 glossary |
 | 2026-07-05 | Cierre Fase 17 locale zh | 6ec6435 — pack zh, segmentación, L0 EN→ZH stub, benchmark n1_n2_zh |
@@ -436,3 +476,6 @@ flowchart LR
 | [benchmark-harness.md](benchmark-harness.md) | Spec Fase 8 |
 | [benchmark-ollama.md](benchmark-ollama.md) | Evaluadores Ollama fast vs quality |
 | [level5.md](level5.md) | Spec Fases 14–16 |
+| [getting-started.md](getting-started.md) | **Fase 20** — guía integrador (visitante) |
+| [STATUS.md](STATUS.md) | **Fase 20** — tabla spec/implementación (maintainers) |
+| [FAQ.md](FAQ.md) | **Fase 20** — preguntas frecuentes adopción |
